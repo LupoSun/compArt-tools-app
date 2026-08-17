@@ -204,6 +204,7 @@
             <li><a href="#canvas">Canvas Controls</a></li>
           </ul>
         </li>
+        <li><a href="#layers">Layers</a></li>
         <li><a href="#requirements">System Requirements</a></li>
         <li><a href="#file">File &amp; Export</a></li>
         <li><a href="#troubleshooting">Troubleshooting</a></li>
@@ -232,6 +233,8 @@
         <li><strong>Blob</strong> – closed shapes. Click-drag to draw; releases seal the shape.</li>
         <li><strong>Line</strong> – open polylines. Click-drag to draw</li>
         <li><strong>Circle</strong> – draw a repulsion circle. Drag sets radius; blobs avoid inside. Wrap blobs around circles to create controlled shapes.</li>
+        <li><strong>Rectangle</strong> – drag to size a rectangle. Corners are pinned so the shape holds its geometry while its edges still breathe.</li>
+        <li><strong>Triangle</strong> – drag to size an isosceles triangle, apex centred on the top edge. Corners are pinned as with the rectangle.</li>
       </ul>
       <p>Active tool shows an "ON" badge on its icon.</p>
     </section>
@@ -284,6 +287,8 @@
     <section id="shortcuts">
       <h2>Keyboard</h2>
       <ul>
+        <li><kbd>Q</kbd> Blob · <kbd>W</kbd> Line · <kbd>E</kbd> Circle · <kbd>T</kbd> Rectangle · <kbd>Y</kbd> Triangle · <kbd>R</kbd> Particles</li>
+        <li><kbd>A</kbd> Drag · <kbd>S</kbd> Freeze · <kbd>D</kbd> Pin · <kbd>Z</kbd> Slice · <kbd>X</kbd> Delete</li>
         <li><kbd>Mouse‑Wheel</kbd> over canvas / slider – adjust Blob Size smoothly.</li>
         <li><kbd>Space</kbd> – Freezes animation -> toggles Excitability to 0 and back.</li>
       </ul>
@@ -292,13 +297,34 @@
       <h2>File &amp; Export</h2>
       <h3>File Menu</h3>
       <ul>
-        <li>Save Blobs – saves shapes + settings to JSON.</li>
+        <li>Save Blobs – saves shapes + settings (including layers) to JSON.</li>
         <li>Load Blobs – import shapes + settings from JSON.</li>
+        <li>Import SVG – open an Illustrator SVG. Top-level groups become layers,
+            per-shape fill colours are kept, and hidden groups arrive hidden.
+            Imported layers start with physics off so the artwork matches the
+            source file; switch a layer's physics on when you want it to move.</li>
       </ul>
       <h3>Export Menu</h3>
       <ul>
         <li>Lines → SVG/JPG – strokes only.</li>
         <li>Fill → SVG/JPG – fills closed shapes.</li>
+        <li>Background Color – when on, exports paint the canvas background colour
+            instead of white. Toggle it from the Export menu.</li>
+      </ul>
+      <p>Exported SVGs write one group per layer, named the way Illustrator names
+         its own, so opening the file in Illustrator reconstructs the layers.</p>
+    </section>
+
+    <section id="layers">
+      <h2>Layers</h2>
+      <ul>
+        <li>New shapes are drawn onto the highlighted layer. Click a layer to make it active.</li>
+        <li>Double-click a layer name to rename it. Names carry through to SVG export.</li>
+        <li><strong>◉ / ○</strong> – show or hide the layer. Hidden layers cannot be picked.</li>
+        <li><strong>🔓 / 🔒</strong> – lock the layer. Locked shapes cannot be dragged, pinned, frozen, sliced or deleted.</li>
+        <li><strong>◈ / ◇</strong> – per-layer physics. Switch it off to hold a layer perfectly
+            still while the rest of the canvas keeps moving — useful for crisp geometric shapes.</li>
+        <li><strong>▲</strong> – move the layer up one step. The top of the list draws last.</li>
       </ul>
     </section>
     <section id="requirements">

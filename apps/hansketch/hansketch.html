@@ -239,105 +239,21 @@ body::before {
 }
 
 #exportSubmenu {
-  width: 160px;
+  width: 190px;
+}
+
+/* Menu rows that toggle a setting rather than firing an action. Separated from the
+   action rows above so it reads as an option, not a third export format. */
+.submenu-toggle {
+  border-top: 1px solid var(--hairline);
+  font-size: 11px;
+  opacity: 0.85;
+}
+.submenu-toggle.is-off {
+  opacity: 0.5;
 }
 #fileSubmenu {
   width: 200px;
-}
-
-/* Movement-to-form research controls. Kept compact so they remain a tool,
-   rather than turning the sketchbook into a literal pose editor. */
-.movement-research-section {
-  border-top: 1px solid var(--hairline);
-  padding-top: var(--sp-3);
-}
-
-.movement-research-section button,
-.movement-research-section select,
-.movement-research-section input {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 30px;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-sm);
-  background: var(--panel);
-  color: var(--ink);
-  font: inherit;
-}
-
-.movement-research-section button {
-  cursor: pointer;
-  padding: 5px 7px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.movement-research-section button:hover {
-  border-color: var(--hairline-strong);
-  background: var(--panel-2);
-}
-
-.movement-research-section .movement-primary {
-  background: var(--ink);
-  color: var(--panel);
-  border-color: var(--ink);
-}
-
-.movement-research-section .movement-primary:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.movement-research-section .movement-status {
-  color: var(--ink-3);
-  font-size: 10px;
-  line-height: 1.35;
-}
-
-.movement-research-section .movement-field {
-  display: grid;
-  gap: 3px;
-  font-size: 10px;
-  color: var(--ink-3);
-}
-
-.movement-research-section .movement-field + .movement-field,
-.movement-research-section .movement-row,
-.movement-research-section .movement-actions,
-.movement-research-section .movement-overlay {
-  margin-top: 7px;
-}
-
-.movement-research-section .movement-row,
-.movement-research-section .movement-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-
-.movement-research-section .movement-overlay {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 7px;
-  font-size: 10px;
-  color: var(--ink-2);
-}
-
-.movement-research-section .movement-overlay label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-}
-
-.movement-research-section .movement-overlay input {
-  width: auto;
-  min-height: 0;
-  accent-color: var(--accent);
-}
-
-.movement-research-section .movement-conditional[hidden] {
-  display: none;
 }
 
 /* Shape + motion binding stays deliberately compact in the toolbar. The
@@ -502,6 +418,167 @@ body::before {
 
 .topology-note {
   margin: 0;
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+/* ── Layers panel ─────────────────────────────────────────────
+   Topmost layer sits at the top of the list, matching Illustrator, so the
+   list order is the reverse of the layers[] array. */
+.layer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: var(--sp-1);
+}
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 5px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--panel);
+  cursor: pointer;
+}
+.layer-row.is-active {
+  border-color: var(--accent-ring);
+  background: var(--accent-soft);
+}
+.layer-row .layer-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--ink);
+}
+.layer-row.is-hidden .layer-name {
+  color: var(--ink-3);
+  text-decoration: line-through;
+}
+/* Per-row toggles. Kept as flat glyph buttons so a row of four does not
+   out-shout the tool icons above it. */
+.layer-row button {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+}
+.layer-row button:hover {
+  background: var(--panel-2);
+  opacity: 1;
+}
+.layer-row button.is-on {
+  opacity: 1;
+  color: var(--accent);
+}
+.layer-actions {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--sp-1);
+}
+.layer-actions button {
+  flex: 1;
+  padding: 5px 6px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--panel);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.layer-actions button:hover {
+  border-color: var(--hairline-strong);
+  color: var(--ink);
+}
+.layer-note {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+/* ── Imported palette (hansketch.color from Color Extractor) ───────────── */
+.palette-block {
+  margin-top: var(--sp-2);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--hairline);
+}
+.palette-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.palette-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.palette-head button {
+  flex: none;
+  padding: 3px 7px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--panel);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.palette-head button:hover {
+  border-color: var(--hairline-strong);
+  color: var(--ink);
+}
+/* Swatches wrap rather than scroll: a palette is usually 5-20 colors, and
+   seeing all of them at once is the point. */
+.palette-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.palette-swatches:empty {
+  display: none;
+}
+.palette-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.palette-swatch:hover {
+  transform: scale(1.12);
+}
+.palette-swatch.is-active {
+  box-shadow: 0 0 0 2px var(--accent-ring);
+}
+.palette-note {
+  margin: 6px 0 0;
   color: var(--ink-3);
   font-size: 10px;
   line-height: 1.35;
@@ -1248,6 +1325,10 @@ canvas {
 }
 .canvas-circle-mode {
   cursor: url("images/wrap.png"), auto;
+}
+/* Primitives are drag-to-size, so a crosshair reads better than the pencil. */
+.canvas-shape-mode {
+  cursor: crosshair;
 }
 .canvas-attractor-mode,
 .canvas-repulsor-mode {
@@ -3478,7 +3559,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 					<div class="submenu" id="fileSubmenu">
 						<span id="saveBlobsOption">Save Blobs (JSON)</span>
 						<span id="loadBlobsOption">Load Blobs (JSON)</span>
-						<span id="importMovementOption">Import Movement JSON</span>
+						<span id="importSVGOption">Import SVG (Illustrator)</span>
 						<span id="presentationModeOption">Presentation Mode</span>
 					</div>
 				</span>
@@ -3486,6 +3567,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 					<div class="submenu" id="exportSubmenu">
 						<span id="exportSVGOption">SVG</span>
 						<span id="exportJPGOption">JPG</span>
+						<span id="exportBackgroundToggle" class="submenu-toggle">Background Color ✓</span>
 					</div>
 				</span>
 				<span id="menuPresets">Presets</span>
@@ -3522,6 +3604,8 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 						<div class="icon" id="iconCircle" data-label="Circle (E)">
 							<img src="images/wrap.png" alt="Circle Mode" />
 						</div>
+					<div class="icon" id="iconRect" data-label="Rectangle (T)">▭</div>
+					<div class="icon" id="iconTriangle" data-label="Triangle (Y)">△</div>
 					<div class="icon" id="iconParticle" data-label="Particles (R)">✦</div>
 					<div class="icon" id="iconAttractorRepulsor" data-label="Attractor/Repulsor">
 						<img src="images/repulse.png" alt="Attractor/Repulsor" style="opacity: 0.7;" />
@@ -3563,6 +3647,28 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 							<input type="number" id="radiusAvgInput" min="0.0" max="20" step="0.2" value="5">
 						</div>
 					</div>
+
+					<!-- Palette imported from Color Extractor (hansketch.color) -->
+					<div class="palette-block">
+						<div class="palette-head">
+							<span class="palette-title" id="paletteName">Palette</span>
+							<button id="paletteLoadBtn" title="Load a palette exported from Color Extractor">Load</button>
+							<button id="paletteClearBtn" title="Clear the palette" style="display:none;">✕</button>
+						</div>
+						<div class="palette-swatches" id="paletteSwatches"></div>
+						<p class="palette-note" id="paletteNote">Load a palette from Color Extractor.</p>
+					</div>
+				</div>
+
+				<!-- LAYERS -->
+				<div class="toolbar-section" id="layersSection">
+					<h4>Layers</h4>
+					<div class="layer-list" id="layerList"></div>
+					<div class="layer-actions">
+						<button id="layerAddBtn" title="Add a layer above the active one">+ Layer</button>
+						<button id="layerDeleteBtn" title="Delete the active layer and everything on it">Delete</button>
+					</div>
+					<p class="layer-note">Drawing goes to the highlighted layer.</p>
 				</div>
 
 				<!-- CANVAS TOOLS -->
@@ -3592,76 +3698,6 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 					<p>Bind an abstract shape to continuous dance motion.</p>
 				</div>
 
-				<!-- MOVEMENT-TO-FORM RESEARCH -->
-				<div class="toolbar-section movement-research-section" id="movementResearchSection">
-					<h4>Legacy movement → form</h4>
-					<button id="movementImportBtn">Import Movement JSON</button>
-					<div class="movement-status" id="movementResearchStatus">Import a Movement Extractor JSON to begin.</div>
-
-					<div class="movement-field">
-						<label for="movementExperiment">Experiment</label>
-						<select id="movementExperiment" disabled>
-							<option value="anatomy">A · Stochastic anatomy</option>
-							<option value="hull">B · Temporal hull</option>
-						</select>
-					</div>
-					<div class="movement-field">
-						<label for="movementDancer">Dancer / track</label>
-						<select id="movementDancer" disabled></select>
-					</div>
-					<div class="movement-field">
-						<label for="movementReleaseTime">Release frame · seconds</label>
-						<select id="movementReleaseTime" disabled></select>
-					</div>
-
-					<div id="movementAnatomyControls">
-						<div class="movement-row">
-							<div class="movement-field"><label for="movementMergeCount">Bubbles</label><input id="movementMergeCount" type="number" min="1" max="6" value="3"></div>
-							<div class="movement-field"><label for="movementSeed">Seed</label><input id="movementSeed" type="number" min="1" max="99999" value="17"></div>
-						</div>
-						<div class="movement-field"><label for="movementMergeCharacter">Merge character</label><select id="movementMergeCharacter"><option value="mixed">Mixed</option><option value="local">Local</option><option value="dislocated">Dislocated</option></select></div>
-						<div class="movement-field"><label for="movementInflation">Inflation · px</label><input id="movementInflation" type="number" min="4" max="100" value="22"></div>
-					</div>
-
-					<div id="movementHullControls" class="movement-conditional" hidden>
-						<div class="movement-field"><label for="movementJoint">Body part trajectory</label><select id="movementJoint"><option value="left_wrist">Left wrist</option><option value="right_wrist">Right wrist</option><option value="left_ankle">Left ankle</option><option value="right_ankle">Right ankle</option><option value="body_center">Body centre</option></select></div>
-						<div class="movement-field"><label for="movementTrajectoryStart">Trajectory start · seconds</label><select id="movementTrajectoryStart"></select></div>
-						<div class="movement-row">
-							<div class="movement-field"><label for="movementHullThickness">Hull thickness</label><input id="movementHullThickness" type="number" min="2" max="100" value="18"></div>
-							<div class="movement-field"><label for="movementMemory">Memory / impulse</label><input id="movementMemory" type="number" min="0" max="100" value="70"></div>
-						</div>
-					</div>
-
-					<div class="movement-actions">
-						<button id="movementGenerateBtn" class="movement-primary" disabled>Generate form</button>
-						<button id="movementReshuffleBtn" disabled>Reshuffle</button>
-					</div>
-					<div class="movement-row">
-						<div class="movement-field"><label for="movementForceMode">Charge</label><select id="movementForceMode"><option value="impulse">Impulse</option><option value="pulse">Short pulse</option><option value="drive">Continuous</option></select></div>
-						<div class="movement-field"><label for="movementStrength">Strength</label><input id="movementStrength" type="number" min="0.01" max="1" step="0.01" value="0.12"></div>
-					</div>
-					<div class="movement-actions">
-						<button id="movementReleaseBtn" class="movement-primary" disabled>Release movement</button>
-						<button id="movementClearBtn" disabled>Clear generated</button>
-					</div>
-
-					<div class="movement-overlay">
-						<label><input id="movementOverlayEnabled" type="checkbox"> View overlay</label>
-						<label><input id="movementOverlaySource" type="checkbox" checked> Source geometry</label>
-						<label><input id="movementOverlayTrajectory" type="checkbox" checked> Trajectory</label>
-						<label><input id="movementOverlayVelocity" type="checkbox" checked> Velocity</label>
-						<label><input id="movementExportComparison" type="checkbox"> Comparison export</label>
-					</div>
-					<div class="movement-field"><label for="movementCaption">Export caption</label><input id="movementCaption" type="text" placeholder="optional research note"></div>
-					<div class="movement-row">
-						<button id="movementExportPngBtn" disabled>Export PNG</button>
-						<button id="movementRecordWebmBtn" disabled>Record WebM</button>
-					</div>
-					<div class="movement-row">
-						<div class="movement-field"><label for="movementRecordSeconds">Record · sec</label><input id="movementRecordSeconds" type="number" min="1" max="20" value="6"></div>
-						<button id="movementRecordGifBtn" disabled>Record Miro GIF</button>
-					</div>
-				</div>
 			</div>
 
 			<!-- Main Drawing Area -->
@@ -6129,6 +6165,92 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 			// ───── Unified Pointer Events (mouse + touch + Pencil) ─────
 			let activePointerId = null;
 
+			/* -----------------------------------
+			   PRIMITIVE SHAPES (rectangle / triangle)
+			----------------------------------- */
+			// Drag-to-size primitives. Unlike freehand blobs these begin as exact geometry,
+			// so the corner vertices are pinned — otherwise spring and turgor forces round
+			// the shape off within a second of it landing on the canvas. Edges stay
+			// unpinned so the shape still breathes and collides like everything else.
+			let isShapeDrawing = false;
+			let shapeStartX = 0, shapeStartY = 0, shapeCurX = 0, shapeCurY = 0;
+
+			const SHAPE_EDGE_SPACING = 12; // px between generated vertices along an edge
+			const SHAPE_MIN_SIZE = 8;      // ignore accidental click-sized drags
+
+			function isShapeMode(m) { return m === "rect" || m === "triangle"; }
+
+			// Walk the outline emitting evenly spaced vertices, pinning each corner.
+			function buildPolygonChain(corners) {
+				const pts = [];
+				for (let i = 0; i < corners.length; i++) {
+					const a = corners[i];
+					const b = corners[(i + 1) % corners.length];
+					const len = Math.hypot(b.x - a.x, b.y - a.y);
+					const steps = Math.max(1, Math.round(len / SHAPE_EDGE_SPACING));
+					for (let s = 0; s < steps; s++) {
+						const t = s / steps;
+						pts.push({
+							x: a.x + (b.x - a.x) * t,
+							y: a.y + (b.y - a.y) * t,
+							vx: 0, vy: 0,
+							pinned: s === 0 // the corner itself
+						});
+					}
+				}
+				// Closed chains repeat their first point, matching freehand blob creation.
+				pts.push({ ...pts[0] });
+				return pts;
+			}
+
+			function rectCorners(x0, y0, x1, y1) {
+				const minX = Math.min(x0, x1), maxX = Math.max(x0, x1);
+				const minY = Math.min(y0, y1), maxY = Math.max(y0, y1);
+				return [
+					{ x: minX, y: minY }, { x: maxX, y: minY },
+					{ x: maxX, y: maxY }, { x: minX, y: maxY }
+				];
+			}
+
+			// Isosceles triangle inscribed in the drag rectangle: apex centred on the top
+			// edge, base spanning the bottom — the same construction Illustrator uses.
+			function triangleCorners(x0, y0, x1, y1) {
+				const minX = Math.min(x0, x1), maxX = Math.max(x0, x1);
+				const minY = Math.min(y0, y1), maxY = Math.max(y0, y1);
+				return [
+					{ x: (minX + maxX) / 2, y: minY },
+					{ x: maxX, y: maxY },
+					{ x: minX, y: maxY }
+				];
+			}
+
+			function currentShapeCorners() {
+				return (drawMode === "rect")
+					? rectCorners(shapeStartX, shapeStartY, shapeCurX, shapeCurY)
+					: triangleCorners(shapeStartX, shapeStartY, shapeCurX, shapeCurY);
+			}
+
+			function commitShape() {
+				const w = Math.abs(shapeCurX - shapeStartX);
+				const h = Math.abs(shapeCurY - shapeStartY);
+				if (w < SHAPE_MIN_SIZE || h < SHAPE_MIN_SIZE) return false;
+
+				let r = globalRadiusAvg + (Math.random() * 2 - 1) * globalRadiusVar;
+				if (r < 1) r = 1;
+
+				chains.push({
+					chain: buildPolygonChain(currentShapeCorners()),
+					color: hexToRGBA(colorInput.value),
+					baseDotRadius: r,
+					isClosed: true,
+					frozen: false
+				});
+				history.push({ type: "chain" });
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+				return true;
+			}
+
 			canvas.addEventListener("pointerdown", (e) => {
 				if (!isPrimaryPointer(e)) return;
 				e.preventDefault();
@@ -6273,6 +6395,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 					const pickRadius = 20; // same radius you use in mousedown
 
 					for (let c = 0; c < chains.length; c++) {
+						if (!isChainPickable(chains[c])) continue;
 						const ch = chains[c].chain;
 						for (let i = 0; i < ch.length; i++) {
 							const dx = x - ch[i].x;
@@ -6303,6 +6426,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 				  const pickRadius = 20;
 
 				  for (let c = 0; c < chains.length; c++) {
+				    if (!isChainPickable(chains[c])) continue;
 				    const ch = chains[c].chain;
 				    for (let i = 0; i < ch.length; i++) {
 				      const dot = ch[i];
@@ -6334,6 +6458,15 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 
 
 
+
+				// Start a drag-to-size primitive
+				if (isShapeMode(drawMode) && !dragMode) {
+					isShapeDrawing = true;
+					shapeStartX = shapeCurX = x;
+					shapeStartY = shapeCurY = y;
+					SFX.blobDraw(colorInput.value);
+					return;
+				}
 
 				if ((drawMode === 'blob' || drawMode === 'line') && !dragMode) {
 					isDrawing = true;
@@ -6467,6 +6600,13 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 					}
 					return; // swallow move while resizing
 				}
+				// live-size an in-progress primitive
+				if (isShapeDrawing && isShapeMode(drawMode)) {
+					shapeCurX = x;
+					shapeCurY = y;
+					return;
+				}
+
 				// draw path (blob/line)
 				if (isDrawing && (drawMode === 'blob' || drawMode === 'line')) {
 					const last = currentPathPoints[currentPathPoints.length - 1];
@@ -6548,6 +6688,12 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 					currentCircle = null;
 					draggingCircleIndex = null;
 					circleInfo.style.display = "none";
+				}
+
+				// Finalize a drag-to-size primitive
+				if (isShapeDrawing && isShapeMode(drawMode)) {
+					if (commitShape()) SFX.blobComplete(colorInput.value);
+					isShapeDrawing = false;
 				}
 
 				if (isDrawing && currentPathPoints.length > 2 &&
@@ -6976,6 +7122,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 				for (let i = 0; i < chains.length; i++) {
 					const ch = chains[i];
 					if (!ch.isClosed) continue;
+					if (!isChainPickable(ch)) continue;
 					if (pointInPolygon(x, y, ch.chain)) hits.push(i);
 				}
 				if (hits.length) {
@@ -7021,6 +7168,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 				// Delete chains (blobs, lines, particles) if any vertex is inside the lasso
 				for (let k = chains.length - 1; k >= 0; k--) {
 					const obj = chains[k];
+					if (!isChainPickable(obj)) continue;
 					const inside = obj.chain.some(p => pointInPolygon(p.x, p.y, lasso));
 					if (inside) {
 						chains.splice(k, 1);
@@ -7043,6 +7191,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 				for (let i = 0; i < chains.length; i++) {
 					const ch = chains[i];
 					if (!ch.isClosed) continue;
+					if (!isChainPickable(ch)) continue;
 					if (pointInPolygon(x, y, ch.chain)) hits.push(i);
 				}
 				if (hits.length) {
@@ -7068,6 +7217,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 
 				for (let k = 0; k < chains.length; k++) {
 					const obj = chains[k];
+					if (!isChainPickable(obj)) continue;
 					let inside = false;
 					if (obj.isClosed) {
 						let sx = 0, sy = 0;
@@ -7369,7 +7519,7 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 			----------------------------------- */
 
 			/* 1. Canvas draw-mode */
-			let drawMode = 'blob'; // 'blob' | 'line' | 'circle' | 'attractor' | 'repulsor' | 'particle'
+			let drawMode = 'blob'; // 'blob' | 'line' | 'circle' | 'rect' | 'triangle' | 'attractor' | 'repulsor' | 'particle'
 			let attractorRepulsorType = null; // 'attractor' | 'repulsor' | null
 
 			/* Particle emitter settings */
@@ -7379,8 +7529,116 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 			let particleEmitTimer = null;    // interval timer for emission
 
 			/* 2. Geometry collections */
-			const chains = []; // { chain:[…], color, baseDotRadius, isClosed, frozen }
+			const chains = []; // { chain:[…], color, baseDotRadius, isClosed, frozen, layerId }
 			const attractorsRepulsors = []; // { path: [{x, y}], type: 'attractor' | 'repulsor' }
+
+			/* 2b. Layers
+			   Layers are a flat registry plus a layerId on each chain — chains[] itself stays
+			   one flat array so the physics loop, spatial hash, and particle batching are
+			   completely untouched. Draw order is kept intrinsic by re-grouping chains[] by
+			   layer whenever layer order changes, rather than sorting every frame.
+			   layers[0] is the BOTTOM layer, drawn first. */
+			const layers = []; // { id, name, visible, locked, physicsEnabled }
+			const _layerById = new Map(); // id -> layer, rebuilt by refreshLayerIndex()
+			let activeLayerId = 1;
+			let _nextLayerId = 1;
+			let _needsLayerRegroup = false; // set when a new chain lands out of layer order
+
+			function refreshLayerIndex() {
+				_layerById.clear();
+				for (const l of layers) _layerById.set(l.id, l);
+			}
+
+			function createLayer(name) {
+				const layer = {
+					id: _nextLayerId++,
+					name: name || `Layer ${layers.length + 1}`,
+					visible: true,
+					locked: false,
+					physicsEnabled: true
+				};
+				layers.push(layer);
+				refreshLayerIndex();
+				return layer;
+			}
+
+			function getActiveLayer() {
+				return _layerById.get(activeLayerId) || layers[0];
+			}
+
+			// Chains from older scenes (and any created before a layer existed) fall back to
+			// the bottom layer rather than vanishing.
+			function layerOf(chainObj) {
+				return _layerById.get(chainObj.layerId) || layers[0];
+			}
+
+			function isChainVisible(chainObj) {
+				const l = layerOf(chainObj);
+				return !l || l.visible;
+			}
+
+			function isChainLocked(chainObj) {
+				const l = layerOf(chainObj);
+				return !!(l && l.locked);
+			}
+
+			// A chain can be grabbed, pinned, sliced, frozen or deleted only when its layer is
+			// both visible and unlocked — you should never hit something you cannot see.
+			function isChainPickable(chainObj) {
+				const l = layerOf(chainObj);
+				if (!l) return true;
+				return l.visible && !l.locked;
+			}
+
+			// The single predicate every force function consults. Folding per-layer physics
+			// into the existing `frozen` checkpoints means attractors, noise, circle repulsion
+			// and inter-chain repulsion all honour it without each growing its own test.
+			function isChainStatic(chainObj) {
+				if (chainObj.frozen) return true;
+				const l = layerOf(chainObj);
+				return !!(l && !l.physicsEnabled);
+			}
+
+			// Assign one freshly created chain to the active layer.
+			function assignChainToActiveLayer(chainObj) {
+				chainObj.layerId = activeLayerId;
+				// A new chain lands at the end of chains[], which is only the right place when
+				// the active layer is already the topmost one; otherwise flag a regroup.
+				if (layers.length > 1 && activeLayerId !== layers[layers.length - 1].id) {
+					_needsLayerRegroup = true;
+				}
+			}
+
+			// Claim every chain that has not been assigned yet. The render loop normally does
+			// this for free, but it must also run immediately before activeLayerId changes:
+			// otherwise a chain created and a layer switched within the same frame would be
+			// stamped with the new layer instead of the one it was drawn on.
+			function stampUnassignedChains() {
+				for (let i = 0; i < chains.length; i++) {
+					if (chains[i].layerId === undefined) assignChainToActiveLayer(chains[i]);
+				}
+			}
+
+			// Keep chains[] physically grouped by layer so array order == draw order.
+			// Stable within a layer, so relative order of shapes on a layer is preserved.
+			function reorderChainsByLayer() {
+				if (layers.length < 2) return;
+				const rank = new Map();
+				layers.forEach((l, i) => rank.set(l.id, i));
+				const fallback = layers.length; // unknown layerId sinks to the bottom-most group
+				const decorated = chains.map((c, i) => ({ c, i, r: rank.has(c.layerId) ? rank.get(c.layerId) : fallback }));
+				decorated.sort((a, b) => (a.r - b.r) || (a.i - b.i));
+				for (let i = 0; i < decorated.length; i++) chains[i] = decorated[i].c;
+				// Chain indices moved: spline cache is index-keyed and GPU textures are packed
+				// in array order, so both must be invalidated.
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
+			// Seed the default layer. Scenes that carry their own layer list replace this.
+			createLayer("Layer 1");
+			activeLayerId = layers[0].id;
 
 			// PERFORMANCE: Cache splines to avoid recalculating when blobs haven't moved
 			const splineCache = new Map(); // chainIndex -> { spline, hash }
@@ -7457,21 +7715,6 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 			const circles = []; // { x, y, radius }
 			let history = []; // undo stack
 
-			// Movement Extractor data is deliberately held separately from hand-drawn
-			// geometry. Generated chains carry only the compact force field they need.
-			const movementResearch = {
-				data: null,
-				dataName: "",
-				selectedTrackId: null,
-				overlay: { enabled: false, source: true, trajectory: true, velocity: true },
-				overlayData: { sourceSegments: [], trajectories: [], velocityFields: [], releasePoint: null, label: "" },
-				lastExperiment: null,
-				hullColorIndex: 0,
-				forceUntil: 0,
-				driveActive: false,
-				recording: false
-			};
-
 			// Binding Studio keeps source assets separate from the simulation. Only
 			// compact point weights and rest positions are placed on chains, which
 			// makes a saved scene portable without embedding image/video pixels.
@@ -7530,6 +7773,9 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 			let showFilled = true; // Show filled area
 			let outlineWidth = 4; // Width of outline/border
 			let canvasBackgroundColor = [0.75, 0.80, 0.67, 1.0]; // Canvas background color [r, g, b, a]
+			// When true, SVG/JPG exports paint canvasBackgroundColor behind the artwork instead
+			// of the legacy hardcoded white. Toggled from the Export menu, persisted in scenes.
+			let exportWithBackground = true;
 			let showGrid = true; // Show grid on canvas
 			let selfPerforationEnabled = false;
 			let selfIntersectionCheckFrame = 0;
@@ -7596,6 +7842,10 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 			let globalRadiusAvg = 5,
 				globalRadiusVar = 0;
 
+			/* 9b. Imported palette (hansketch.color) */
+			let palette = [];        // ["#rrggbb", ...] in the producer's order
+			let paletteLabel = "";   // palette name from the document, for the panel header
+
 				let turgorPressure = 0.0; // 0..1 — 0 = no inflation, 1 = max
 
 			// --- Gravity Mode ---
@@ -7605,6 +7855,135 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 
 			/* 9. UI element references */
 			const colorInput = $("blobColor");
+
+			/* -----------------------------------
+			   PALETTE (hansketch.color interop)
+			-----------------------------------
+			   Reads the palette Color Extractor exports. The contract lives at
+			   contracts/hansketch.color.md; the reader is deliberately more permissive
+			   than the contract requires, because the loose shapes below predate it and
+			   users have files in those forms already. */
+
+			const HEX_RE = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+
+			function normaliseHex(value) {
+				if (typeof value !== "string") return null;
+				const m = value.trim().match(HEX_RE);
+				if (!m) return null;
+				let h = m[1];
+				if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+				return "#" + h.toLowerCase();
+			}
+
+			// Returns { colors, label } or null when nothing usable was found.
+			function parsePaletteDocument(text, fileName) {
+				const fallbackLabel = (fileName || "").replace(/\.(palette\.)?(json|txt)$/i, "");
+				let data = null;
+				try { data = JSON.parse(text); } catch (e) { data = null; }
+
+				// Not JSON: accept the Color Extractor's .txt export by scraping hex tokens.
+				if (data === null) {
+					const found = (text.match(/#[0-9a-f]{6}\b/gi) || []).map(normaliseHex).filter(Boolean);
+					return found.length ? { colors: [...new Set(found)], label: fallbackLabel } : null;
+				}
+
+				// A document that declares a different format is a mistake, not a palette.
+				if (data && typeof data === "object" && !Array.isArray(data) &&
+				    typeof data.format === "string" && data.format !== "hansketch.color") {
+					return null;
+				}
+
+				// hansketch.color, or any { colors: [...] } object.
+				let list = null;
+				let label = fallbackLabel;
+				if (data && typeof data === "object" && !Array.isArray(data) && Array.isArray(data.colors)) {
+					list = data.colors;
+					if (typeof data.name === "string" && data.name.trim()) label = data.name.trim();
+				} else if (Array.isArray(data)) {
+					// Either a bare hex array, or an array of saved combinations.
+					if (data.length && typeof data[0] === "object" && data[0] && Array.isArray(data[0].colors)) {
+						list = data.flatMap(c => c.colors);
+						if (data.length === 1 && typeof data[0].name === "string") label = data[0].name;
+					} else {
+						list = data;
+					}
+				}
+				if (!Array.isArray(list)) return null;
+
+				const colors = list
+					.map(entry => normaliseHex(typeof entry === "string" ? entry : entry && entry.hex))
+					.filter(Boolean);
+				return colors.length ? { colors, label } : null;
+			}
+
+			function renderPalette() {
+				const strip = $("paletteSwatches");
+				const note = $("paletteNote");
+				const clearBtn = $("paletteClearBtn");
+				const title = $("paletteName");
+				if (!strip) return;
+
+				strip.textContent = "";
+				const active = normaliseHex(colorInput.value);
+
+				palette.forEach(hex => {
+					const b = document.createElement("button");
+					b.className = "palette-swatch" + (hex === active ? " is-active" : "");
+					b.style.background = hex;
+					b.title = hex;
+					b.onclick = () => {
+						colorInput.value = hex;
+						renderPalette();
+					};
+					strip.appendChild(b);
+				});
+
+				title.textContent = paletteLabel ? `Palette · ${paletteLabel}` : "Palette";
+				clearBtn.style.display = palette.length ? "" : "none";
+				note.textContent = palette.length
+					? `${palette.length} color${palette.length === 1 ? "" : "s"} — click to draw with one.`
+					: "Load a palette from Color Extractor.";
+			}
+
+			function applyPaletteDocument(text, fileName) {
+				const parsed = parsePaletteDocument(text, fileName);
+				if (!parsed) {
+					toast("No colors found in that file.", 2500);
+					return;
+				}
+				palette = parsed.colors;
+				paletteLabel = parsed.label || "";
+				renderPalette();
+				toast(`Loaded ${palette.length} color${palette.length === 1 ? "" : "s"}.`, 2000);
+			}
+
+			$("paletteLoadBtn").onclick = () => {
+				const fi = document.createElement("input");
+				fi.type = "file";
+				fi.accept = ".json,application/json,.txt,text/plain";
+				fi.style.display = "none";
+				document.body.appendChild(fi);
+				fi.onchange = ev => {
+					const file = ev.target.files && ev.target.files[0];
+					if (!file) { fi.remove(); return; }
+					const reader = new FileReader();
+					reader.onload = e => { applyPaletteDocument(String(e.target.result), file.name); fi.remove(); };
+					reader.onerror = () => { toast("Could not read that file.", 2500); fi.remove(); };
+					reader.readAsText(file);
+				};
+				fi.click();
+			};
+
+			$("paletteClearBtn").onclick = () => {
+				palette = [];
+				paletteLabel = "";
+				renderPalette();
+			};
+
+			// Keep the active-swatch ring in sync when the color is changed by the picker.
+			colorInput.addEventListener("input", renderPalette);
+
+			renderPalette();
 			$("selfIntersectionToggle").addEventListener("change", event => {
 				selfPerforationEnabled = event.target.checked;
 				toast(selfPerforationEnabled ? "Self-intersection perforation is armed." : "Self-intersection perforation is off.");
@@ -7711,6 +8090,8 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 			  toggleActiveIcon($("iconBlob"), false);
 			  toggleActiveIcon($("iconLine"), false);
 			  toggleActiveIcon($("iconCircle"), false);
+			  toggleActiveIcon($("iconRect"), false);
+			  toggleActiveIcon($("iconTriangle"), false);
 			  toggleActiveIcon($("iconParticle"), false);
 			  toggleActiveIcon($("iconAttractorRepulsor"), false);
 			}
@@ -7723,6 +8104,8 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 			  toggleActiveIcon($("iconBlob"),   drawMode === "blob");
 			  toggleActiveIcon($("iconLine"),   drawMode === "line");
 			  toggleActiveIcon($("iconCircle"), drawMode === "circle");
+			  toggleActiveIcon($("iconRect"), drawMode === "rect");
+			  toggleActiveIcon($("iconTriangle"), drawMode === "triangle");
 			  toggleActiveIcon($("iconParticle"), drawMode === "particle");
 			  toggleActiveIcon($("iconAttractorRepulsor"), drawMode === "attractor" || drawMode === "repulsor");
 
@@ -9146,7 +9529,12 @@ body.fullscreen-mode .filmstrip-panel.panel-hidden::before {
 				const totalDuration = filmstripData.frames.length * frameDuration;
 
 				// Create SVG with animation - use capture area dimensions if set
-				const svgParts = [`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${scaledExportWidth} ${scaledExportHeight}" style="background:white;">`];
+				const svgParts = [`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${scaledExportWidth} ${scaledExportHeight}">`];
+
+				// Painted background rect — see exportSVG() for why a style attribute is not enough.
+				if (exportWithBackground) {
+					svgParts.push(`<rect x="0" y="0" width="${scaledExportWidth}" height="${scaledExportHeight}" fill="${getExportBackgroundCSS()}" />`);
+				}
 
 				// Create a hidden master timeline that repeats indefinitely
 				// This will be used to synchronize all frame animations
@@ -10407,6 +10795,113 @@ window.addEventListener("keydown", (e) => {
 			$("iconBlob").onclick = () => setDrawMode('blob');
 			$("iconLine").onclick   = () => setDrawMode("line");
 			$("iconCircle").onclick = () => setDrawMode("circle");
+			$("iconRect").onclick = () => setDrawMode("rect");
+			$("iconTriangle").onclick = () => setDrawMode("triangle");
+
+			/* -----------------------------------
+			   LAYERS PANEL
+			----------------------------------- */
+			// The list is rendered top-down (topmost layer first) to match Illustrator, which
+			// is the reverse of layers[] where index 0 is the bottom, drawn first.
+			function renderLayerPanel() {
+				const list = $("layerList");
+				if (!list) return;
+				list.textContent = "";
+
+				for (let i = layers.length - 1; i >= 0; i--) {
+					const layer = layers[i];
+					const row = document.createElement("div");
+					row.className = "layer-row"
+						+ (layer.id === activeLayerId ? " is-active" : "")
+						+ (layer.visible ? "" : " is-hidden");
+					row.onclick = () => {
+						stampUnassignedChains(); // shapes drawn just now belong to the old layer
+						activeLayerId = layer.id;
+						renderLayerPanel();
+					};
+
+					const name = document.createElement("span");
+					name.className = "layer-name";
+					name.textContent = layer.name;
+					name.title = "Double-click to rename";
+					name.ondblclick = e => {
+						e.stopPropagation();
+						const next = prompt("Layer name:", layer.name);
+						if (next && next.trim()) {
+							layer.name = next.trim();
+							renderLayerPanel();
+						}
+					};
+					row.appendChild(name);
+
+					// Glyph toggles: visibility, lock, physics, and raise-one-step.
+					const addBtn = (glyph, on, title, fn) => {
+						const b = document.createElement("button");
+						b.textContent = glyph;
+						b.title = title;
+						if (on) b.classList.add("is-on");
+						b.onclick = e => { e.stopPropagation(); fn(); };
+						row.appendChild(b);
+						return b;
+					};
+
+					addBtn(layer.visible ? "◉" : "○", layer.visible,
+						layer.visible ? "Hide layer" : "Show layer",
+						() => { layer.visible = !layer.visible; renderLayerPanel(); });
+
+					addBtn(layer.locked ? "🔒" : "🔓", layer.locked,
+						layer.locked ? "Unlock layer" : "Lock layer",
+						() => { layer.locked = !layer.locked; renderLayerPanel(); });
+
+					addBtn(layer.physicsEnabled ? "◈" : "◇", layer.physicsEnabled,
+						layer.physicsEnabled ? "Physics on — click to freeze layer" : "Physics off — click to animate layer",
+						() => { layer.physicsEnabled = !layer.physicsEnabled; renderLayerPanel(); });
+
+					addBtn("▲", false, "Move layer up", () => {
+						if (i >= layers.length - 1) return;
+						const t = layers[i]; layers[i] = layers[i + 1]; layers[i + 1] = t;
+						refreshLayerIndex();
+						reorderChainsByLayer();
+						renderLayerPanel();
+					});
+
+					list.appendChild(row);
+				}
+			}
+
+			$("layerAddBtn").onclick = () => {
+				stampUnassignedChains(); // shapes drawn just now belong to the old layer
+				const layer = createLayer();
+				activeLayerId = layer.id;
+				reorderChainsByLayer();
+				renderLayerPanel();
+				toast(`Added ${layer.name}`, 1200);
+			};
+
+			$("layerDeleteBtn").onclick = () => {
+				if (layers.length <= 1) {
+					toast("Cannot delete the last layer", 1500);
+					return;
+				}
+				stampUnassignedChains(); // so just-drawn shapes are counted and removed too
+				const layer = getActiveLayer();
+				const doomed = chains.filter(c => c.layerId === layer.id).length;
+				if (doomed > 0 && !confirm(`Delete "${layer.name}" and its ${doomed} shape${doomed === 1 ? "" : "s"}?`)) return;
+
+				for (let i = chains.length - 1; i >= 0; i--) {
+					if (chains[i].layerId === layer.id) chains.splice(i, 1);
+				}
+				layers.splice(layers.indexOf(layer), 1);
+				refreshLayerIndex();
+				activeLayerId = layers[layers.length - 1].id;
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+				history.push({ type: "chain" });
+				renderLayerPanel();
+			};
+
+			renderLayerPanel();
 
 			// Particle emitter icon — show settings dialog
 			$("iconParticle").onclick = () => {
@@ -10547,6 +11042,7 @@ window.addEventListener("keydown", (e) => {
 					"canvas-blob-mode",
 					"canvas-line-mode",
 					"canvas-circle-mode",
+					"canvas-shape-mode",
 					"canvas-particle-mode",
 					"canvas-attractor-mode",
 					"canvas-repulsor-mode",
@@ -10560,6 +11056,7 @@ window.addEventListener("keydown", (e) => {
 				if (drawMode === 'blob') canvas.classList.add("canvas-blob-mode");
 				if (drawMode === 'line') canvas.classList.add("canvas-line-mode");
 				if (drawMode === 'circle') canvas.classList.add("canvas-circle-mode");
+			if (drawMode === 'rect' || drawMode === 'triangle') canvas.classList.add("canvas-shape-mode");
 				if (drawMode === 'particle') canvas.classList.add("canvas-particle-mode");
 				if (drawMode === 'attractor') canvas.classList.add("canvas-attractor-mode");
 				if (drawMode === 'repulsor') canvas.classList.add("canvas-repulsor-mode");
@@ -10586,12 +11083,20 @@ window.addEventListener("keydown", (e) => {
 			        globalRadiusAvg,
 			        globalRadiusVar,
 			        colorValue: colorInput.value,
+			        // Imported palette travels with the scene so a saved sketch reopens
+			        // with the same swatches to hand.
+			        palette: palette.slice(),
+			        paletteLabel,
 			        turgorPressure,      // NEW: 0..1
 			        // Appearance settings
 			        showOutline,
 			        showFilled,
 			        outlineWidth,
 				canvasBackgroundColor,
+				exportWithBackground,
+				// Layers travel with the scene; chains carry their own layerId.
+				layers: layers.map(l => ({ ...l })),
+				activeLayerId,
 				showGrid,
 				selfPerforationEnabled,
 				travelingSegmentEnabled,
@@ -10606,7 +11111,6 @@ window.addEventListener("keydown", (e) => {
 				canvasPhysicalWidthMm,
 				canvasPhysicalHeightMm,
 				canvasDpi,
-				movementResearch: movementSerializableState(),
 				movementBinding: movementBindingSerializableState()
 			    };
 			}
@@ -10640,23 +11144,40 @@ window.addEventListener("keydown", (e) => {
 				}
 				if (typeof obj.currentLineThickness === "number") {
 					currentLineThickness = obj.currentLineThickness;
-					$("iconThickness").title = (currentLineThickness === 1) ?
-						"Line Thickness: Thin" :
-						"Line Thickness: Thick";
-					$("iconThickness").style.fontWeight = (currentLineThickness === 5) ? "bold" : "normal";
-					$("iconThickness").style.backgroundColor = (currentLineThickness === 5) ? "#D3D3D3" : "";
-					toggleActiveIcon($("iconThickness"), currentLineThickness > 1);
+					// The thickness icon was removed from the toolbar but this block still
+					// addressed it, so every scene carrying currentLineThickness — i.e. every
+					// scene saved with settings — threw here. applySettings is called inside a
+					// try/catch that only console.warns, so the failure was invisible and every
+					// setting after this point was silently dropped on load.
+					const thicknessIcon = $("iconThickness");
+					if (thicknessIcon) {
+						thicknessIcon.title = (currentLineThickness === 1) ?
+							"Line Thickness: Thin" :
+							"Line Thickness: Thick";
+						thicknessIcon.style.fontWeight = (currentLineThickness === 5) ? "bold" : "normal";
+						thicknessIcon.style.backgroundColor = (currentLineThickness === 5) ? "#D3D3D3" : "";
+						toggleActiveIcon(thicknessIcon, currentLineThickness > 1);
+					}
 				}
 				if (typeof obj.globalRadiusAvg === "number") {
 					globalRadiusAvg = obj.globalRadiusAvg;
-					$("radiusAvgInput").value = obj.globalRadiusAvg;
+					const el = $("radiusAvgInput");
+					if (el) el.value = obj.globalRadiusAvg;
 				}
 				if (typeof obj.globalRadiusVar === "number") {
 					globalRadiusVar = obj.globalRadiusVar;
-					$("radiusVarInput").value = obj.globalRadiusVar;
+					// radiusVarInput is no longer in the toolbar; guarded the same way its
+					// listener setup already is further down.
+					const el = $("radiusVarInput");
+					if (el) el.value = obj.globalRadiusVar;
 				}
 				if (typeof obj.colorValue === "string") {
 					colorInput.value = obj.colorValue;
+				}
+				if (Array.isArray(obj.palette)) {
+					palette = obj.palette.map(normaliseHex).filter(Boolean);
+					paletteLabel = typeof obj.paletteLabel === "string" ? obj.paletteLabel : "";
+					renderPalette();
 				}
 				if (typeof obj.turgorPressure === "number") {
 			    // clamp just in case incoming JSON is slightly out of range
@@ -10687,6 +11208,32 @@ window.addEventListener("keydown", (e) => {
 				if (canvasBackgroundColor.length === 3) canvasBackgroundColor.push(1.0); // Add alpha if missing
 				gl.clearColor(canvasBackgroundColor[0], canvasBackgroundColor[1], canvasBackgroundColor[2], canvasBackgroundColor[3]);
 				updateTextColorsForBackground();
+			}
+			if (typeof obj.exportWithBackground === "boolean") {
+				exportWithBackground = obj.exportWithBackground;
+				refreshExportBackgroundToggle();
+			}
+			// Layers. Scenes saved before layers existed have none, in which case the default
+			// single layer is kept and their chains fall back onto it via layerOf().
+			if (Array.isArray(obj.layers) && obj.layers.length) {
+				stampUnassignedChains(); // pin pre-existing chains to the layer they were drawn on
+				layers.length = 0;
+				obj.layers.forEach(l => {
+					layers.push({
+						id: l.id,
+						name: l.name || `Layer ${layers.length + 1}`,
+						visible: l.visible !== false,
+						locked: !!l.locked,
+						physicsEnabled: l.physicsEnabled !== false
+					});
+				});
+				refreshLayerIndex();
+				_nextLayerId = Math.max(...layers.map(l => l.id)) + 1;
+				activeLayerId = _layerById.has(obj.activeLayerId)
+					? obj.activeLayerId
+					: layers[layers.length - 1].id;
+				reorderChainsByLayer();
+				renderLayerPanel();
 			}
 			if (typeof obj.showGrid === "boolean") {
 				showGrid = obj.showGrid;
@@ -10725,7 +11272,6 @@ window.addEventListener("keydown", (e) => {
 			if (typeof obj.canvasDpi === "number" && obj.canvasDpi > 0) {
 				canvasDpi = obj.canvasDpi;
 			}
-			if (obj.movementResearch) movementRestoreState(obj.movementResearch);
 			if (obj.movementBinding) movementBindingRestoreState(obj.movementBinding);
 			if (typeof obj.canvasPhysicalWidthMm === "number" &&
 			    typeof obj.canvasPhysicalHeightMm === "number" &&
@@ -10763,6 +11309,7 @@ window.addEventListener("keydown", (e) => {
 				$("saveOptionsBackdrop").style.display = "none";
 
 			$("confirmSaveBtn").onclick = () => {
+				stampUnassignedChains(); // don't persist chains that never got a layer
 				const payload = {};
 				if ($("saveIncludeChains").checked) payload.chains = chains;
 				if ($("saveIncludeCircles").checked) payload.circles = circles;
@@ -10777,6 +11324,30 @@ window.addEventListener("keydown", (e) => {
 
 			/* ---------- IMPORT (file ➜ dialog) ---------- */
 			let pendingImport = null; // temp storage
+
+			$("importSVGOption").onclick = e => {
+				e.stopPropagation();
+				$("fileSubmenu").style.display = "none";
+
+				const fi = document.createElement("input");
+				fi.type = "file";
+				fi.accept = ".svg,image/svg+xml";
+				fi.style.display = "none";
+				document.body.appendChild(fi);
+
+				fi.onchange = ev => {
+					const file = ev.target.files && ev.target.files[0];
+					if (!file) { fi.remove(); return; }
+					const reader = new FileReader();
+					reader.onload = evt => {
+						importSVGText(String(evt.target.result), file.name);
+						fi.remove();
+					};
+					reader.onerror = () => { toast("Could not read that file.", 2500); fi.remove(); };
+					reader.readAsText(file);
+				};
+				fi.click();
+			};
 
 			$("loadBlobsOption").onclick = e => {
 				e.stopPropagation();
@@ -10894,9 +11465,6 @@ window.addEventListener("keydown", (e) => {
 				$("importOptionsBackdrop").style.display = "none";
 			};
 
-			/* -----------------------------------
-			   MOVEMENT → FORM RESEARCH
-			----------------------------------- */
 			/* -----------------------------------
 			   SHAPE + MOTION BINDING STUDIO
 			----------------------------------- */
@@ -11049,7 +11617,7 @@ window.addEventListener("keydown", (e) => {
 				};
 				chains.push(chain);
 				movementBinding.shapes.push({ id, name: name || "Shape JSON", shape, transform, chainId });
-				movementInvalidateGeometry();
+				bindingInvalidateGeometry();
 				bindingRefreshUI();
 				toast(`Shape imported with ${holes.length ? `${holes.length} internal ${holes.length === 1 ? "hole" : "holes"}` : "no internal holes"}.`);
 				return movementBinding.shapes[movementBinding.shapes.length - 1];
@@ -11624,7 +12192,7 @@ window.addEventListener("keydown", (e) => {
 				bindingRefreshPaintOptions();
 				bindingUpdateStudioStatus(`${binding.mapping === "semantic" ? "Semantic anchors" : binding.mapping === "spatial" ? "Spatial correspondence" : "Energy field"} mapped across the outer contour and ${chain.holes?.length || 0} hole ring${chain.holes?.length === 1 ? "" : "s"}.`);
 				bindingDrawMap();
-				movementInvalidateGeometry();
+				bindingInvalidateGeometry();
 				return binding;
 			}
 
@@ -11950,461 +12518,12 @@ window.addEventListener("keydown", (e) => {
 					context.beginPath(); context.arc(mapX(jointX[jointIndex]), mapY(jointY[jointIndex]), 3, 0, Math.PI * 2); context.fill();
 				}
 			}
-			const movementPartSpecs = [
-				{ id: "head", links: [["left_ear", "right_ear"], ["nose", "left_ear"], ["nose", "right_ear"]] },
-				{ id: "torso", links: [["left_shoulder", "right_shoulder"], ["left_shoulder", "left_hip"], ["right_shoulder", "right_hip"], ["left_hip", "right_hip"]] },
-				{ id: "left arm", links: [["left_shoulder", "left_elbow"], ["left_elbow", "left_wrist"]] },
-				{ id: "right arm", links: [["right_shoulder", "right_elbow"], ["right_elbow", "right_wrist"]] },
-				{ id: "left leg", links: [["left_hip", "left_knee"], ["left_knee", "left_ankle"]] },
-				{ id: "right leg", links: [["right_hip", "right_knee"], ["right_knee", "right_ankle"]] }
-			];
-			const movementPalette = ["#e34a33", "#2e78c7", "#2f9c69", "#d09b2c", "#8656a7", "#cc5f91"];
-
-			function movementFormatTime(time) {
-				return `${Number(time).toFixed(3)} s`;
-			}
-
-			function movementMapPoint(point) {
-				return { x: point.x * canvas.width, y: point.y * canvas.height };
-			}
-
-			function movementHexColor(hex, alpha = 1) {
-				const value = (hex || "#e34a33").replace("#", "");
-				return [parseInt(value.slice(0, 2), 16) / 255, parseInt(value.slice(2, 4), 16) / 255, parseInt(value.slice(4, 6), 16) / 255, alpha];
-			}
-
-			function movementRandom(seed) {
-				let state = (Number(seed) || 1) >>> 0;
-				return () => {
-					state = (state * 1664525 + 1013904223) >>> 0;
-					return state / 4294967296;
-				};
-			}
-
-			function movementHull(points) {
-				if (points.length < 3) return points.slice();
-				const sorted = points.slice().sort((a, b) => a.x - b.x || a.y - b.y);
-				const cross = (origin, a, b) => (a.x - origin.x) * (b.y - origin.y) - (a.y - origin.y) * (b.x - origin.x);
-				const lower = [];
-				for (const point of sorted) {
-					while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], point) <= 0) lower.pop();
-					lower.push(point);
-				}
-				const upper = [];
-				for (let i = sorted.length - 1; i >= 0; i--) {
-					const point = sorted[i];
-					while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], point) <= 0) upper.pop();
-					upper.push(point);
-				}
-				upper.pop();
-				lower.pop();
-				return lower.concat(upper);
-			}
-
-			function movementResampleClosed(points, count = 24) {
-				if (points.length < 3) return points;
-				const lengths = [];
-				let total = 0;
-				for (let i = 0; i < points.length; i++) {
-					const a = points[i], b = points[(i + 1) % points.length];
-					const length = Math.hypot(b.x - a.x, b.y - a.y);
-					lengths.push(length);
-					total += length;
-				}
-				const result = [];
-				for (let n = 0; n < count; n++) {
-					let distance = total * n / count;
-					for (let i = 0; i < points.length; i++) {
-						if (distance <= lengths[i] || i === points.length - 1) {
-							const a = points[i], b = points[(i + 1) % points.length];
-							const ratio = lengths[i] ? distance / lengths[i] : 0;
-							result.push({ x: a.x + (b.x - a.x) * ratio, y: a.y + (b.y - a.y) * ratio });
-							break;
-						}
-						distance -= lengths[i];
-					}
-				}
-				return result;
-			}
-
-			function movementCapsuleCloud(points, radius) {
-				const cloud = [];
-				for (const point of points) {
-					for (let i = 0; i < 8; i++) {
-						const angle = Math.PI * 2 * i / 8;
-						cloud.push({ x: point.x + Math.cos(angle) * radius, y: point.y + Math.sin(angle) * radius });
-					}
-				}
-				return cloud;
-			}
-
-			function movementNearestSampleIndex(timestamp) {
-				const samples = movementResearch.data?.samples || [];
-				let low = 0, high = samples.length - 1;
-				while (low < high) {
-					const mid = (low + high) >> 1;
-					if (samples[mid].timestamp < timestamp) low = mid + 1;
-					else high = mid;
-				}
-				if (low > 0 && Math.abs(samples[low - 1].timestamp - timestamp) < Math.abs(samples[low].timestamp - timestamp)) return low - 1;
-				return low;
-			}
-
-			function movementDancerAt(trackId, timestamp) {
-				const samples = movementResearch.data?.samples || [];
-				const center = movementNearestSampleIndex(timestamp);
-				for (let distance = 0; distance < 18; distance++) {
-					for (const index of [center - distance, center + distance]) {
-						const sample = samples[index];
-						const dancer = sample?.dancers?.find(item => item.trackId === trackId);
-						if (dancer) return { dancer, sample, index };
-					}
-				}
-				return null;
-			}
-
-			function movementPointFromDancer(dancer, name) {
-				if (!dancer) return null;
-				if (name === "body_center") return dancer.derived?.bodyCenter || null;
-				const landmark = dancer.landmarks?.find(item => item.name === name && item.score >= 0.25);
-				return landmark ? { x: landmark.x, y: landmark.y } : null;
-			}
-
-			function movementVelocity(trackId, name, timestamp) {
-				const samples = movementResearch.data?.samples || [];
-				const center = movementNearestSampleIndex(timestamp);
-				let before = null, after = null;
-				for (let offset = 1; offset < 24 && (!before || !after); offset++) {
-					if (!before) {
-						const sample = samples[center - offset];
-						const dancer = sample?.dancers?.find(item => item.trackId === trackId);
-						const point = movementPointFromDancer(dancer, name);
-						if (point) before = { point, timestamp: sample.timestamp };
-					}
-					if (!after) {
-						const sample = samples[center + offset];
-						const dancer = sample?.dancers?.find(item => item.trackId === trackId);
-						const point = movementPointFromDancer(dancer, name);
-						if (point) after = { point, timestamp: sample.timestamp };
-					}
-				}
-				if (!before || !after) return { vx: 0, vy: 0 };
-				const duration = after.timestamp - before.timestamp;
-				if (duration <= 0) return { vx: 0, vy: 0 };
-				return {
-					vx: (after.point.x - before.point.x) * canvas.width / duration,
-					vy: (after.point.y - before.point.y) * canvas.height / duration
-				};
-			}
-
-			function movementSnapshot(trackId, timestamp) {
-				const found = movementDancerAt(trackId, timestamp);
-				if (!found) return null;
-				const landmark = name => {
-					const point = movementPointFromDancer(found.dancer, name);
-					if (!point) return null;
-					return { name, ...movementMapPoint(point), ...movementVelocity(trackId, name, found.sample.timestamp) };
-				};
-				return { found, landmark };
-			}
-
-			function movementAddGeneratedChain(points, fields, color, metadata) {
-				const nearestField = point => fields.reduce((closest, field) => {
-					const currentDistance = (field.x - point.x) ** 2 + (field.y - point.y) ** 2;
-					return currentDistance < closest.distance ? { field, distance: currentDistance } : closest;
-				}, { field: { vx: 0, vy: 0 }, distance: Infinity }).field;
-				const chain = points.map(point => {
-					const field = nearestField(point);
-					return { x: point.x, y: point.y, vx: 0, vy: 0, pinned: false, movementVx: field.vx || 0, movementVy: field.vy || 0 };
-				});
-				chains.push({
-					chain,
-					color: movementHexColor(color),
-					baseDotRadius: globalRadiusAvg,
-					isClosed: true,
-					frozen: false,
-					isMovementGenerated: true,
-					movementMeta: metadata
-				});
-				history.push({ type: "chain" });
-			}
-
-			function movementInvalidateGeometry() {
+			function bindingInvalidateGeometry() {
 				splineCache.clear();
 				spatialHashCache.needsRebuild = true;
 				_gpuTexturesDirty = true;
 			}
 
-			function movementSourceParts(trackId, timestamp) {
-				const snapshot = movementSnapshot(trackId, timestamp);
-				if (!snapshot) return null;
-				const parts = movementPartSpecs.map(spec => {
-					const links = spec.links.map(([a, b]) => {
-						const start = snapshot.landmark(a), end = snapshot.landmark(b);
-						return start && end ? { start, end } : null;
-					}).filter(Boolean);
-					const fields = [];
-					links.forEach(link => fields.push(link.start, link.end));
-					return { id: spec.id, links, fields };
-				}).filter(part => part.fields.length);
-				return { parts, timestamp: snapshot.found.sample.timestamp };
-			}
-
-			function movementGenerateAnatomy() {
-				const trackId = $("movementDancer").value;
-				const timestamp = Number($("movementReleaseTime").value);
-				const source = movementSourceParts(trackId, timestamp);
-				if (!source || !source.parts.length) throw new Error("No reliable body structure exists at this release frame.");
-				const count = Math.max(1, Math.min(source.parts.length, Number($("movementMergeCount").value) || 3));
-				const character = $("movementMergeCharacter").value;
-				const random = movementRandom($("movementSeed").value);
-				const ordered = source.parts.slice();
-				if (character !== "local") {
-					for (let i = ordered.length - 1; i > 0; i--) {
-						const swap = Math.floor(random() * (i + 1));
-						[ordered[i], ordered[swap]] = [ordered[swap], ordered[i]];
-					}
-				}
-				const groups = Array.from({ length: count }, () => []);
-				ordered.forEach((part, index) => groups[character === "local" ? Math.min(count - 1, Math.floor(index * count / ordered.length)) : index % count].push(part));
-				const inflation = Number($("movementInflation").value) || 22;
-				const colorOffset = Math.floor(random() * movementPalette.length);
-				const segments = [];
-				const fields = [];
-				groups.forEach((group, groupIndex) => {
-					const points = [];
-					const groupFields = [];
-					group.forEach(part => part.links.forEach(link => {
-						segments.push({ start: link.start, end: link.end, color: movementPalette[(colorOffset + groupIndex) % movementPalette.length] });
-						points.push(link.start, link.end);
-						groupFields.push(link.start, link.end);
-					}));
-					if (points.length < 2) return;
-					const hull = movementHull(movementCapsuleCloud(points, inflation));
-					if (hull.length >= 3) {
-						movementAddGeneratedChain(movementResampleClosed(hull, 28), groupFields, movementPalette[(colorOffset + groupIndex) % movementPalette.length], {
-							experiment: "stochastic-anatomy", parts: group.map(part => part.id), timestamp: source.timestamp, seed: Number($("movementSeed").value) || 1
-						});
-					}
-					fields.push(...groupFields);
-				});
-				movementResearch.overlayData = {
-					sourceSegments: segments,
-					trajectories: [],
-					velocityFields: fields,
-					releasePoint: fields[0] || null,
-					label: `Stochastic anatomy · ${movementFormatTime(source.timestamp)} · seed ${$("movementSeed").value}`
-				};
-				movementResearch.lastExperiment = "anatomy";
-				movementInvalidateGeometry();
-				return groups.length;
-			}
-
-			function movementGenerateHull() {
-				const trackId = $("movementDancer").value;
-				const joint = $("movementJoint").value;
-				const start = Number($("movementTrajectoryStart").value);
-				const release = Number($("movementReleaseTime").value);
-				if (!(start < release)) throw new Error("The trajectory start must be before the selected release frame.");
-				const samples = movementResearch.data.samples;
-				const startIndex = movementNearestSampleIndex(start), endIndex = movementNearestSampleIndex(release);
-				const stride = Math.max(1, Math.ceil((endIndex - startIndex + 1) / 96));
-				const trajectory = [];
-				for (let index = startIndex; index <= endIndex; index += stride) {
-					const sample = samples[index];
-					const dancer = sample.dancers?.find(item => item.trackId === trackId);
-					const point = movementPointFromDancer(dancer, joint);
-					if (point) trajectory.push({ ...movementMapPoint(point), ...movementVelocity(trackId, joint, sample.timestamp), timestamp: sample.timestamp });
-				}
-				if (trajectory.length < 2) throw new Error("This body part is not tracked across the chosen trajectory window.");
-				const releaseVelocity = movementVelocity(trackId, joint, release);
-				const memory = Math.max(0, Math.min(100, Number($("movementMemory").value) || 70)) / 100;
-				const fields = trajectory.map(point => ({
-					...point,
-					vx: point.vx * memory + releaseVelocity.vx * (1 - memory),
-					vy: point.vy * memory + releaseVelocity.vy * (1 - memory)
-				}));
-				const hull = movementHull(movementCapsuleCloud(trajectory, Number($("movementHullThickness").value) || 18));
-				if (hull.length < 3) throw new Error("The selected trajectory is too short to form a hull.");
-				const color = movementPalette[movementResearch.hullColorIndex++ % movementPalette.length];
-				movementAddGeneratedChain(movementResampleClosed(hull, 32), fields, color, {
-					experiment: "temporal-hull", joint, start, release, memory
-				});
-				movementResearch.overlayData = {
-					sourceSegments: [],
-					trajectories: [{ points: trajectory, color, joint }],
-					velocityFields: fields,
-					releasePoint: trajectory[trajectory.length - 1],
-					label: `Temporal hull · ${joint.replace("_", " ")} · ${movementFormatTime(start)} → ${movementFormatTime(release)}`
-				};
-				movementResearch.lastExperiment = "hull";
-				movementInvalidateGeometry();
-				return 1;
-			}
-
-			function movementGeneratedChains() {
-				return chains.filter(chain => chain.isMovementGenerated);
-			}
-
-			function movementRelease() {
-				const generated = movementGeneratedChains();
-				if (!generated.length) return toast("Generate a movement form before releasing it.");
-				const strength = Number($("movementStrength").value) || 0.12;
-				const mode = $("movementForceMode").value;
-				if (mode === "drive" && movementResearch.driveActive) {
-					movementResearch.driveActive = false;
-					toast("Continuous movement charge stopped.");
-					return;
-				}
-				generated.forEach(chain => chain.chain.forEach(point => {
-					point.vx += (point.movementVx || 0) * strength;
-					point.vy += (point.movementVy || 0) * strength;
-				}));
-				movementResearch.forceUntil = mode === "pulse" ? performance.now() + 650 : 0;
-				movementResearch.driveActive = mode === "drive";
-				movementInvalidateGeometry();
-				toast(mode === "drive" ? "Continuous movement charge is active." : "Movement released into the simulation.");
-			}
-
-			function movementApplyCharge() {
-				const active = movementResearch.driveActive || performance.now() < movementResearch.forceUntil;
-				if (!active) return;
-				const strength = (Number($("movementStrength").value) || 0.12) * (movementResearch.driveActive ? 0.012 : 0.025);
-				movementGeneratedChains().forEach(chain => chain.chain.forEach(point => {
-					point.vx += (point.movementVx || 0) * strength;
-					point.vy += (point.movementVy || 0) * strength;
-				}));
-			}
-
-			function movementClearGenerated() {
-				for (let index = chains.length - 1; index >= 0; index--) if (chains[index].isMovementGenerated) chains.splice(index, 1);
-				movementResearch.overlayData = { sourceSegments: [], trajectories: [], velocityFields: [], releasePoint: null, label: "" };
-				movementResearch.driveActive = false;
-				movementResearch.forceUntil = 0;
-				movementInvalidateGeometry();
-				movementUpdateButtons();
-				toast("Movement-generated forms cleared.");
-			}
-
-			function movementSerializableState() {
-				return {
-					overlay: { ...movementResearch.overlay },
-					overlayData: movementResearch.overlayData,
-					lastExperiment: movementResearch.lastExperiment,
-					caption: $("movementCaption")?.value || ""
-				};
-			}
-
-			function movementRestoreState(state) {
-				if (!state || typeof state !== "object") return;
-				if (state.overlay) Object.assign(movementResearch.overlay, state.overlay);
-				if (state.overlayData) movementResearch.overlayData = state.overlayData;
-				movementResearch.lastExperiment = state.lastExperiment || null;
-				if (typeof state.caption === "string") $("movementCaption").value = state.caption;
-				[["movementOverlayEnabled", "enabled"], ["movementOverlaySource", "source"], ["movementOverlayTrajectory", "trajectory"], ["movementOverlayVelocity", "velocity"]].forEach(([id, key]) => $(id).checked = !!movementResearch.overlay[key]);
-				if (movementResearch.overlayData.label) $("movementResearchStatus").textContent = "Saved movement overlay restored. Re-import its Movement JSON to generate a new variation.";
-				movementUpdateButtons();
-			}
-
-			function movementUpdateButtons() {
-				const ready = !!movementResearch.data;
-				const hasGenerated = movementGeneratedChains().length > 0;
-				["movementExperiment", "movementDancer", "movementReleaseTime", "movementGenerateBtn", "movementTrajectoryStart", "movementJoint"].forEach(id => $(id).disabled = !ready);
-				$("movementReshuffleBtn").disabled = !ready || $("movementExperiment").value === "hull";
-				["movementReleaseBtn", "movementClearBtn", "movementExportPngBtn", "movementRecordWebmBtn", "movementRecordGifBtn"].forEach(id => $(id).disabled = !hasGenerated || movementResearch.recording);
-			}
-
-			function movementPopulateTimes() {
-				const data = movementResearch.data;
-				const timestamps = Array.from(new Set([
-					data.analysis?.range?.start,
-					...(data.keyframes || []),
-					data.analysis?.range?.end
-				].filter(Number.isFinite))).sort((a, b) => a - b);
-				const makeOptions = select => {
-					select.innerHTML = "";
-					timestamps.forEach((time, index) => {
-						const option = document.createElement("option");
-						option.value = time;
-						option.textContent = `${movementFormatTime(time)}${(data.keyframes || []).includes(time) ? " · keyframe" : ""}`;
-						select.appendChild(option);
-						if (index === timestamps.length - 2) option.selected = true;
-					});
-				};
-				makeOptions($("movementReleaseTime"));
-				makeOptions($("movementTrajectoryStart"));
-				if (timestamps.length > 1) $("movementTrajectoryStart").selectedIndex = 0;
-			}
-
-			function movementLoadData(data, name) {
-				if (data?.schema !== "hansketch.movement" || !Array.isArray(data.samples)) throw new Error("Choose a Movement Extractor Movement JSON export.");
-				movementResearch.data = data;
-				movementResearch.dataName = name || "Movement JSON";
-				movementPopulateTimes();
-				const dancerSelect = $("movementDancer");
-				dancerSelect.innerHTML = "";
-				Object.entries(data.dancers || {}).sort((a, b) => (a[1].name || a[0]).localeCompare(b[1].name || b[0])).forEach(([id, dancer]) => {
-					const option = document.createElement("option");
-					option.value = id;
-					option.textContent = dancer.name || id;
-					dancerSelect.appendChild(option);
-				});
-				const release = Number($("movementReleaseTime").value);
-				const sample = data.samples[movementNearestSampleIndex(release)];
-				const visibleTrack = sample?.dancers?.[0]?.trackId;
-				if (visibleTrack) dancerSelect.value = visibleTrack;
-				movementResearch.selectedTrackId = dancerSelect.value;
-				$("movementResearchStatus").textContent = `${name || "Movement JSON"} · ${data.samples.length.toLocaleString()} samples · choose a track and release frame.`;
-				movementUpdateButtons();
-				toast("Movement structure imported.");
-			}
-
-			function movementImportFile() {
-				const input = document.createElement("input");
-				input.type = "file";
-				input.accept = ".json,application/json";
-				input.onchange = async () => {
-					const file = input.files?.[0];
-					if (!file) return;
-					try { movementLoadData(JSON.parse(await file.text()), file.name); }
-					catch (error) { console.error(error); toast(error.message || "Could not read Movement JSON."); }
-				};
-				input.click();
-			}
-
-			function movementGenerate() {
-				try {
-					const created = $("movementExperiment").value === "hull" ? movementGenerateHull() : movementGenerateAnatomy();
-					movementUpdateButtons();
-					toast(`${created} movement-derived ${created === 1 ? "form" : "forms"} generated. Press Release Movement when ready.`);
-				} catch (error) {
-					console.error(error);
-					toast(error.message || "Could not generate the movement form.");
-				}
-			}
-
-			$("movementImportBtn").onclick = movementImportFile;
-			$("importMovementOption").onclick = event => { event.stopPropagation(); $("fileSubmenu").style.display = "none"; movementImportFile(); };
-			$("movementExperiment").onchange = () => {
-				const isHull = $("movementExperiment").value === "hull";
-				$("movementHullControls").hidden = !isHull;
-				$("movementAnatomyControls").hidden = isHull;
-				$("movementReshuffleBtn").disabled = isHull;
-			};
-			$("movementDancer").onchange = event => movementResearch.selectedTrackId = event.target.value;
-			$("movementGenerateBtn").onclick = movementGenerate;
-			$("movementReshuffleBtn").onclick = () => {
-				$("movementSeed").value = Math.floor(Math.random() * 99999) + 1;
-				movementGenerate();
-			};
-			$("movementReleaseBtn").onclick = movementRelease;
-			$("movementClearBtn").onclick = movementClearGenerated;
-			[["movementOverlayEnabled", "enabled"], ["movementOverlaySource", "source"], ["movementOverlayTrajectory", "trajectory"], ["movementOverlayVelocity", "velocity"]].forEach(([id, key]) => {
-				$(id).onchange = event => movementResearch.overlay[key] = event.target.checked;
-			});
-
-			/* Binding Studio UI intentionally does not alter the legacy Movement JSON
-			   importer or generator. It only accepts the new Shape/Motion contracts. */
 			$("bindingStudioBtn").onclick = () => {
 				bindingRefreshUI();
 				$("bindingStudioBackdrop").style.display = "flex";
@@ -12820,6 +12939,7 @@ window.addEventListener("keydown", (e) => {
 					const sliceRadius = 15;
 
 					for (let c = 0; c < chains.length; c++) {
+						if (!isChainPickable(chains[c])) continue;
 						const ch = chains[c].chain;
 						for (let i = 0; i < ch.length; i++) {
 							const dot = ch[i];
@@ -14698,7 +14818,7 @@ window.addEventListener("keydown", (e) => {
 					for (let pi = 0, pLen = points.length; pi < pLen; pi++) {
 						const pt = points[pi];
 						const A = chains[pt.c];
-						if (A.frozen) continue;
+						if (isChainStatic(A)) continue;
 						const dotA = pt.p;
 						const rA = pt.r;
 						const ptC = pt.c;
@@ -14723,7 +14843,7 @@ window.addEventListener("keydown", (e) => {
 							    }
 
 							    const B = chains[nPt.c];
-							    if (B.frozen) continue;
+							    if (isChainStatic(B)) continue;
 							    const dotB = nPt.p;
 							    const minD = rA + nPt.r;
 
@@ -14766,7 +14886,7 @@ window.addEventListener("keydown", (e) => {
 					const circleRadiusSq = circleRadius * circleRadius; // Squared for comparison
 
 					for (let ch = 0; ch < chains.length; ch++) {
-						if (chains[ch].frozen) continue;
+						if (isChainStatic(chains[ch])) continue;
 						const arr = chains[ch].chain;
 						const dotR = chains[ch].baseDotRadius * dotScaleFactor * ps;
 
@@ -14860,7 +14980,7 @@ window.addEventListener("keydown", (e) => {
 				// PERFORMANCE: Use index-based loops instead of forEach (avoids closure allocation)
 				for (let ci = 0, cLen = chains.length; ci < cLen; ci++) {
 					const chainObj = chains[ci];
-					if (chainObj.frozen) continue;
+					if (isChainStatic(chainObj)) continue;
 					const ch = chainObj.chain;
 					const chLen = ch.length;
 
@@ -15907,6 +16027,22 @@ window.addEventListener("keydown", (e) => {
 					gl.drawArrays(gl.LINE_STRIP, 0, currentPathPoints.length);
 			    }
 
+			    // Draw the in-progress primitive outline as a plain corner-to-corner loop —
+			    // no subdivision needed for a preview, the real vertices land on commit.
+			    if (isShapeDrawing && isShapeMode(drawMode)) {
+				    const corners = currentShapeCorners();
+				    const verts = [];
+				    for (const c of corners) verts.push(c.x, c.y);
+				    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+				    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.DYNAMIC_DRAW);
+				    gl.useProgram(lineProgram);
+				    gl.enableVertexAttribArray(linePosLoc);
+				    gl.vertexAttribPointer(linePosLoc, 2, gl.FLOAT, false, 0, 0);
+				    gl.uniform2f(lineResLoc, canvas.width, canvas.height);
+				    gl.uniform4fv(lineColorLoc, hexToRGBA(colorInput.value));
+				    gl.drawArrays(gl.LINE_LOOP, 0, corners.length);
+			    }
+
 			    // Draw in-progress attractor/repulsor path (but not in presentation mode)
 			    const arN = currentAttractorRepulsorPath.length;
 			    if (!isPresentationMode && isDrawing && (drawMode === 'attractor' || drawMode === 'repulsor') && arN >= 2) {
@@ -16090,51 +16226,6 @@ window.addEventListener("keydown", (e) => {
 				});
 			}
 
-			function drawMovementOverlayLine(points, color, close = false) {
-				if (points.length < 2) return;
-				const vertices = new Float32Array(points.length * 2);
-				for (let i = 0; i < points.length; i++) {
-					vertices[i * 2] = points[i].x;
-					vertices[i * 2 + 1] = points[i].y;
-				}
-				gl.useProgram(lineProgram);
-				gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-				gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.DYNAMIC_DRAW);
-				gl.enableVertexAttribArray(linePosLoc);
-				gl.vertexAttribPointer(linePosLoc, 2, gl.FLOAT, false, 0, 0);
-				gl.uniform2f(lineResLoc, canvas.width, canvas.height);
-				gl.uniform4fv(lineColorLoc, color);
-				gl.drawArrays(close ? gl.LINE_LOOP : gl.LINE_STRIP, 0, points.length);
-			}
-
-			function drawMovementOverlayArrow(field) {
-				const magnitude = Math.hypot(field.vx || 0, field.vy || 0);
-				if (magnitude < 2) return;
-				const length = Math.min(34, 7 + magnitude * 0.055);
-				const dx = field.vx / magnitude * length, dy = field.vy / magnitude * length;
-				const end = { x: field.x + dx, y: field.y + dy };
-				const angle = Math.atan2(dy, dx);
-				const wing = 6;
-				drawMovementOverlayLine([{ x: field.x, y: field.y }, end], [0.08, 0.08, 0.08, 0.62]);
-				drawMovementOverlayLine([end, { x: end.x - Math.cos(angle - 0.48) * wing, y: end.y - Math.sin(angle - 0.48) * wing }], [0.08, 0.08, 0.08, 0.62]);
-				drawMovementOverlayLine([end, { x: end.x - Math.cos(angle + 0.48) * wing, y: end.y - Math.sin(angle + 0.48) * wing }], [0.08, 0.08, 0.08, 0.62]);
-			}
-
-			function drawMovementResearchOverlay() {
-				if (!movementResearch.overlay.enabled) return;
-				const overlay = movementResearch.overlayData;
-				if (movementResearch.overlay.source) {
-					overlay.sourceSegments.forEach(segment => drawMovementOverlayLine([segment.start, segment.end], movementHexColor(segment.color, 0.48)));
-				}
-				if (movementResearch.overlay.trajectory) {
-					overlay.trajectories.forEach(trajectory => drawMovementOverlayLine(trajectory.points, movementHexColor(trajectory.color, 0.52)));
-				}
-				if (movementResearch.overlay.velocity) {
-					const fields = overlay.velocityFields;
-					const step = Math.max(1, Math.ceil(fields.length / 18));
-					for (let index = 0; index < fields.length; index += step) drawMovementOverlayArrow(fields[index]);
-				}
-			}
             const isIpad = document.querySelector(".window").classList.contains("ipad");
 			/* -----------------------------------
 			   ANIMATION LOOP
@@ -16184,11 +16275,13 @@ window.addEventListener("keydown", (e) => {
 				const isPhysicsActive = damping > 0.001; // Small threshold to account for floating point
 
 				if (isPhysicsActive) {
-					movementApplyCharge();
 					// PERFORMANCE: Optimized CPU physics
 					// GPU spatial hashing not available — CPU with spatial hash is fastest
 					for (let ci = 0, cLen = chains.length; ci < cLen; ci++) {
 						const chainObj = chains[ci];
+						// Guard here rather than inside simulateChain so a chain's holes, which
+						// carry no layerId of their own, follow their parent's layer.
+						if (isChainStatic(chainObj)) continue;
 						simulateChain(chainObj, ci);
 						chainObj.holes?.forEach(hole => simulateChain(hole, -1));
 					}
@@ -16224,6 +16317,12 @@ window.addEventListener("keydown", (e) => {
 				let _pbLen = 0; // particle batch length
 				for (let ci = 0; ci < chains.length; ci++) {
 					const chainObj = chains[ci];
+					// Adopt the active layer. Done here rather than at each of the dozen
+					// chains.push() sites: this loop already visits every chain, so it costs
+					// nothing and cannot be forgotten by a future creation path. Chains loaded
+					// from a scene already carry their own layerId and are left alone.
+					if (chainObj.layerId === undefined) assignChainToActiveLayer(chainObj);
+					if (!isChainVisible(chainObj)) continue;
 					if (chainObj.isParticle) {
 						_particleBatch[_pbLen++] = chainObj;
 					} else {
@@ -16235,6 +16334,11 @@ window.addEventListener("keydown", (e) => {
 					drawParticlesBatched(_particleBatch, _pbLen);
 				}
 
+				if (_needsLayerRegroup) {
+					_needsLayerRegroup = false;
+					reorderChainsByLayer();
+				}
+
 				drawInProgressPath();
 				// Don't draw circles in presentation mode
 				if (!isPresentationMode) {
@@ -16244,7 +16348,6 @@ window.addEventListener("keydown", (e) => {
 
 				// Draw attractors/repulsors (pulsating green/red)
 				drawAttractorsRepulsors();
-				drawMovementResearchOverlay();
 				drawBindingOverlay();
 
 				// Draw lasso selection overlay (delete/freeze)
@@ -16373,287 +16476,37 @@ window.addEventListener("keydown", (e) => {
 			/* -----------------------------------
 			   EXPORT HELPERS
 			----------------------------------- */
-			function movementCssColor(color, alpha = 1) {
-				return `rgba(${Math.round(color[0] * 255)}, ${Math.round(color[1] * 255)}, ${Math.round(color[2] * 255)}, ${alpha})`;
+			// Export background as a CSS colour string. Falls back to white when the user has
+			// switched the background off, which reproduces the legacy export behaviour.
+			function getExportBackgroundCSS() {
+				if (!exportWithBackground) return "rgb(255,255,255)";
+				const [r, g, b] = canvasBackgroundColor;
+				return `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
 			}
 
-			function drawMovementChains2D(ctx) {
-				chains.forEach(obj => {
-					if (obj.isParticle && obj.chain.length === 1) {
-						const point = obj.chain[0];
-						ctx.beginPath();
-						ctx.arc(point.x, point.y, (obj.particleRenderSize || 4) * dotScaleFactor * getPhysicsScale(), 0, Math.PI * 2);
-						ctx.fillStyle = movementCssColor(obj.color, obj.alpha ?? 1);
-						ctx.fill();
-						return;
-					}
-					if (obj.chain.length < 2) return;
-					const spline = obj.isClosed ? getClosedSmoothCurve(obj.chain, 10) : getOpenSmoothCurve(obj.chain, 10);
-					if (spline.length < 4) return;
-					ctx.beginPath();
-					ctx.moveTo(spline[0], spline[1]);
-					for (let i = 2; i < spline.length; i += 2) ctx.lineTo(spline[i], spline[i + 1]);
-					if (obj.isClosed) ctx.closePath();
-					if (obj.isClosed && obj.holes?.length) {
-						obj.holes.forEach(hole => {
-							const holeSpline = getClosedSmoothCurve(hole.chain, 10);
-							if (holeSpline.length < 6) return;
-							ctx.moveTo(holeSpline[0], holeSpline[1]);
-							for (let i = 2; i < holeSpline.length; i += 2) ctx.lineTo(holeSpline[i], holeSpline[i + 1]);
-							ctx.closePath();
-						});
-					}
-					if (showFilled && obj.isClosed) {
-						ctx.fillStyle = movementCssColor(obj.color, obj.alpha ?? 1);
-						ctx.fill(obj.holes?.length ? "evenodd" : "nonzero");
-					}
-					if (showOutline) {
-						ctx.strokeStyle = showFilled && obj.isClosed ? "#000" : movementCssColor(obj.color, obj.alpha ?? 1);
-						ctx.lineWidth = outlineWidth;
-						ctx.lineJoin = "round";
-						ctx.lineCap = "round";
-						ctx.stroke();
-					}
-				});
+			function escapeXML(s) {
+				return String(s)
+					.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+					.replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 			}
 
-			function drawMovementOverlay2D(ctx) {
-				const overlay = movementResearch.overlayData;
-				ctx.lineCap = "round";
-				ctx.lineJoin = "round";
-				if (movementResearch.overlay.source) {
-					ctx.setLineDash([4, 5]);
-					overlay.sourceSegments.forEach(segment => {
-						ctx.beginPath();
-						ctx.moveTo(segment.start.x, segment.start.y);
-						ctx.lineTo(segment.end.x, segment.end.y);
-						ctx.strokeStyle = movementCssColor(movementHexColor(segment.color), 0.55);
-						ctx.lineWidth = 1.4;
-						ctx.stroke();
-					});
-					ctx.setLineDash([]);
-				}
-				if (movementResearch.overlay.trajectory) {
-					overlay.trajectories.forEach(trajectory => {
-						if (trajectory.points.length < 2) return;
-						ctx.beginPath();
-						ctx.moveTo(trajectory.points[0].x, trajectory.points[0].y);
-						trajectory.points.slice(1).forEach(point => ctx.lineTo(point.x, point.y));
-						ctx.strokeStyle = movementCssColor(movementHexColor(trajectory.color), 0.62);
-						ctx.lineWidth = 1.6;
-						ctx.stroke();
-					});
-				}
-				if (movementResearch.overlay.velocity) {
-					const fields = overlay.velocityFields;
-					const step = Math.max(1, Math.ceil(fields.length / 18));
-					for (let i = 0; i < fields.length; i += step) {
-						const field = fields[i];
-						const magnitude = Math.hypot(field.vx || 0, field.vy || 0);
-						if (magnitude < 2) continue;
-						const length = Math.min(34, 7 + magnitude * 0.055);
-						const angle = Math.atan2(field.vy, field.vx);
-						const end = { x: field.x + Math.cos(angle) * length, y: field.y + Math.sin(angle) * length };
-						ctx.beginPath();
-						ctx.moveTo(field.x, field.y); ctx.lineTo(end.x, end.y);
-						ctx.lineTo(end.x - Math.cos(angle - 0.48) * 6, end.y - Math.sin(angle - 0.48) * 6);
-						ctx.moveTo(end.x, end.y);
-						ctx.lineTo(end.x - Math.cos(angle + 0.48) * 6, end.y - Math.sin(angle + 0.48) * 6);
-						ctx.strokeStyle = "rgba(20,20,20,.72)";
-						ctx.lineWidth = 1.1;
-						ctx.stroke();
-					}
-				}
+			// Illustrator-style layer id: XML-safe, unique within the document. The readable
+			// name is preserved separately in data-name, exactly as Illustrator does it.
+			function svgIdFor(name, used) {
+				let base = String(name || "").trim().replace(/[^A-Za-z0-9_-]+/g, "_").replace(/^[^A-Za-z_]+/, "_");
+				if (!base) base = "Layer";
+				let id = base;
+				let n = 2;
+				while (used.has(id)) id = `${base}_${n++}`;
+				used.add(id);
+				return id;
 			}
-
-			function drawMovementResearchScene(ctx, offsetX, scale, withOverlay) {
-				ctx.save();
-				ctx.translate(offsetX, 0);
-				ctx.scale(scale, scale);
-				drawMovementChains2D(ctx);
-				if (withOverlay) drawMovementOverlay2D(ctx);
-				ctx.restore();
-			}
-
-			function movementExportCaption() {
-				return $("movementCaption").value.trim() || movementResearch.overlayData.label || "Movement → form";
-			}
-
-			function makeMovementExportCanvas() {
-				const comparison = $("movementExportComparison").checked;
-				const baseScale = Math.min(2, 2000 / Math.max(canvas.width * (comparison ? 2 : 1), canvas.height));
-				const output = document.createElement("canvas");
-				output.width = Math.max(1, Math.round(canvas.width * baseScale * (comparison ? 2 : 1)));
-				output.height = Math.max(1, Math.round(canvas.height * baseScale));
-				const ctx = output.getContext("2d");
-				ctx.fillStyle = "#fff";
-				ctx.fillRect(0, 0, output.width, output.height);
-				if (comparison) {
-					drawMovementResearchScene(ctx, 0, baseScale, false);
-					drawMovementResearchScene(ctx, canvas.width * baseScale, baseScale, true);
-					ctx.strokeStyle = "rgba(0,0,0,.16)";
-					ctx.beginPath(); ctx.moveTo(canvas.width * baseScale, 0); ctx.lineTo(canvas.width * baseScale, output.height); ctx.stroke();
-					ctx.fillStyle = "rgba(0,0,0,.62)";
-					ctx.font = `${Math.max(11, Math.round(11 * baseScale))}px sans-serif`;
-					ctx.fillText("FORM", 12 * baseScale, 18 * baseScale);
-					ctx.fillText("FORCE MAP", canvas.width * baseScale + 12 * baseScale, 18 * baseScale);
-				} else {
-					drawMovementResearchScene(ctx, 0, baseScale, true);
-				}
-				const caption = movementExportCaption();
-				if (caption) {
-					ctx.fillStyle = "rgba(0,0,0,.7)";
-					ctx.font = `${Math.max(11, Math.round(11 * baseScale))}px sans-serif`;
-					ctx.fillText(caption, 12 * baseScale, output.height - 12 * baseScale);
-				}
-				return output;
-			}
-
-			function movementDownloadBlob(filename, blob) {
-				const url = URL.createObjectURL(blob);
-				const link = document.createElement("a");
-				link.href = url;
-				link.download = filename;
-				link.click();
-				setTimeout(() => URL.revokeObjectURL(url), 500);
-			}
-
-			function movementExportPNG() {
-				const output = makeMovementExportCanvas();
-				output.toBlob(blob => {
-					if (!blob) return toast("Could not prepare the research export.");
-					movementDownloadBlob(`movement-${movementResearch.lastExperiment || "form"}.png`, blob);
-					toast("Research PNG exported.");
-				}, "image/png");
-			}
-
-			function movementSetRecording(active) {
-				movementResearch.recording = active;
-				movementUpdateButtons();
-			}
-
-			function movementRecordWebM() {
-				if (!canvas.captureStream || !window.MediaRecorder) return toast("This browser cannot record WebM from the canvas.");
-				const duration = Math.max(1, Math.min(20, Number($("movementRecordSeconds").value) || 6));
-				const visibleBefore = movementResearch.overlay.enabled;
-				movementResearch.overlay.enabled = true;
-				movementSetRecording(true);
-				try {
-					const stream = canvas.captureStream(24);
-					const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
-					const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8_000_000 });
-					const chunks = [];
-					recorder.ondataavailable = event => event.data.size && chunks.push(event.data);
-					recorder.onstop = () => {
-						stream.getTracks().forEach(track => track.stop());
-						movementResearch.overlay.enabled = visibleBefore;
-						movementSetRecording(false);
-						movementDownloadBlob(`movement-${movementResearch.lastExperiment || "form"}.webm`, new Blob(chunks, { type: "video/webm" }));
-						toast(`Research WebM exported · ${duration} s.`);
-					};
-					recorder.start(250);
-					toast(`Recording ${duration} seconds with the selected research overlays.`);
-					setTimeout(() => recorder.state !== "inactive" && recorder.stop(), duration * 1000);
-				} catch (error) {
-					console.error(error);
-					movementResearch.overlay.enabled = visibleBefore;
-					movementSetRecording(false);
-					toast("Could not record WebM in this browser.");
-				}
-			}
-
-			function movementLE16(value) { return [value & 255, (value >> 8) & 255]; }
-			function movementGifPalette() {
-				const colors = [];
-				for (let r = 0; r < 6; r++) for (let g = 0; g < 6; g++) for (let b = 0; b < 6; b++) colors.push(r * 51, g * 51, b * 51);
-				while (colors.length < 768) colors.push(0, 0, 0);
-				return new Uint8Array(colors);
-			}
-			function movementGifIndices(data) {
-				const indices = new Uint8Array(data.length / 4);
-				for (let i = 0, index = 0; i < data.length; i += 4, index++) indices[index] = Math.round(data[i] / 51) * 36 + Math.round(data[i + 1] / 51) * 6 + Math.round(data[i + 2] / 51);
-				return indices;
-			}
-			function movementGifLzw(indices) {
-				const clear = 256, end = 257, bytes = [], dictionary = new Map();
-				for (let i = 0; i < 256; i++) dictionary.set(String(i), i);
-				let next = 258, size = 9, bitBuffer = 0, bits = 0;
-				const write = code => { bitBuffer |= code << bits; bits += size; while (bits >= 8) { bytes.push(bitBuffer & 255); bitBuffer >>>= 8; bits -= 8; } };
-				write(clear);
-				let prefix = indices[0];
-				for (let i = 1; i < indices.length; i++) {
-					const value = indices[i], key = `${prefix},${value}`, known = dictionary.get(key);
-					if (known !== undefined) { prefix = known; continue; }
-					write(prefix);
-					if (next < 4096) { dictionary.set(key, next++); if (next === (1 << size) && size < 12) size++; }
-					else { write(clear); dictionary.clear(); for (let c = 0; c < 256; c++) dictionary.set(String(c), c); next = 258; size = 9; }
-					prefix = value;
-				}
-				write(prefix); write(end); if (bits) bytes.push(bitBuffer & 255);
-				return new Uint8Array(bytes);
-			}
-			function movementGifFrame(image, delay) {
-				const compressed = movementGifLzw(movementGifIndices(image.data));
-				const bytes = [33, 249, 4, 4, ...movementLE16(delay), 0, 0, 44, 0, 0, 0, 0, ...movementLE16(image.width), ...movementLE16(image.height), 0, 8];
-				for (let i = 0; i < compressed.length; i += 255) bytes.push(Math.min(255, compressed.length - i), ...compressed.subarray(i, i + 255));
-				bytes.push(0);
-				return new Uint8Array(bytes);
-			}
-
-			function movementRecordGif() {
-				const requested = Math.max(1, Number($("movementRecordSeconds").value) || 6);
-				const duration = Math.min(8, requested), fps = 8, maxEdge = 480;
-				const scale = Math.min(1, maxEdge / Math.max(canvas.width, canvas.height));
-				const width = Math.max(1, Math.round(canvas.width * scale)), height = Math.max(1, Math.round(canvas.height * scale));
-				const capture = document.createElement("canvas");
-				capture.width = width; capture.height = height;
-				const context = capture.getContext("2d", { willReadFrequently: true });
-				const frames = [], visibleBefore = movementResearch.overlay.enabled;
-				movementResearch.overlay.enabled = true;
-				movementSetRecording(true);
-				const start = performance.now(), interval = 1000 / fps;
-				let next = start;
-				const captureFrame = now => {
-					if (now >= next) {
-						context.drawImage(canvas, 0, 0, width, height);
-						frames.push(context.getImageData(0, 0, width, height));
-						next += interval;
-					}
-					if (now - start < duration * 1000) return requestAnimationFrame(captureFrame);
-					movementEncodeGif(frames, width, height, fps, duration, requested, visibleBefore);
-				};
-				toast(`Capturing Miro GIF · ${duration} seconds · ${fps} fps.`);
-				requestAnimationFrame(captureFrame);
-			}
-
-			async function movementEncodeGif(frames, width, height, fps, duration, requested, visibleBefore) {
-				try {
-					const header = new Uint8Array([
-						...new TextEncoder().encode("GIF89a"), ...movementLE16(width), ...movementLE16(height), 247, 0, 0,
-						...movementGifPalette(), 33, 255, 11, ...new TextEncoder().encode("NETSCAPE2.0"), 3, 1, 0, 0, 0
-					]);
-					const parts = [header];
-					for (let index = 0; index < frames.length; index++) {
-						parts.push(movementGifFrame(frames[index], Math.round(1000 / fps)));
-						if (index % 2 === 1) await new Promise(requestAnimationFrame);
-					}
-					parts.push(new Uint8Array([59]));
-					movementDownloadBlob(`movement-${movementResearch.lastExperiment || "form"}.gif`, new Blob(parts, { type: "image/gif" }));
-					toast(`Miro GIF exported · ${width}×${height} · ${fps} fps${requested > duration ? " · capped at 8 s" : ""}.`);
-				} catch (error) {
-					console.error(error);
-					toast("Could not encode the Miro GIF.");
-				} finally {
-					movementResearch.overlay.enabled = visibleBefore;
-					movementSetRecording(false);
-				}
-			}
-
-			$("movementExportPngBtn").onclick = movementExportPNG;
-			$("movementRecordWebmBtn").onclick = movementRecordWebM;
-			$("movementRecordGifBtn").onclick = movementRecordGif;
 
 			function exportSVG() {
+				// Layer assignment is normally done by the render loop; do it up front so a
+				// shape drawn in the same frame as the export still lands in the right group.
+				stampUnassignedChains();
+
 				// When the user has declared a physical canvas size in mm, bake that into the
 				// <svg> as real-world width/height attributes. The viewBox stays in the internal
 				// pixel coordinate system so no path scaling is needed — SVG viewers handle the
@@ -16669,18 +16522,30 @@ window.addEventListener("keydown", (e) => {
 					scaleX = 1; scaleY = 1;
 					svgOpenTag = `<svg xmlns="http://www.w3.org/2000/svg" `
 						+ `width="${canvasPhysicalWidthMm}mm" height="${canvasPhysicalHeightMm}mm" `
-						+ `viewBox="0 0 ${canvas.width} ${canvas.height}" style="background:white;">`;
+						+ `viewBox="0 0 ${canvas.width} ${canvas.height}">`;
 				} else {
 					const rect = canvas.getBoundingClientRect();
 					visualWidth  = rect.width  || parseInt(canvas.style.width)  || canvas.width;
 					visualHeight = rect.height || parseInt(canvas.style.height) || canvas.height;
 					scaleX = visualWidth  / canvas.width;
 					scaleY = visualHeight / canvas.height;
-					svgOpenTag = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${visualWidth} ${visualHeight}" style="background:white;">`;
+					svgOpenTag = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${visualWidth} ${visualHeight}">`;
 				}
 				const parts = [svgOpenTag];
 
-				chains.forEach(obj => {
+				// Background as a real <rect> rather than a style attribute on <svg>: Illustrator
+				// and most rasterisers ignore CSS backgrounds on the root element, so a painted
+				// rect is the only way the colour survives the round trip.
+				// Tagged so re-importing our own export does not turn the backdrop into a
+				// shape. A background rect in someone else's SVG is real artwork and is kept.
+				if (exportWithBackground) {
+					parts.push(`<rect data-hansketch="background" x="0" y="0" width="${visualWidth}" height="${visualHeight}" fill="${getExportBackgroundCSS()}" />`);
+				}
+
+				// Emit one <g> per layer, named the way Illustrator names its own layer groups
+				// (sanitised id + data-name holding the original). Illustrator turns these into
+				// real layers on open, which is the whole point of the round trip.
+				const emitChain = obj => {
 					// Handle particle chains (single-vertex, rendered as circles)
 					if (obj.isParticle && obj.chain.length === 1) {
 						const dot = obj.chain[0];
@@ -16729,7 +16594,23 @@ window.addEventListener("keydown", (e) => {
 						// Only outline
 						parts.push(`<path d="${d}" stroke="rgb(${rr},${gg},${bb})" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" />`);
 					}
+				};
+
+				const usedIds = new Set();
+				layers.forEach(layer => {
+					const members = chains.filter(c => layerOf(c) === layer);
+					if (!members.length) return;
+					// Hidden layers are still written out, marked hidden, so the document
+					// survives a round trip instead of silently losing work.
+					const hidden = layer.visible ? "" : ` display="none"`;
+					parts.push(`<g id="${svgIdFor(layer.name, usedIds)}" data-name="${escapeXML(layer.name)}"${hidden}>`);
+					members.forEach(emitChain);
+					parts.push(`</g>`);
 				});
+				// Any chain whose layer no longer exists still gets written, ungrouped.
+				const orphans = chains.filter(c => !layers.includes(layerOf(c)));
+				orphans.forEach(emitChain);
+
 				parts.push("</svg>");
 				const blob = new Blob([parts.join("")], { type: "image/svg+xml" });
 				const url = URL.createObjectURL(blob);
@@ -16738,6 +16619,194 @@ window.addEventListener("keydown", (e) => {
 				link.download = "blobs.svg";
 				link.click();
 				URL.revokeObjectURL(url);
+			}
+
+			/* -----------------------------------
+			   SVG IMPORT (Illustrator round trip)
+			-----------------------------------
+			   Illustrator writes and reads SVG losslessly for paths, so SVG — not the
+			   PDF-based .ai container — is the practical interchange format.
+
+			   Rather than parsing path data by hand, the document is mounted offscreen and
+			   sampled through the browser's own SVG geometry API. getPointAtLength handles
+			   every command (cubics, arcs, the lot) for free, and getCTM folds in any nested
+			   transforms, which is where a hand-rolled parser would quietly go wrong.
+
+			   Imported layers arrive with physics OFF. Imported vertices are unpinned, so with
+			   physics on the artwork immediately relaxes into blobs and no longer resembles the
+			   file that was opened. Landing it inert means what you see matches Illustrator;
+			   switching a layer's physics on is then a deliberate act. */
+
+			const _svgColorProbe = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+			_svgColorProbe.canvas.width = _svgColorProbe.canvas.height = 1;
+
+			function cssColorToRGBA(css) {
+				if (!css || css === "none") return null;
+				try {
+					_svgColorProbe.clearRect(0, 0, 1, 1);
+					_svgColorProbe.fillStyle = "#000";
+					_svgColorProbe.fillStyle = css;
+					_svgColorProbe.fillRect(0, 0, 1, 1);
+					const d = _svgColorProbe.getImageData(0, 0, 1, 1).data;
+					if (d[3] === 0) return null;
+					return [d[0] / 255, d[1] / 255, d[2] / 255, 1.0];
+				} catch (e) {
+					return null;
+				}
+			}
+
+			// Our own exported backdrop carries data-hansketch="background" and is excluded, so
+			// a round trip does not accumulate a canvas-sized rectangle on every pass.
+			const SVG_GEOMETRY_SELECTOR =
+				"path,polygon,polyline,rect,circle,ellipse,line";
+			const SVG_GEOMETRY_EXCLUDE = '[data-hansketch="background"]';
+
+			function svgGeometryIn(root) {
+				return [...root.querySelectorAll(SVG_GEOMETRY_SELECTOR)]
+					.filter(el => !el.matches(SVG_GEOMETRY_EXCLUDE));
+			}
+
+			// True when the element encloses an area, so the resulting chain should be closed.
+			function svgElementIsClosed(el) {
+				const tag = el.tagName.toLowerCase();
+				if (tag === "polyline" || tag === "line") return false;
+				if (tag === "path") return /z\s*$/i.test(el.getAttribute("d") || "");
+				return true; // polygon, rect, circle, ellipse
+			}
+
+			function importSVGText(svgText, fileName) {
+				const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
+				if (doc.querySelector("parsererror") || doc.documentElement.tagName.toLowerCase() !== "svg") {
+					toast("That file could not be read as SVG.", 2500);
+					return;
+				}
+
+				// Mount offscreen: the geometry and style APIs only work on a live element.
+				const host = document.createElement("div");
+				host.setAttribute("aria-hidden", "true");
+				host.style.cssText = "position:absolute;left:-99999px;top:0;width:0;height:0;overflow:hidden;";
+				const svgEl = document.importNode(doc.documentElement, true);
+				host.appendChild(svgEl);
+				document.body.appendChild(host);
+
+				try {
+					// Resolve the source coordinate system.
+					let vbX = 0, vbY = 0, vbW = 0, vbH = 0;
+					const vb = svgEl.getAttribute("viewBox");
+					if (vb) {
+						const n = vb.trim().split(/[\s,]+/).map(parseFloat);
+						if (n.length === 4 && n.every(v => isFinite(v))) { vbX = n[0]; vbY = n[1]; vbW = n[2]; vbH = n[3]; }
+					}
+					if (!(vbW > 0 && vbH > 0)) {
+						vbW = parseFloat(svgEl.getAttribute("width")) || 0;
+						vbH = parseFloat(svgEl.getAttribute("height")) || 0;
+					}
+					if (!(vbW > 0 && vbH > 0)) { vbW = canvas.width; vbH = canvas.height; }
+
+					// Force user units to map 1:1 so getCTM yields viewBox coordinates.
+					svgEl.setAttribute("width", vbW);
+					svgEl.setAttribute("height", vbH);
+
+					// Fit the artwork into the canvas, preserving aspect ratio and centring it.
+					const fit = Math.min(canvas.width / vbW, canvas.height / vbH);
+					const offX = (canvas.width - vbW * fit) / 2;
+					const offY = (canvas.height - vbH * fit) / 2;
+					const toCanvas = p => ({ x: (p.x - vbX) * fit + offX, y: (p.y - vbY) * fit + offY });
+
+					const sampleElement = el => {
+						let len = 0;
+						try { len = el.getTotalLength(); } catch (e) { return null; }
+						if (!(len > 0)) return null;
+						// One vertex per SHAPE_EDGE_SPACING of source path, clamped so a huge
+						// path cannot dump thousands of points into the physics solver.
+						const steps = Math.max(3, Math.min(400, Math.round(len * fit / SHAPE_EDGE_SPACING)));
+						const m = el.getCTM();
+						const pts = [];
+						for (let i = 0; i < steps; i++) {
+							let p = el.getPointAtLength(len * i / steps);
+							if (m && p.matrixTransform) p = p.matrixTransform(m);
+							const q = toCanvas(p);
+							if (!isFinite(q.x) || !isFinite(q.y)) return null;
+							pts.push({ x: q.x, y: q.y, vx: 0, vy: 0, pinned: false });
+						}
+						return pts;
+					};
+
+					const buildChain = (el, layerId) => {
+						const pts = sampleElement(el);
+						if (!pts || pts.length < 3) return null;
+						const style = getComputedStyle(el);
+						const color = cssColorToRGBA(style.fill) || cssColorToRGBA(style.stroke) || hexToRGBA(colorInput.value);
+						const isClosed = svgElementIsClosed(el);
+						if (isClosed) pts.push({ ...pts[0] }); // closed chains repeat their first point
+						return {
+							chain: pts,
+							color,
+							baseDotRadius: Math.max(1, globalRadiusAvg),
+							isClosed,
+							frozen: false,
+							layerId
+						};
+					};
+
+					// Top-level <g> elements become layers; loose geometry goes to one layer
+					// named after the file, mirroring how Illustrator presents a flat document.
+					const added = [];
+					const groups = [...svgEl.children].filter(el => el.tagName.toLowerCase() === "g");
+					const claimed = new Set();
+
+					groups.forEach(g => {
+						const geo = svgGeometryIn(g);
+						if (!geo.length) return;
+						const name = g.getAttribute("data-name") || g.getAttribute("id") || `Layer ${layers.length + 1}`;
+						const layer = createLayer(name);
+						layer.physicsEnabled = false; // see note in importSVGText
+						if (g.getAttribute("display") === "none" || getComputedStyle(g).display === "none") layer.visible = false;
+						geo.forEach(el => {
+							claimed.add(el);
+							const c = buildChain(el, layer.id);
+							if (c) added.push(c);
+						});
+						// Drop a layer that yielded nothing usable rather than leaving it empty.
+						if (!added.some(c => c.layerId === layer.id)) {
+							layers.splice(layers.indexOf(layer), 1);
+							refreshLayerIndex();
+						}
+					});
+
+					const loose = svgGeometryIn(svgEl).filter(el => !claimed.has(el));
+					if (loose.length) {
+						const layer = createLayer(fileName ? fileName.replace(/\.svg$/i, "") : "Imported");
+						layer.physicsEnabled = false; // see note in importSVGText
+						loose.forEach(el => {
+							const c = buildChain(el, layer.id);
+							if (c) added.push(c);
+						});
+						if (!added.some(c => c.layerId === layer.id)) {
+							layers.splice(layers.indexOf(layer), 1);
+							refreshLayerIndex();
+						}
+					}
+
+					if (!added.length) {
+						toast("No importable shapes found in that SVG.", 2500);
+						renderLayerPanel();
+						return;
+					}
+
+					stampUnassignedChains(); // anything drawn before the import keeps its layer
+					added.forEach(c => chains.push(c));
+					reorderChainsByLayer();
+					activeLayerId = layers[layers.length - 1].id;
+					history.push({ type: "chain" });
+					renderLayerPanel();
+					toast(`Imported ${added.length} shape${added.length === 1 ? "" : "s"} from SVG.`, 2200);
+				} catch (err) {
+					console.warn("SVG import failed", err);
+					toast("That SVG could not be imported.", 2500);
+				} finally {
+					host.remove();
+				}
 			}
 
 			function exportJPG() {
@@ -16773,8 +16842,9 @@ window.addEventListener("keydown", (e) => {
 				offscreen.height = exportHeight;
 				const ctx = offscreen.getContext("2d");
 
-				// Draw white background (no canvas background color or grid in exports)
-				ctx.fillStyle = "#fff";
+				// Paint the canvas background colour (or white when the user has switched the
+				// background off). The grid is still never exported.
+				ctx.fillStyle = getExportBackgroundCSS();
 				ctx.fillRect(0, 0, exportWidth, exportHeight);
 
 				chains.forEach(obj => {
@@ -16856,6 +16926,23 @@ window.addEventListener("keydown", (e) => {
 				exportJPG();
 				$("exportSubmenu").style.display = "none";
 			};
+
+			// Background toggle stays open on click so the user can see the state flip.
+			function refreshExportBackgroundToggle() {
+				const el = $("exportBackgroundToggle");
+				if (!el) return;
+				el.textContent = exportWithBackground ? "Background Color ✓" : "Background Color ✗";
+				el.classList.toggle("is-off", !exportWithBackground);
+				el.title = exportWithBackground
+					? "Exports use the canvas background color"
+					: "Exports use a white background";
+			}
+			$("exportBackgroundToggle").onclick = e => {
+				e.stopPropagation();
+				exportWithBackground = !exportWithBackground;
+				refreshExportBackgroundToggle();
+			};
+			refreshExportBackgroundToggle();
 
 			/* -----------------------------------
 			   SLIDER SETUP
@@ -17059,7 +17146,7 @@ window.addEventListener("keydown", (e) => {
 
 				for (let ci = 0, cLen = chains.length; ci < cLen; ci++) {
 					const chainObj = chains[ci];
-					if (chainObj.frozen) continue;
+					if (isChainStatic(chainObj)) continue;
 					const ch = chainObj.chain;
 
 					for (let vi = 0, vLen = ch.length; vi < vLen; vi++) {
@@ -17161,6 +17248,12 @@ window.addEventListener("keydown", (e) => {
 					case "e":
 						setDrawMode("circle");
 						break; // Circle
+					case "t":
+						setDrawMode("rect");
+						break; // Rectangle
+					case "y":
+						setDrawMode("triangle");
+						break; // Triangle
 					case "r":
 						// If not already in particle mode, open settings; if already, toggle off
 						if (drawMode === "particle") {

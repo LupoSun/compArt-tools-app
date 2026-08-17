@@ -532,6 +532,8 @@ select:focus, input[type=text]:focus { border-color: var(--accent); }
                 <small>Import into Illustrator, Photoshop, InDesign</small></button>
               <button class="dropdown-item" data-exp="txt">Text file (.txt)
                 <small>Hex, RGB, HSL and coverage</small></button>
+              <button class="dropdown-item" data-exp="json">HanSketch palette (.json)
+                <small>Load as swatches in HanSketch</small></button>
             </span>
           </span>
         </div>
@@ -1086,6 +1088,7 @@ document.getElementById('copyAllBtn').onclick = () => {
       const kind  = btn.dataset.exp;
       if (kind === 'png') exportPNG(hexes, name, pcts);
       else if (kind === 'ase') exportASE(hexes, name);
+      else if (kind === 'json') exportJSON(hexes, name, pcts);
       else exportTXT(hexes, name, pcts);
     };
   });
@@ -1425,6 +1428,8 @@ function renderCombos() {
                 <small>Import into Illustrator, Photoshop, InDesign</small></button>
               <button class="dropdown-item" data-exp="txt">Text file (.txt)
                 <small>Hex, RGB and HSL values</small></button>
+              <button class="dropdown-item" data-exp="json">HanSketch palette (.json)
+                <small>Load as swatches in HanSketch</small></button>
             </span>
           </span>
           <button class="link-btn" data-act="del">Delete</button>
@@ -1460,6 +1465,7 @@ function renderCombos() {
         const kind = btn.dataset.exp;
         if (kind === 'png') exportPNG(combo.colors, combo.name);
         else if (kind === 'ase') exportASE(combo.colors, combo.name);
+        else if (kind === 'json') exportJSON(combo.colors, combo.name);
         else exportTXT(combo.colors, combo.name);
       };
     });
@@ -1546,6 +1552,31 @@ function exportASE(colors, name) {
   if (!colors.length) return;
   downloadBlob(buildASE(colors, name), safeName(name) + '.ase');
   toast('Illustrator swatch exported');
+}
+
+// hansketch.color v1 — see contracts/hansketch.color.md in the monorepo.
+// Coverage is only written where the app actually has it: the extracted-results
+// palette. Saved combinations are hand-assembled and carry no coverage figures.
+function exportJSON(colors, name, meta) {
+  if (!colors.length) return;
+  const doc = {
+    format: 'hansketch.color',
+    version: 1,
+    name,
+    source: 'color-extractor',
+    created: new Date().toISOString(),
+    colors: colors.map((hex, i) => {
+      const [r, g, b] = hexToRgb(hex);
+      const entry = { hex, rgb: [r, g, b] };
+      if (meta && meta[i] != null) entry.coverage = Number(meta[i].toFixed(2));
+      return entry;
+    })
+  };
+  downloadBlob(
+    new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' }),
+    safeName(name) + '.palette.json'
+  );
+  toast('HanSketch palette exported');
 }
 
 function exportTXT(colors, name, meta) {
