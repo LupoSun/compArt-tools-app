@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Movement Extractor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><strong>Movement Extractor</strong><span class="subtitle">dance → tracked structure</span></div>
+    <nav>
+      <button id="newProject">New project</button>
+      <button id="clearAutosave" title="Delete the saved browser project without clearing model downloads">Clear autosave</button>
+      <label class="button">Open video<input id="videoInput" type="file" accept="video/mp4,video/webm,video/quicktime" hidden></label>
+      <button id="openProject">Open project</button><input id="projectInput" type="file" accept="application/json,.json" hidden>
+      <button id="saveProject">Save project</button>
+      <button id="undoBtn" title="Undo correction">Undo</button><button id="redoBtn" title="Redo correction">Redo</button>
+    </nav>
+  </header>
+
+  <main class="workspace">
+    <aside class="panel controls">
+      <section><h2>01 / Source</h2><div id="sourceMeta" class="muted">No video loaded</div></section>
+      <section>
+        <h2>02 / Analysis</h2>
+        <label>Detector<select id="detector"><option value="mediapipe">MediaPipe · 33 points</option><option value="movenet">MoveNet MultiPose · 17 points</option></select></label>
+        <label>Sampling · fps<select id="sampleRate"><option>5</option><option>10</option><option selected>15</option><option>30</option></select></label>
+        <label>Maximum dancers<input id="maxPoses" type="number" min="1" max="6" value="4"></label>
+        <div class="row"><button id="analyzeBtn" class="primary">Analyze range</button><button id="cancelBtn" disabled>Cancel</button></div>
+        <progress id="progress" value="0" max="1"></progress><div id="status" class="muted">Ready</div>
+        <label>Analysis pass<select id="passSelect"><option value="">None</option></select></label>
+      </section>
+      <section>
+        <h2>03 / View</h2>
+        <label><input id="showSkeleton" type="checkbox" checked> Skeleton</label>
+        <label><input id="showLabels" type="checkbox" checked> Dancer labels</label>
+        <label><input id="showTrails" type="checkbox"> Joint trails</label>
+        <label class="slider">Confidence<span class="slider-row"><input id="confidence" type="range" min="0" max="1" value="0.35" step="0.05"><output id="confidenceOut">0.35</output></span></label>
+        <div class="visibility-actions"><button id="showAllDancers">Select all</button><button id="hideAllDancers">Deselect all</button></div>
+        <div id="dancerList" class="dancer-list muted">No tracks</div>
+      </section>
+      <section class="future"><h2>Surface layer</h2><p>Silhouette and body-plane extraction is reserved for the next research stage.</p></section>
+    </aside>
+
+    <section class="stage-column">
+      <div class="stage" id="stage" aria-label="Video drop area">
+        <video id="video" playsinline></video><canvas id="overlay"></canvas>
+        <div id="emptyState"><strong>Drop in a dance clip</strong><span>Video stays on this device.</span></div>
+      </div>
+      <div class="transport">
+        <button id="prevFrame" title="Previous frame">−│</button><button id="playBtn">▶</button><button id="nextFrame" title="Next frame">│+</button>
+        <span id="timeReadout">00:00.000 / 00:00.000</span>
+        <button id="setInBtn">Set In</button><button id="setOutBtn">Set Out</button>
+        <button id="keyframeBtn">+ Keyframe</button>
+      </div>
+      <div class="timeline-wrap">
+        <div class="timeline-track"><div id="analysisBands" class="analysis-bands"></div><div id="selectedRangeBand" class="selected-range-band"></div><span id="inMarker" class="range-marker in-marker">IN</span><span id="outMarker" class="range-marker out-marker">OUT</span><input id="scrubber" type="range" min="0" max="1" value="0" step="0.001"></div>
+        <div class="range-grid"><label>In<input id="rangeIn" type="number" min="0" value="0" step="0.01"></label><label>Out<input id="rangeOut" type="number" min="0" value="0" step="0.01"></label><label>Zoom<input id="timelineZoom" type="range" min="1" max="8" value="1"></label></div>
+        <div id="keyframes" class="keyframes"></div>
+      </div>
+    </section>
+
+    <aside class="panel inspector">
+      <section><h2>Movement inspector</h2><p class="muted">Drag a visible joint to correct it. Right-click a joint to mark it hidden; double-click it to restore the model result.</p><div id="sampleInfo" class="sample-info">No analyzed sample at this time.</div></section>
+      <section>
+        <h2>Identity correction</h2>
+        <label>Dancer A<select id="swapA"></select></label><label>Dancer B<select id="swapB"></select></label>
+        <label>Apply<select id="swapMode"><option value="forward">from current time onward</option><option value="range">inside analysis range</option></select></label>
+        <button id="swapBtn">Swap identities</button>
+        <button id="mergeFragmentsBtn">Merge B into A</button>
+        <p class="muted identity-note">Merge only non-overlapping track fragments from this analysis pass.</p>
+      </section>
+      <section>
+        <h2>Export</h2>
+        <button id="exportMovement">Movement JSON</button>
+        <label>Continuous clip range<select id="motionClipRange"><option value="pass" selected>Active analysis pass</option><option value="selection">Current In / Out</option></select></label>
+        <label>Motion smoothing · ms<input id="motionSmoothing" type="number" min="0" max="250" step="10" value="100"></label>
+        <label>Fill gaps up to · s<input id="motionGap" type="number" min="0" max="1" step="0.01" value="0.25"></label>
+        <button id="exportMotionClip">Continuous Motion Clip</button>
+        <div id="motionClipStatus" class="muted motion-clip-status">Analyze a range to export continuous motion.</div>
+        <hr>
+        <label>Geometry<select id="geometryMode"><option value="skeleton">Skeleton chains</option><option value="trajectories">Joint trajectories</option><option value="bodyPaths">Body paths</option></select></label>
+        <label>Canvas<div class="row"><input id="canvasW" type="number" value="500" min="64"><span>×</span><input id="canvasH" type="number" value="500" min="64"></div></label>
+        <label>Base radius<input id="baseRadius" type="number" value="5" min="0.1" step="0.1"></label>
+        <label>Velocity scale<input id="velocityScale" type="number" value="1" min="0" step="0.1"></label>
+        <div class="export-actions"><button id="previewBtn">Preview</button><button id="exportHan" class="primary">HanSketch JSON</button></div>
+      </section>
+    </aside>
+  </main>
+  <div id="previewBackdrop" class="preview-backdrop" hidden>
+    <div class="preview-dialog" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+      <header><div><h3 id="previewTitle">Dynamic movement preview</h3><span id="previewModeLabel"></span></div><button id="previewClose" aria-label="Close preview">×</button></header>
+      <div class="preview-canvas-wrap"><canvas id="previewCanvas" width="500" height="500"></canvas></div>
+      <footer>
+        <button id="previewRestart">Restart</button><button id="previewPlay">Pause</button><button id="previewGif">Save GIF</button>
+        <label>Speed<select id="previewSpeed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+        <label class="preview-check"><input id="previewLoop" type="checkbox" checked> Loop</label><label class="preview-check"><input id="previewBlur" type="checkbox" checked> Motion blur</label>
+        <output id="previewTime">00:00.000</output>
+      </footer>
+    </div>
+  </div>
+  <div id="toast" role="status"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

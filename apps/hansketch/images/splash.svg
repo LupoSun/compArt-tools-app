@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 600" width="640" height="600" role="img" aria-label="HanSketch">
+  <defs>
+    <!-- biomorphic Arp-style blobs, reused with transforms -->
+    <path id="b1" d="M60,6 C84,2 112,18 110,46 C108,70 120,86 100,104 C82,120 52,116 32,104 C12,92 2,66 8,42 C14,18 36,10 60,6 Z"/>
+    <path id="b2" d="M30,20 C55,5 95,8 105,35 C113,57 92,66 80,80 C66,96 70,118 45,116 C20,114 8,92 10,66 C12,44 14,30 30,20 Z"/>
+    <path id="b3" d="M20,40 C30,12 70,8 96,18 C120,27 116,55 104,72 C90,92 60,98 38,92 C16,86 12,62 20,40 Z"/>
+  </defs>
+
+  <rect width="640" height="600" fill="#F4F1EA"/>
+
+  <!-- corners + margins kept full, centre left calm for the wordmark -->
+  <use href="#b1" transform="translate(-26,-34) scale(1.7) rotate(8 60 60)" fill="#C0533B"/>
+  <use href="#b3" transform="translate(452,-44) scale(1.6) rotate(-12 60 60)" fill="#1C1813"/>
+  <use href="#b2" transform="translate(516,150) scale(1.15) rotate(20 60 60)" fill="#3F6FB0"/>
+  <use href="#b1" transform="translate(452,360) scale(1.7) rotate(-18 60 60)" fill="#C0533B"/>
+  <use href="#b2" transform="translate(-44,330) scale(1.7) rotate(14 60 60)" fill="#1C1813"/>
+  <use href="#b3" transform="translate(-56,150) scale(1.1) rotate(-6 60 60)" fill="#3F6FB0"/>
+
+  <!-- small playful accents -->
+  <circle cx="306" cy="86" r="13" fill="#1C1813"/>
+  <circle cx="360" cy="468" r="16" fill="#3F6FB0"/>
+
+  <!-- wordmark + tagline (system-font fallback when rendered inside <img>) -->
+  <g text-anchor="middle" font-family="'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif">
+    <text x="320" y="300" font-size="68" font-weight="700" letter-spacing="-2" fill="#1C1813"><tspan fill="#C0533B">H</tspan>anSketch</text>
+    <text x="320" y="340" font-size="19" font-weight="500" letter-spacing="0.4" fill="#6B645A">draw shapes that wobble, breathe, and become</text>
+  </g>
+</svg>

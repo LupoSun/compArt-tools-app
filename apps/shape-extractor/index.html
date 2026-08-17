@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Shape Extractor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><strong>Shape Extractor</strong><span class="subtitle">image → abstract boundary</span></div>
+    <nav aria-label="Project actions">
+      <button id="newProject">New project</button>
+      <button id="clearAutosave" title="Delete only the browser's saved Shape Extractor project">Clear autosave</button>
+      <label class="button">Open image<input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+      <button id="openProject">Open project</button><input id="projectInput" type="file" accept="application/json,.json" hidden>
+      <button id="saveProject">Save project</button>
+    </nav>
+  </header>
+
+  <main class="workspace">
+    <aside class="panel controls">
+      <section>
+        <h2>Source image</h2>
+        <div id="sourceMeta" class="muted">No image loaded</div>
+        <label class="button full-button">Choose image<input id="imageInputSide" type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+      </section>
+
+      <section>
+        <h2>Mask</h2>
+        <div class="tool-grid" role="group" aria-label="Mask tools">
+          <button class="tool active" data-tool="add" aria-pressed="true">Add brush</button>
+          <button class="tool" data-tool="subtract" aria-pressed="false">Subtract</button>
+          <button class="tool" data-tool="lasso" aria-pressed="false">Lasso</button>
+          <button class="tool" data-tool="fill" aria-pressed="false">Fill region</button>
+        </div>
+        <label class="slider">Brush size<span class="slider-row"><input id="brushSize" type="range" min="4" max="180" value="42"><output id="brushSizeOut">42 px</output></span></label>
+        <div class="row"><button id="undoBtn" disabled>Undo</button><button id="redoBtn" disabled>Redo</button></div>
+        <button id="clearMask" class="danger">Clear mask</button>
+        <p id="suggestionStatus" class="hint" role="status" aria-live="polite" aria-busy="false"><span class="recognition-status-row"><span class="recognition-spinner" aria-hidden="true"></span><span id="suggestionText">Opening an image looks for a person. If none is recognised, use these tools to define the material manually.</span></span><span id="recognitionProgress" class="recognition-progress" role="progressbar" aria-label="AI person recognition progress" aria-valuemin="0" aria-valuemax="100" aria-valuetext="Not running" aria-hidden="true"><span></span></span></p>
+      </section>
+
+      <section>
+        <h2>Abstraction</h2>
+        <label class="slider">Contour smoothing<span class="slider-row"><input id="smoothing" type="range" min="0" max="6" value="2"><output id="smoothingOut">2</output></span></label>
+        <label class="slider">Target vertices<span class="slider-row"><input id="targetVertices" type="range" min="16" max="192" step="4" value="64"><output id="targetVerticesOut">64</output></span></label>
+        <label class="slider">Inflate / deflate<span class="slider-row"><input id="inflate" type="range" min="-80" max="80" value="0"><output id="inflateOut">0 px</output></span></label>
+        <label class="slider">Bridge gaps<span class="slider-row"><input id="mergeGaps" type="range" min="0" max="12" value="0"><output id="mergeGapsOut">off</output></span></label>
+        <label class="slider">Asymmetry<span class="slider-row"><input id="randomness" type="range" min="0" max="32" value="0"><output id="randomnessOut">0</output></span></label>
+        <label>Random seed<input id="seed" type="text" value="form-01" spellcheck="false"></label>
+        <div class="variation-block"><span>Seed variations</span><div id="variationList" class="variation-list"><button data-variation="1">01</button><button data-variation="2">02</button><button data-variation="3">03</button><button data-variation="4">04</button></div></div>
+        <label class="check-row"><input id="allowHoles" type="checkbox"> Allow internal holes</label>
+        <label class="slider hole-option">Minimum hole area<span class="slider-row"><input id="minHoleArea" type="range" min="20" max="3000" step="20" value="220"><output id="minHoleAreaOut">220 px²</output></span></label>
+        <p class="hint">The contour preview updates automatically as the mask or controls change.</p>
+      </section>
+
+      <section>
+        <h2>Semantic binding</h2>
+        <label>Anchor target<select id="anchorKind">
+          <option value="body_center">Body centre</option>
+          <option value="head">Head</option>
+          <option value="left_hand">Left hand</option>
+          <option value="right_hand">Right hand</option>
+          <option value="left_foot">Left foot</option>
+          <option value="right_foot">Right foot</option>
+          <option value="custom">Custom</option>
+        </select></label>
+        <button id="placeAnchor" class="full-button" aria-pressed="false">Place selected anchor</button>
+        <button id="autoAnchors" class="full-button" disabled>Place detected anchors</button>
+        <p class="hint">When a person is recognised, place the detected body anchors here. You can then drag every anchor directly on the image.</p>
+        <div id="anchorList" class="anchor-list muted">No anchors placed</div>
+      </section>
+    </aside>
+
+    <section class="stage-column">
+      <div id="editorStage" class="editor-stage" aria-label="Image mask editor">
+        <canvas id="editorCanvas"></canvas>
+        <div id="emptyState" class="empty-state">
+          <strong>Drop in a reference image</strong>
+          <span>Mark material to extract an autonomous form.</span>
+        </div>
+        <div id="relinkState" class="relink-state" hidden>
+          <strong>Relink the reference image</strong>
+          <span>The saved project contains its mask and contour, not source pixels.</span>
+          <label class="button">Relink image<input id="relinkInput" type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+        </div>
+      </div>
+      <div class="stage-footer">
+        <span id="toolHelp">Add brush: paint the material that should survive abstraction.</span>
+        <span id="maskReadout" class="mono">0 selected pixels</span>
+      </div>
+    </section>
+
+    <aside class="panel output-panel">
+      <section>
+        <h2>Abstract form</h2>
+        <div class="preview-frame"><canvas id="previewCanvas" width="420" height="420"></canvas></div>
+        <div id="shapeInfo" class="shape-info">Open an image to receive a suggested form.</div>
+      </section>
+      <section>
+        <h2>Export</h2>
+        <button id="exportShape" class="primary">Shape JSON</button>
+        <button id="exportSvg">Contour SVG</button>
+        <p class="hint">The JSON carries contour rings, optional holes, abstraction settings, anchors, and source provenance. It never embeds the source image.</p>
+      </section>
+      <section class="future">
+        <h2>Binding ready</h2>
+        <p>Use this form with a continuous Motion Clip in HanSketch Binding Studio. The shape stays an image-derived material source, not a dancer copy.</p>
+      </section>
+    </aside>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js?rev=20260816f"></script>
+</body>
+</html>

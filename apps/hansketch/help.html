@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HanSketch – Help &amp; User Guide</title>
+  <meta name="theme-color" content="#F4F1EA">
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- HanSketch help — modernist art-studio theme ---------- */
+    :root {
+      --paper: #F4F1EA;
+      --paper-2: #EAE5D9;
+      --panel: #FBF9F4;
+      --panel-2: #F3EFE6;
+      --ink: #1C1813;
+      --ink-2: #6B645A;
+      --ink-3: #9A9388;
+      --hairline: rgba(28,24,19,.12);
+      --hairline-strong: rgba(28,24,19,.22);
+      --accent: #C0533B;
+      --accent-soft: rgba(192,83,59,.12);
+      --r-sm: 6px;
+      --r-md: 10px;
+      --font-display: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-ui: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: var(--font-ui);
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      display: flex;
+      overflow: hidden;
+    }
+    aside {
+      flex: 0 0 248px;
+      min-width: 210px;
+      background: var(--panel-2);
+      border-right: 1px solid var(--hairline);
+      padding: 28px 22px 48px;
+      overflow-y: auto;
+    }
+    main {
+      flex: 1 1 auto;
+      padding: 44px 56px 96px;
+      overflow-y: auto;
+    }
+    main > section { max-width: 68ch; }
+
+    /* ---------- TYPOGRAPHY ---------- */
+    h1 {
+      margin: 0 0 24px;
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    h1::first-letter { color: var(--accent); }
+    h2 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 24px;
+      letter-spacing: -0.015em;
+      padding: 0 0 8px;
+      margin: 44px 0 16px;
+      border-bottom: 1px solid var(--hairline);
+    }
+    h3 {
+      font-family: var(--font-ui);
+      margin: 24px 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    p, li {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+    a { color: var(--accent); }
+    kbd {
+      display: inline-block;
+      min-width: 20px;
+      padding: 2px 6px;
+      border: 1px solid var(--hairline-strong);
+      border-bottom-width: 2px;
+      border-radius: var(--r-sm);
+      background: var(--panel);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-align: center;
+      color: var(--ink);
+    }
+
+    /* ---------- NAVIGATION ---------- */
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    nav li {
+      margin-bottom: 6px;
+    }
+    nav a {
+      display: block;
+      color: var(--ink-2);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 3px 0;
+      border-radius: var(--r-sm);
+      word-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
+      transition: color .2s ease;
+    }
+    nav a:hover {
+      color: var(--ink);
+      text-decoration: none;
+    }
+    nav a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    nav ul ul {
+      margin-top: 4px;
+      margin-left: 12px;
+      padding-left: 14px;
+      border-left: 1px solid var(--hairline);
+    }
+
+    /* ---------- TABLE ---------- */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--hairline);
+      padding: 8px 10px;
+      text-align: left;
+    }
+    th {
+      background: var(--panel-2);
+      font-weight: 600;
+    }
+
+    /* ---------- BACK LINK ---------- */
+    .back-link {
+      display: inline-block;
+      margin-top: 32px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    /* ---------- RESPONSIVE Fallback ---------- */
+    @media (max-width: 600px) {
+      body {
+        flex-direction: column;
+        overflow: auto;
+      }
+      aside {
+        width: 100%;
+        flex: 0 0 auto;
+        border-right: none;
+        border-bottom: 1px solid var(--hairline);
+      }
+      main {
+        width: 100%;
+        padding: 24px 22px 64px;
+      }
+      nav ul ul {
+        border-left: none;
+        padding-left: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>HanSketch Help</h1>
+    <nav>
+      <ul>
+        <li><a href="#intro">Overview</a></li>
+        <li><a href="#interface">Interface</a>
+          <ul>
+            <li><a href="#draw">Draw Tools</a></li>
+            <li><a href="#edit">Edit Tools</a></li>
+            <li><a href="#shape">Shape Settings</a></li>
+            <li><a href="#sliders">Physics Sliders</a></li>
+            <li><a href="#canvas">Canvas Controls</a></li>
+          </ul>
+        </li>
+        <li><a href="#requirements">System Requirements</a></li>
+        <li><a href="#file">File &amp; Export</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+      </ul>
+    </nav>
+    <a href="hansketch.html" class="back-link">← Back to App</a>
+  </aside>
+  <main>
+    <section id="intro">
+      <h2>Overview</h2>
+      <p>HanSketch is a WebGL-based canvas for creating physics-driven blobs, lines, and repulsion circles. Draw shapes, tweak physics, then export to SVG or high-res JPG.</p>
+    </section>
+
+    <section id="interface">
+      <h2>Interface</h2>
+      <ul>
+        <li><strong>Toolbar (left)</strong> – icons for draw/edit modes and shape defaults.</li>
+        <li><strong>Canvas (center)</strong> – 500×500 px drawing area with always-on grid.</li>
+        <li><strong>Sliders (bottom)</strong> – real-time physics controls.</li>
+      </ul>
+    </section>
+
+    <section id="draw">
+      <h2>Draw Tools</h2>
+      <ul>
+        <li><strong>Blob</strong> – closed shapes. Click-drag to draw; releases seal the shape.</li>
+        <li><strong>Line</strong> – open polylines. Click-drag to draw</li>
+        <li><strong>Circle</strong> – draw a repulsion circle. Drag sets radius; blobs avoid inside. Wrap blobs around circles to create controlled shapes.</li>
+      </ul>
+      <p>Active tool shows an "ON" badge on its icon.</p>
+    </section>
+
+    <section id="edit">
+      <h2>Edit Tools</h2>
+      <ul>
+        <li><strong>Drag</strong> – move blobs, lines or circles.</li>
+        <li><strong>Freeze</strong> – lock physics inside closed shapes (dashed rendering).</li>
+        <li><strong>Slice</strong> – click a chain segment to split the shape.</li>
+        <li><strong>Pin</strong> – fix single points in place (red target ring). Click red target ring to release point.</li>
+        <li><strong>Delete</strong> – erase the nearest circle, line segment or blob.</li>
+      </ul>
+      <p>Only one edit mode may be active at a time.</p>
+    </section>
+
+    <section id="shape">
+      <h2>Shape Settings</h2>
+      <ul>
+        <li><strong>Color</strong> – sets stroke/fill color.</li>
+        <li><strong>Size</strong> – sets the base blob / line size</li>
+        <li><strong>Variation</strong> – random size variation per drawn object</li>
+      </ul>
+    </section>
+
+    <section id="sliders">
+      <h2>Physics Sliders</h2>
+      <table>
+        <thead><tr><th>Slider</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Blob Size</td><td>Scales blob size.</td></tr>
+          <tr><td>Excitability</td><td>Controls bounce/damping.</td></tr>
+          <tr><td>Rigidity</td><td>Spring tension between points on blob/line.</td></tr>
+          <tr><td>Turmoil</td><td>Repulsion strength to avoid overlaps.</td></tr>
+          <tr><td>Animation Speed</td><td>Adjusts the global timestep.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="canvas">
+      <h2>Canvas Controls</h2>
+      <ul>
+        <li><strong>Thickness (T icon)</strong> – toggles 1 px/5 px stroke.</li>
+        <li><strong>Solid Fill (▣)</strong> In Fill mode, blob interiors render as filled.</li>
+        <li><strong>Undo (⎌)</strong> – removes last element.</li>
+        <li><strong>Repel ↔ </strong> – enables high repel mode, which adds more force to keep blobs from intersecting</li>
+        <li><strong>Reset (⟳)</strong> – clears all after confirmation.</li>
+      </ul>
+    </section>
+    <section id="shortcuts">
+      <h2>Keyboard</h2>
+      <ul>
+        <li><kbd>Mouse‑Wheel</kbd> over canvas / slider – adjust Blob Size smoothly.</li>
+        <li><kbd>Space</kbd> – Freezes animation -> toggles Excitability to 0 and back.</li>
+      </ul>
+    </section>
+    <section id="file">
+      <h2>File &amp; Export</h2>
+      <h3>File Menu</h3>
+      <ul>
+        <li>Save Blobs – saves shapes + settings to JSON.</li>
+        <li>Load Blobs – import shapes + settings from JSON.</li>
+      </ul>
+      <h3>Export Menu</h3>
+      <ul>
+        <li>Lines → SVG/JPG – strokes only.</li>
+        <li>Fill → SVG/JPG – fills closed shapes.</li>
+      </ul>
+    </section>
+    <section id="requirements">
+      <h2>System Requirements</h2>
+      <h3>Hardware</h3>
+      <ul>
+        <li><strong>Desktop / Laptop (recommended)</strong> – any CPU from 2013‑onward with an
+            integrated or discrete GPU that supports OpenGL 2.1 / WebGL 1.0.</li>
+        <li><strong>Tablets and Mobile Devices</strong> – Not Supported</li>
+      </ul>
+
+      <h3>Software</h3>
+      <ul>
+        <li><strong>Browsers</strong> – Chrome 49+, Firefox 44+, Edge 79+, Safari 11+ with WebGL enabled.</li>
+        <li><strong>OS</strong> – Windows 7+, macOS 10.11+, Linux distros with Mesa 11+ drivers.</li>
+      </ul>
+
+      <h3>Performance Tips</h3>
+      <ul>
+        <li>Turn off <em>Thickness</em> or lower <em>Blob Size</em> on Intel HD 4000‑era GPUs.</li>
+        <li>Press <kbd>Space</kbd> to mute physics when previewing static artwork.</li>
+        <li>Laptop users: disable high‑DPI rendering by setting browser zoom to 100 % for extra FPS.</li>
+      </ul>
+    </section>
+    <section id="troubleshooting">
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><strong>No drawing?</strong> Ensure WebGL is enabled in your browser.</li>
+        <li><strong>Red glow won’t go away?</strong> Click the active Edit‑Tool icon again to exit edit mode.</li>
+        <li><strong>Slow performance?</strong> Lower Blob Size or Animation Speed.</li>
+        <li><strong>Mobile warning?</strong> App requires a desktop browser.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const navLinks = document.querySelectorAll('aside nav a');
+    const sections = document.querySelectorAll('main section');
+    function updateNav(){
+      let id = 'intro';
+      sections.forEach(sec=>{
+        if(sec.getBoundingClientRect().top <= 60) id=sec.id;
+      });
+      navLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href').slice(1)===id));
+    }
+    document.addEventListener('scroll', updateNav, {passive:true});
+  </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>compArt-tools — Experimental Apps</title>
+<style>
+  :root{
+    --paper:#ebe7dc; --panel:#f5f2ea; --surface:#ffffff;
+    --ink:#1a1a17; --muted:#8b8577; --faint:#b6b0a1; --line:#d9d3c5;
+    --accent:#d64b2a; --blue:#2458d8;
+    --font:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{
+    font:16px/1.5 var(--font); color:var(--ink);
+    background:radial-gradient(ellipse at 50% -10%, #f8f5ee 0%, var(--paper) 55%, #e4dfd2 100%);
+    -webkit-font-smoothing:antialiased;
+    min-height:100dvh; display:flex; flex-direction:column;
+  }
+  /* faint paper grain */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.35;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+  }
+  .wrap{position:relative; z-index:1; width:100%; max-width:940px; margin:0 auto; padding:56px 24px 40px; flex:1 0 auto;}
+
+  header.top{display:flex; align-items:center; gap:11px; margin-bottom:48px;}
+  header.top .mark{width:11px; height:11px; background:var(--accent); flex:none}
+  header.top .name{font-weight:700; letter-spacing:.01em}
+  header.top .eyebrow{margin-left:auto; font-size:11px; text-transform:uppercase; letter-spacing:.16em; color:var(--muted)}
+
+  .lede{max-width:620px; margin:0 0 44px}
+  .lede h1{font-size:clamp(30px,5vw,46px); line-height:1.05; letter-spacing:-0.02em; margin:0 0 16px; font-weight:700}
+  .lede h1 .arrow{color:var(--accent)}
+  .lede p{margin:0; font-size:17px; color:#494741; max-width:56ch}
+
+  .cards{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px}
+  @media(max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:680px){.cards{grid-template-columns:1fr}}
+
+  .card{
+    position:relative; display:flex; flex-direction:column; overflow:hidden;
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    text-decoration:none; color:inherit;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover{transform:translateY(-3px); box-shadow:0 16px 40px #2b241a1f; border-color:var(--ink)}
+  .card:focus-visible{outline:2px solid var(--blue); outline-offset:3px}
+
+  .card .art{height:150px; position:relative; overflow:hidden; border-bottom:1px solid var(--line)}
+  .card .art svg{position:absolute; inset:0; width:100%; height:100%}
+  .card--hs .art{background:#f0ece2}
+  .card--me .art{background:#111}
+  .card--se .art{background:#e8eee5}
+  .card--ce .art{background:#f2e8df}
+  .shape-art{position:absolute; inset:0; overflow:hidden}
+  .shape-art::before{content:""; position:absolute; width:116px; height:92px; left:50%; top:50%; transform:translate(-50%,-50%) rotate(-12deg); background:#2f9c69; border-radius:53% 42% 46% 38% / 46% 55% 36% 54%; box-shadow:28px -18px 0 -12px #d64b2a, -38px 21px 0 -22px #2458d8}
+  .shape-art::after{content:""; position:absolute; width:29px; height:29px; left:50%; top:50%; transform:translate(-9px,-4px); background:#e8eee5; border-radius:50%; box-shadow:40px 20px 0 -7px #e8eee5}
+
+  .card .body{padding:20px 22px 24px; display:flex; flex-direction:column; gap:8px; flex:1}
+  .card .kicker{display:flex; align-items:center; gap:9px; font-size:10.5px; text-transform:uppercase; letter-spacing:.14em; color:var(--muted)}
+  .card .kicker::before{content:""; width:7px; height:7px; flex:none}
+  .card--hs .kicker::before{background:var(--accent)}
+  .card--me .kicker::before{background:var(--blue)}
+  .card--se .kicker::before{background:#2f9c69}
+  .card--ce .kicker::before{background:#b8653e}
+  .card h2{margin:2px 0 0; font-size:23px; letter-spacing:-0.01em; font-weight:700}
+  .card p{margin:0; color:#5b584f; font-size:14.5px; flex:1}
+  .card .go{display:inline-flex; align-items:center; gap:8px; margin-top:10px; font-weight:600; font-size:14px}
+  .card .go .chev{transition:transform .18s ease}
+  .card:hover .go .chev{transform:translateX(4px)}
+
+  .pipeline{margin:40px 0 0; padding-top:22px; border-top:1px solid var(--line);
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; font-size:13px; color:var(--muted)}
+  .pipeline strong{color:var(--ink); font-weight:600}
+  .pipeline .step{display:inline-flex; align-items:center; gap:8px}
+  .pipeline .sep{color:var(--accent); font-weight:700}
+  .pipeline .priv{margin-left:auto; font-size:12px}
+
+  footer.foot{position:relative; z-index:1; text-align:center; padding:20px; font-size:12px; color:var(--faint)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <span class="mark" aria-hidden="true"></span>
+      <span class="name">compArt-tools</span>
+      <span class="eyebrow">Movement → Form</span>
+    </header>
+
+    <div class="lede">
+      <h1>Make images, movement, and color <span class="arrow">→</span> material for form.</h1>
+      <p>Four independent browser apps for extracting, composing, and transforming visual material. Pick one to begin.</p>
+    </div>
+
+    <div class="cards">
+      <!-- Shape Extractor -->
+      <a class="card card--se" href="apps/shape-extractor/index.html">
+        <div class="art" aria-hidden="true"><div class="shape-art"></div></div>
+        <div class="body">
+          <span class="kicker">Step 01A · Extract</span>
+          <h2>Shape Extractor</h2>
+          <p>Mark a reference image, abstract its contour, keep or remove inner holes, and export a shape ready to inhabit movement.</p>
+          <span class="go">Open Extractor <span class="chev">→</span></span>
+        </div>
+      </a>
+
+      <!-- Movement Extractor -->
+      <a class="card card--me" href="apps/movement-extractor/index.html">
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice">
+            <g stroke="#2458d8" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="150" cy="42" r="9" fill="#2458d8" stroke="none"/>
+              <path d="M150 51 L150 92 M150 66 L124 80 M150 66 L182 74 M150 92 L133 124 M150 92 L172 122"/>
+            </g>
+            <g fill="#d64b2a"><circle cx="124" cy="80" r="3.4"/><circle cx="182" cy="74" r="3.4"/><circle cx="133" cy="124" r="3.4"/><circle cx="172" cy="122" r="3.4"/></g>
+            <g stroke="#ffffff" stroke-width="1" opacity=".18"><path d="M40 20 V132 M280 20 V132"/></g>
+          </svg>
+        </div>
+        <div class="body">
+          <span class="kicker">Step 01 · Extract</span>
+          <h2>Movement Extractor</h2>
+          <p>Load a dance clip, track dancers pose-by-pose, correct identities, and export neutral movement data. Video stays on your device.</p>
+          <span class="go">Open Extractor <span class="chev">→</span></span>
+        </div>
+      </a>
+
+      <!-- Color Extractor -->
+      <a class="card card--ce" href="apps/color-extractor/index.html">
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice">
+            <rect x="44" y="34" width="54" height="82" rx="8" fill="#c45d3e"/>
+            <rect x="104" y="24" width="54" height="102" rx="8" fill="#e0a458"/>
+            <rect x="164" y="46" width="54" height="60" rx="8" fill="#5f8b75"/>
+            <rect x="224" y="30" width="54" height="94" rx="8" fill="#394d73"/>
+          </svg>
+        </div>
+        <div class="body">
+          <span class="kicker">Step 01B · Extract</span>
+          <h2>Color Extractor</h2>
+          <p>Extract dominant palettes from artwork, inspect the RGB distribution, and build reusable color combinations.</p>
+          <span class="go">Open Extractor <span class="chev">→</span></span>
+        </div>
+      </a>
+
+      <!-- HanSketch -->
+      <a class="card card--hs" href="apps/hansketch/">
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice">
+            <path d="M78 44c22-14 44 2 40 24s-30 22-44 12-18-22 4-36z" fill="#c14a2b"/>
+            <path d="M212 30c26-6 40 20 30 40s-42 20-52 2 -4-36 22-42z" fill="#1a1a17"/>
+            <path d="M150 96c20-6 34 12 26 30s-38 16-46 0 0-24 20-30z" fill="#2458d8"/>
+            <circle cx="120" cy="104" r="7" fill="#1a1a17"/>
+            <circle cx="242" cy="96" r="5" fill="#c14a2b"/>
+          </svg>
+        </div>
+        <div class="body">
+          <span class="kicker">Step 02 · Transform</span>
+          <h2>HanSketch</h2>
+          <p>Draw shapes that wobble, breathe, and become. Feed in movement data, or sketch freely with springs, pressure, and force fields.</p>
+          <span class="go">Open HanSketch <span class="chev">→</span></span>
+        </div>
+      </a>
+    </div>
+
+    <div class="pipeline">
+      <span class="step"><strong>Extract</strong> shape from an image</span>
+      <span class="sep">+</span>
+      <span class="step"><strong>Extract</strong> movement from video</span>
+      <span class="sep">→</span>
+      <span class="step"><strong>Compose</strong> material in HanSketch</span>
+      <span class="priv">Runs entirely in your browser — nothing is uploaded.</span>
+    </div>
+  </div>
+
+  <footer class="foot">Best on a desktop browser (Chrome, Edge, or Safari). First analysis downloads the pose models.</footer>
+</body>
+</html>

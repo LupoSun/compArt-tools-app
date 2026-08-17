@@ -1,0 +1,187 @@
+/* ============================================================
+   Ferdinand × Tao — shared design system
+   Used by every page on the site. Page-specific styles stay
+   in a <style> block on the page itself.
+   ============================================================ */
+
+/* ---- Design tokens ---- */
+:root {
+  --bg: #FDFBF7;
+  --bg-warm: #F7F4EE;
+  --text: #1a1a1a;
+  --text-mid: #5a5a5a;
+  --text-light: #8a8a8a;
+  --accent: #c45d3e;
+  --accent-soft: rgba(196,93,62,0.08);
+  --card: #ffffff;
+  --border: rgba(0,0,0,0.06);
+  --shadow-ambient: 0 8px 40px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02);
+  --shadow-hover: 0 16px 60px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  --radius: 1.5rem;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/* ---- Reset ---- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-serif); font-weight: 400; }
+
+/* ---- Site navigation ---- */
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(253,251,247,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.9rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.topnav .brand {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text);
+}
+.topnav .links { display: flex; gap: 0.4rem; }
+.topnav a {
+  color: var(--text-mid);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.4rem 0.95rem;
+  border-radius: 100px;
+  transition: all 0.3s var(--ease-out);
+}
+.topnav a:hover { background: var(--accent-soft); color: var(--accent); }
+.topnav a.active { background: var(--accent); color: #fff; }
+
+/* Pages with a fixed nav and no full-height hero need this offset */
+.has-fixed-nav { padding-top: 3.6rem; }
+
+/* ---- Section label pill ---- */
+.section-label {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 0.35rem 0.9rem;
+  border-radius: 100px;
+  margin-bottom: 1rem;
+  font-family: var(--font-sans);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  border-radius: 100px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s var(--ease-out);
+}
+.btn:hover { opacity: 0.87; }
+.btn.outline { background: transparent; color: var(--accent); }
+.btn.outline:hover { background: var(--accent-soft); opacity: 1; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+
+.chip {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+}
+.chip:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ---- Card ---- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-ambient);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.card h2 { font-family: var(--font-sans); font-size: 1.15rem; font-weight: 600; margin-bottom: 0.35rem; }
+.card .sub { font-size: 0.82rem; color: var(--text-light); margin-bottom: 1.5rem; }
+
+/* ---- Layout helpers ---- */
+.wrap { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+.wrap-narrow { max-width: 860px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+/* ---- Toast ---- */
+.toast {
+  position: fixed;
+  bottom: 2rem; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 0.7rem 1.4rem;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s var(--ease-out);
+  z-index: 200;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---- Footer ---- */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-light);
+}
+.site-footer a { color: var(--text-mid); text-decoration: none; }
+.site-footer a:hover { color: var(--accent); }
+
+/* ---- Shared animation ---- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .topnav { padding: 0.8rem 1.25rem; }
+  .wrap, .wrap-narrow { padding: 2rem 1.25rem 4rem; }
+  .card { padding: 1.5rem; }
+}

@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Palette Extraction from Artworks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+<style>
+/* Noise overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Section reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Typography */
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.hero-cta {
+  display: inline-block;
+  margin-top: 1.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: var(--accent);
+  padding: 0.7rem 1.6rem;
+  border-radius: 100px;
+  opacity: 0;
+  animation: fadeUp 1.2s var(--ease-out) 1.05s forwards;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  box-shadow: 0 4px 20px rgba(196,93,62,0.25);
+}
+.hero-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(196,93,62,0.35);
+}
+
+.hero-title {
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 1.2s var(--ease-out) 0.3s forwards;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--text-mid);
+  max-width: 560px;
+  font-weight: 300;
+  opacity: 0;
+  animation: fadeUp 1.2s var(--ease-out) 0.6s forwards;
+}
+
+.hero-meta {
+  margin-top: 3rem;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  letter-spacing: 0.1em;
+  opacity: 0;
+  animation: fadeUp 1.2s var(--ease-out) 0.9s forwards;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 3rem;
+  opacity: 0;
+  animation: fadeUp 1.2s var(--ease-out) 1.2s forwards;
+}
+.hero-scroll span {
+  display: block;
+  width: 1.5px;
+  height: 40px;
+  background: var(--accent);
+  margin: 0 auto;
+  animation: scrollPulse 2s ease-in-out infinite;
+  border-radius: 1px;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { transform: scaleY(1); opacity: 0.4; }
+  50% { transform: scaleY(1.4); opacity: 1; }
+}
+
+/* ===== CONTENT SECTIONS ===== */
+.content-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+}
+
+.content-section h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.content-section p {
+  font-size: 1.05rem;
+  color: var(--text-mid);
+  margin-bottom: 1.5rem;
+  max-width: 680px;
+}
+
+/* ===== MEDIANCUT DEMO ===== */
+.pixel-demo {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 2rem 8rem;
+}
+
+.pixel-canvas-wrapper {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-ambient);
+  border: 1px solid var(--border);
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.pixel-canvas-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+}
+
+.demo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.demo-header h3 {
+  font-size: 1.4rem;
+}
+
+.demo-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.demo-btn {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.5rem 1.2rem;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.4s var(--ease-out);
+}
+.demo-btn:hover {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+.demo-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.demo-stage-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+canvas#paintingCanvas {
+  width: 200px;
+  height: 200px;
+  display: block;
+  border-radius: 0.75rem;
+  background: var(--bg-warm);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.demo-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.demo-step-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.demo-step-desc {
+  font-size: 0.82rem;
+  color: var(--text-mid);
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+canvas#rgbCanvas {
+  width: 100%;
+  height: 340px;
+  display: block;
+  border-radius: 0.75rem;
+  background: #0d0d12;
+}
+
+.demo-transport {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.step-btn {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out);
+}
+.step-btn:hover { opacity: 0.85; }
+.step-btn:disabled { opacity: 0.35; cursor: default; }
+.step-btn.outline {
+  background: transparent;
+  color: var(--accent);
+}
+.step-btn.outline:hover { background: var(--accent-soft); }
+
+.step-indicator {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.extracted-palette {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.palette-swatch {
+  flex: 1;
+  min-width: 80px;
+  max-width: 160px;
+  aspect-ratio: 1;
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.6s var(--ease-spring), box-shadow 0.6s var(--ease-out);
+  cursor: default;
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.palette-swatch.appear {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.palette-swatch:hover {
+  transform: scale(1.05) translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.swatch-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans', monospace;
+  background: linear-gradient(transparent, rgba(0,0,0,0.5));
+  color: white;
+}
+
+/* ===== COMPARISON ===== */
+.comparison-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 2rem 8rem;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .comparison-grid { grid-template-columns: 1fr; }
+}
+
+.method-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-ambient);
+  border: 1px solid var(--border);
+  padding: 2.5rem;
+  transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+}
+
+.method-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.method-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.method-card .method-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.2rem;
+  display: block;
+}
+
+.method-card p {
+  font-size: 0.95rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.method-card .trait {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  margin-bottom: 0.5rem;
+}
+
+.trait-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ===== ARTIST SECTIONS ===== */
+.artists-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.artist-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-ambient);
+  border: 1px solid var(--border);
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.artist-card:hover {
+  transform: translateY(-2px);
+}
+
+.artist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.artist-name {
+  font-size: 1.8rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.artist-descriptor {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--accent);
+  font-family: 'Playfair Display', serif;
+  padding-top: 0.5rem;
+}
+
+.palette-row {
+  margin-bottom: 1.5rem;
+}
+
+.palette-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-bottom: 0.75rem;
+}
+
+.palette-strip {
+  display: flex;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  height: 60px;
+  transition: height 0.5s var(--ease-out);
+}
+
+.palette-strip:hover {
+  height: 80px;
+}
+
+.strip-color {
+  flex: 1;
+  position: relative;
+  cursor: default;
+  transition: flex 0.4s var(--ease-out);
+}
+
+.strip-color:hover {
+  flex: 2;
+}
+
+.strip-color .hex {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-family: 'Plus Jakarta Sans', monospace;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  color: white;
+}
+
+.strip-color:hover .hex {
+  opacity: 1;
+}
+
+.artist-note {
+  font-size: 0.9rem;
+  color: var(--text-mid);
+  font-style: italic;
+  line-height: 1.6;
+  border-left: 2px solid var(--accent);
+  padding-left: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+/* ===== PROCESS FLOW ===== */
+.process-diagram {
+  display: flex;
+  align-items: center;
+  margin: 3rem auto;
+  max-width: 1100px;
+  gap: 0;
+}
+
+.process-root {
+  flex-shrink: 0;
+}
+
+.process-fork-svg {
+  flex-shrink: 0;
+  width: 48px;
+  height: 100px;
+  display: block;
+}
+
+.process-branches {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.process-branch {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.branch-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  white-space: nowrap;
+  min-width: 5.5rem;
+  text-align: right;
+}
+
+.process-flow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.process-step {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-ambient);
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.6s var(--ease-out);
+  white-space: nowrap;
+}
+
+.process-step.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.process-step.root-step {
+  padding: 1.1rem 1.8rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.process-arrow {
+  color: var(--accent);
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: opacity 0.4s ease 0.3s;
+  flex-shrink: 0;
+}
+
+.process-arrow.visible {
+  opacity: 1;
+}
+
+/* ===== TENSION SECTION (key finding) ===== */
+.tension-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.tension-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--text);
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+.tension-explanation {
+  font-size: 1rem;
+  color: var(--text-mid);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== ANIMATED PARTICLES (background) ===== */
+#bgCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .content-section { padding: 4rem 1.5rem; }
+  .pixel-canvas-wrapper { padding: 1.5rem; }
+  .method-card { padding: 1.5rem; }
+  .artist-card { padding: 1.5rem; }
+  .extracted-palette { gap: 0.5rem; }
+  .palette-swatch { min-width: 50px; }
+  .process-flow { gap: 0.5rem; }
+  .process-step { padding: 0.8rem 1rem; font-size: 0.75rem; }
+  .demo-stage-row { grid-template-columns: 1fr; }
+  canvas#paintingCanvas { width: 100%; height: auto; }
+  canvas#rgbCanvas { height: 260px; }
+  .process-branches { flex-direction: column; gap: 1.5rem; }
+  .process-branches::after { display: none; }
+  .process-flow { flex-wrap: wrap; justify-content: center; }
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<nav class="topnav">
+  <a class="brand" href="index.html">Color Extractor</a>
+  <div class="links">
+    <a href="study.html" class="active">Study Report</a>
+    <a href="index.html">Extractor</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1 class="hero-title">Color Palette<br>Extraction</h1>
+  <p class="hero-subtitle">A dual-method study exploring the tension between mathematical truth and human perception in artwork color analysis.</p>
+  <p class="hero-meta">Tao Sun &nbsp;&middot;&nbsp; Ferdinand &times; Tao Project &nbsp;&middot;&nbsp; 2026</p>
+  <a href="index.html" class="hero-cta">Try the live extractor &rarr;</a>
+  <div class="hero-scroll"><span></span></div>
+</section>
+
+<!-- INTRO -->
+<section class="content-section reveal">
+  <span class="section-label">The Question</span>
+  <h2>What colors are really in a painting?</h2>
+  <p>The answer depends on who you ask. A pixel-counting algorithm sees one truth. A human eye sees another. An AI trained on millions of images sees something else entirely.</p>
+  <p>This study applies two fundamentally different methods to the same artworks&mdash;and finds that the most interesting discoveries live in the gap between them.</p>
+</section>
+
+<!-- PROCESS FLOW -->
+<section class="content-section reveal">
+  <span class="section-label">Process</span>
+  <h2>Two paths, one image</h2>
+  <div class="process-diagram" id="processFlow">
+    <div class="process-root">
+      <div class="process-step root-step">Artwork Input</div>
+    </div>
+    <svg class="process-fork-svg" viewBox="0 0 48 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 50 H16 Q24 50 24 30 L24 25 Q24 20 32 20 H48" stroke="var(--accent)" stroke-width="1.2" stroke-opacity="0.4" fill="none"/>
+      <path d="M0 50 H16 Q24 50 24 70 L24 75 Q24 80 32 80 H48" stroke="var(--accent)" stroke-width="1.2" stroke-opacity="0.4" fill="none"/>
+    </svg>
+    <div class="process-branches">
+      <div class="process-branch">
+        <span class="branch-label">Deterministic</span>
+        <div class="process-flow">
+          <div class="process-step">Resize 400&times;400</div>
+          <span class="process-arrow">&rarr;</span>
+          <div class="process-step">MEDIANCUT &rarr; 5 Colors</div>
+          <span class="process-arrow">&rarr;</span>
+          <div class="process-step">Count Pixels &amp; Sort</div>
+        </div>
+      </div>
+      <div class="process-branch">
+        <span class="branch-label">AI-Based</span>
+        <div class="process-flow">
+          <div class="process-step">Visual Analysis</div>
+          <span class="process-arrow">&rarr;</span>
+          <div class="process-step">Perceptual Palette</div>
+          <span class="process-arrow">&rarr;</span>
+          <div class="process-step">Artistic Description</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEDIANCUT ALGORITHM DEMO -->
+<section class="pixel-demo reveal">
+  <div class="pixel-canvas-wrapper">
+    <div class="demo-header">
+      <h3>MEDIANCUT Extraction &mdash; Step by Step</h3>
+      <div class="demo-controls">
+        <button class="demo-btn active" onclick="initDemo('rothko', this)">Rothko</button>
+        <button class="demo-btn" onclick="initDemo('frankenthaler', this)">Frankenthaler</button>
+        <button class="demo-btn" onclick="initDemo('giacometti', this)">Giacometti</button>
+        <button class="demo-btn" onclick="initDemo('branch', this)">Branch</button>
+      </div>
+    </div>
+    <div class="demo-stage-row">
+      <div>
+        <div class="demo-step-label">Source</div>
+        <canvas id="paintingCanvas" width="400" height="400"></canvas>
+      </div>
+      <div class="demo-right-col">
+        <div>
+          <div class="demo-step-label" id="stepLabel">Step 1 / 5</div>
+          <div class="demo-step-desc" id="stepDesc">Generating synthetic painting from artist palette&hellip;</div>
+        </div>
+        <canvas id="rgbCanvas"></canvas>
+        <div class="demo-transport">
+          <button class="step-btn" id="btnNext" onclick="advanceStep()">Next Step &rarr;</button>
+          <button class="step-btn outline" id="btnReset" onclick="initDemo(currentArtist)" style="display:none;">Restart</button>
+          <span class="step-indicator" id="stepIndicator"></span>
+        </div>
+      </div>
+    </div>
+    <div class="extracted-palette" id="extractedPalette"></div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="comparison-section reveal">
+  <span class="section-label">Comparison</span>
+  <h2 style="font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); margin-bottom:2rem;">Deterministic vs. AI</h2>
+  <div class="comparison-grid">
+    <div class="method-card">
+      <span class="method-tag">Method 1</span>
+      <h3>Deterministic Algorithm</h3>
+      <p>Python + Pillow. Image resized to 400&times;400, then quantized to 5 colors via MEDIANCUT. Colors sorted by pixel count&mdash;most area first. Same input always yields the same output.</p>
+      <div class="trait"><span class="trait-dot"></span> Fully reproducible</div>
+      <div class="trait"><span class="trait-dot"></span> Sorted by dominant frequency</div>
+      <div class="trait"><span class="trait-dot"></span> Backgrounds &amp; neutrals can dominate</div>
+      <div class="trait"><span class="trait-dot"></span> Output: swatches + hex codes</div>
+    </div>
+    <div class="method-card">
+      <span class="method-tag">Method 2</span>
+      <h3>AI-Based Analysis</h3>
+      <p>Images sent to a vision-capable AI model. It considers visual perception, artistic intent, and compositional emphasis&mdash;not just pixel counts.</p>
+      <div class="trait"><span class="trait-dot"></span> Probabilistic (varies per run)</div>
+      <div class="trait"><span class="trait-dot"></span> Matches human perception</div>
+      <div class="trait"><span class="trait-dot"></span> Captures mood and materiality</div>
+      <div class="trait"><span class="trait-dot"></span> Output: palettes + descriptions</div>
+    </div>
+  </div>
+</section>
+
+<!-- KEY FINDING -->
+<section class="tension-section reveal">
+  <span class="section-label">Key Finding</span>
+  <p class="tension-quote">&ldquo;The deterministic palette reveals colors that are mathematically present but that we may not consciously perceive. The AI produces palettes that conform to our visual experience. Neither is correct in isolation.&rdquo;</p>
+  <p class="tension-explanation">Together, they provide a richer understanding of how color operates. The deterministic results offer unexpected starting points; the AI results capture the emotional and material qualities we want to evoke.</p>
+</section>
+
+<!-- ARTIST PALETTES -->
+<section class="artists-section">
+  <div class="content-section reveal" style="padding-bottom:2rem;">
+    <span class="section-label">Artist Analysis</span>
+    <h2>Four Color Worlds</h2>
+    <p>Each artist's palette represents a distinct emotional and material character. Hover over the color strips to reveal hex codes.</p>
+  </div>
+
+  <!-- Rothko -->
+  <div class="artist-card reveal">
+    <div class="artist-header">
+      <div>
+        <h3 class="artist-name">Mark Rothko</h3>
+        <span class="artist-descriptor">5 works analyzed &mdash; luminous color fields</span>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">White Center (Yellow, Pink and Lavender on Rose)</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#E6B443"><span class="hex">#E6B443</span></div>
+        <div class="strip-color" style="background:#D373A6"><span class="hex">#D373A6</span></div>
+        <div class="strip-color" style="background:#D061A2"><span class="hex">#D061A2</span></div>
+        <div class="strip-color" style="background:#EFDA88"><span class="hex">#EFDA88</span></div>
+        <div class="strip-color" style="background:#BB6298"><span class="hex">#BB6298</span></div>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Orange and Yellow</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#FFFFFF"><span class="hex">#FFFFFF</span></div>
+        <div class="strip-color" style="background:#EE6F32"><span class="hex">#EE6F32</span></div>
+        <div class="strip-color" style="background:#F1A843"><span class="hex">#F1A843</span></div>
+        <div class="strip-color" style="background:#FCFFFD"><span class="hex">#FCFFFD</span></div>
+        <div class="strip-color" style="background:#FCF2D3"><span class="hex">#FCF2D3</span></div>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Dark Composition</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#310C0D"><span class="hex">#310C0D</span></div>
+        <div class="strip-color" style="background:#181718"><span class="hex">#181718</span></div>
+        <div class="strip-color" style="background:#20332F"><span class="hex">#20332F</span></div>
+        <div class="strip-color" style="background:#274942"><span class="hex">#274942</span></div>
+        <div class="strip-color" style="background:#375C54"><span class="hex">#375C54</span></div>
+      </div>
+    </div>
+    <p class="artist-note">"White Center" yields the golds and magentas we perceive. But the dark compositions reveal deep teals (#20332F, #274942) beneath apparent blackness&mdash;the quiet tonal architecture beneath Rothko's luminous surfaces. Note how "Orange and Yellow" is dominated by whites and creams: the canvas and framing consume more pixel area than the vivid orange we remember.</p>
+  </div>
+
+  <!-- Frankenthaler -->
+  <div class="artist-card reveal">
+    <div class="artist-header">
+      <div>
+        <h3 class="artist-name">Helen Frankenthaler</h3>
+        <span class="artist-descriptor">4 works analyzed &mdash; soak-stain technique</span>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Teal &amp; Pink Wash</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#3F6E6C"><span class="hex">#3F6E6C</span></div>
+        <div class="strip-color" style="background:#9A7363"><span class="hex">#9A7363</span></div>
+        <div class="strip-color" style="background:#D99F82"><span class="hex">#D99F82</span></div>
+        <div class="strip-color" style="background:#789C89"><span class="hex">#789C89</span></div>
+        <div class="strip-color" style="background:#E7BE7D"><span class="hex">#E7BE7D</span></div>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Red Study</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#A35750"><span class="hex">#A35750</span></div>
+        <div class="strip-color" style="background:#B2644F"><span class="hex">#B2644F</span></div>
+        <div class="strip-color" style="background:#56413B"><span class="hex">#56413B</span></div>
+        <div class="strip-color" style="background:#DE7774"><span class="hex">#DE7774</span></div>
+        <div class="strip-color" style="background:#C7685E"><span class="hex">#C7685E</span></div>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Green Botanical</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#5E853E"><span class="hex">#5E853E</span></div>
+        <div class="strip-color" style="background:#71964C"><span class="hex">#71964C</span></div>
+        <div class="strip-color" style="background:#83A762"><span class="hex">#83A762</span></div>
+        <div class="strip-color" style="background:#3A5B34"><span class="hex">#3A5B34</span></div>
+        <div class="strip-color" style="background:#A0BD82"><span class="hex">#A0BD82</span></div>
+      </div>
+    </div>
+    <p class="artist-note">Frankenthaler's soak-stain method produces palettes of remarkable range across works. The algorithm perfectly captures her technique: large washes soaking into raw canvas mean a single hue and its variants dominate each piece. The "Red Study" extracts an almost monochromatic spectrum from #A35750 through #DE7774.</p>
+  </div>
+
+  <!-- Giacometti -->
+  <div class="artist-card reveal">
+    <div class="artist-header">
+      <div>
+        <h3 class="artist-name">Augusto Giacometti</h3>
+        <span class="artist-descriptor">2 works analyzed &mdash; textured surfaces</span>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Fantasia (all-over floral)</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#979082"><span class="hex">#979082</span></div>
+        <div class="strip-color" style="background:#BCB292"><span class="hex">#BCB292</span></div>
+        <div class="strip-color" style="background:#505361"><span class="hex">#505361</span></div>
+        <div class="strip-color" style="background:#C3CACC"><span class="hex">#C3CACC</span></div>
+        <div class="strip-color" style="background:#DED7C8"><span class="hex">#DED7C8</span></div>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Pink Blossoms</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#95747F"><span class="hex">#95747F</span></div>
+        <div class="strip-color" style="background:#693E2F"><span class="hex">#693E2F</span></div>
+        <div class="strip-color" style="background:#825C52"><span class="hex">#825C52</span></div>
+        <div class="strip-color" style="background:#9F8D8D"><span class="hex">#9F8D8D</span></div>
+        <div class="strip-color" style="background:#AEA5A3"><span class="hex">#AEA5A3</span></div>
+      </div>
+    </div>
+    <p class="artist-note">A prime example of the algorithm revealing mathematical truth vs. visual perception. "Fantasia" is full of vivid yellows, blues, and greens, yet the palette extracts warm greys and muted neutrals&mdash;the painting's heavily textured, interwoven brushwork means muted, mixed tones genuinely occupy more pixel area than any single pure hue. The vivid colors are present but fragmented across the surface, each too small to dominate a MEDIANCUT partition. The "Blossoms" painting, dominated by pink, extracts as dusty mauves and browns.</p>
+  </div>
+
+  <!-- Winston Branch -->
+  <div class="artist-card reveal">
+    <div class="artist-header">
+      <div>
+        <h3 class="artist-name">Winston Branch</h3>
+        <span class="artist-descriptor">5 works analyzed &mdash; atmospheric abstraction</span>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Red &amp; Blue Atmospheric</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#383936"><span class="hex">#383936</span></div>
+        <div class="strip-color" style="background:#AC331A"><span class="hex">#AC331A</span></div>
+        <div class="strip-color" style="background:#90734E"><span class="hex">#90734E</span></div>
+        <div class="strip-color" style="background:#DBD8D2"><span class="hex">#DBD8D2</span></div>
+        <div class="strip-color" style="background:#CDC1B1"><span class="hex">#CDC1B1</span></div>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Earth &amp; Crimson</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#727953"><span class="hex">#727953</span></div>
+        <div class="strip-color" style="background:#8A3439"><span class="hex">#8A3439</span></div>
+        <div class="strip-color" style="background:#302F29"><span class="hex">#302F29</span></div>
+        <div class="strip-color" style="background:#BDBCB9"><span class="hex">#BDBCB9</span></div>
+        <div class="strip-color" style="background:#B2A389"><span class="hex">#B2A389</span></div>
+      </div>
+    </div>
+    <div class="palette-row">
+      <div class="palette-label">Deep Blue Nocturne</div>
+      <div class="palette-strip">
+        <div class="strip-color" style="background:#273851"><span class="hex">#273851</span></div>
+        <div class="strip-color" style="background:#1B1A38"><span class="hex">#1B1A38</span></div>
+        <div class="strip-color" style="background:#D5CFC2"><span class="hex">#D5CFC2</span></div>
+        <div class="strip-color" style="background:#51787E"><span class="hex">#51787E</span></div>
+        <div class="strip-color" style="background:#E1DED6"><span class="hex">#E1DED6</span></div>
+      </div>
+    </div>
+    <p class="artist-note">Branch's large-scale atmospheric paintings are visually dominated by bold reds, blues, and yellows&mdash;but the algorithm extracts the vast blended regions where those colors meet: olive greens, burnt siennas, warm greys. The vivid primaries that define the visual experience occupy relatively small pixel areas. A clear case where the algorithm's output diverges dramatically from human perception.</p>
+  </div>
+</section>
+
+<!-- WHY TWO METHODS -->
+<section class="content-section reveal">
+  <span class="section-label">Philosophy</span>
+  <h2>Why two methods?</h2>
+  <p>Technology is a tool, not a replacement for critical thinking. The deterministic algorithm represents craft and precision; the AI represents intuition and association. Both are necessary.</p>
+  <p>The most interesting insights emerge from the space between them. By maintaining a ground truth alongside AI interpretation, we preserve the ability to be surprised&mdash;and to find colors we never knew were there.</p>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer reveal">
+  <p>Ferdinand &times; Tao &nbsp;&middot;&nbsp; Color Palette Extraction Study &nbsp;&middot;&nbsp; 2026</p>
+</footer>
+
+<script>
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Stagger process steps
+      const steps = entry.target.querySelectorAll('.process-step, .process-arrow');
+      steps.forEach((step, i) => {
+        setTimeout(() => step.classList.add('visible'), i * 120);
+      });
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== BACKGROUND PARTICLES =====
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+let particles = [];
+
+function resizeBg() {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+}
+resizeBg();
+window.addEventListener('resize', resizeBg);
+
+class Particle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * bgCanvas.width;
+    this.y = Math.random() * bgCanvas.height;
+    this.size = Math.random() * 2 + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.15;
+    this.speedY = (Math.random() - 0.5) * 0.15;
+    this.opacity = Math.random() * 0.08 + 0.02;
+    this.hue = Math.random() * 40 + 15; // warm tones
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.x < 0 || this.x > bgCanvas.width || this.y < 0 || this.y > bgCanvas.height) {
+      this.reset();
+    }
+  }
+  draw() {
+    bgCtx.beginPath();
+    bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    bgCtx.fillStyle = `hsla(${this.hue}, 30%, 50%, ${this.opacity})`;
+    bgCtx.fill();
+  }
+}
+
+for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+function animateBg() {
+  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animateBg);
+}
+animateBg();
+
+// ===== MEDIANCUT ALGORITHM DEMO =====
+
+const paintingCanvas = document.getElementById('paintingCanvas');
+const paintCtx = paintingCanvas.getContext('2d');
+const rgbCanvas = document.getElementById('rgbCanvas');
+const rgbCtx = rgbCanvas.getContext('2d');
+let currentArtist = 'rothko';
+let demoStep = 0;
+let demoAnim = null;
+let sampledPixels = [];
+let partitions = [];
+
+const artistData = {
+  rothko: {
+    name: 'Rothko — White Center',
+    colors: ['#E6B443','#D373A6','#D061A2','#EFDA88','#BB6298'],
+    allColors: ['#E6B443','#D373A6','#D061A2','#EFDA88','#BB6298','#EE6F32','#F1A843','#FCF2D3','#310C0D','#675C5C'],
+    image: 'assets/images/artworks/rothko.jpg',
+    style: 'fields',
+  },
+  frankenthaler: {
+    name: 'Frankenthaler — IMG_9492',
+    colors: ['#3F6E6C','#9A7363','#D99F82','#789C89','#E7BE7D'],
+    allColors: ['#3F6E6C','#9A7363','#D99F82','#789C89','#E7BE7D','#A35750','#5E853E','#966269','#B2644F','#A0BD82'],
+    image: 'assets/images/artworks/frankenthaler.jpg',
+    style: 'wash',
+  },
+  giacometti: {
+    name: 'Giacometti — Fantasia',
+    colors: ['#979082','#BCB292','#505361','#C3CACC','#DED7C8'],
+    allColors: ['#979082','#BCB292','#505361','#C3CACC','#DED7C8','#95747F','#693E2F','#825C52','#9F8D8D','#AEA5A3'],
+    image: 'assets/images/artworks/giacometti.jpg',
+    style: 'spatter',
+  },
+  branch: {
+    name: 'Branch — IMG_7666',
+    colors: ['#383936','#AC331A','#90734E','#DBD8D2','#CDC1B1'],
+    allColors: ['#383936','#AC331A','#90734E','#DBD8D2','#CDC1B1','#8B8B69','#7B704F','#8B3520','#727953','#273851'],
+    image: 'assets/images/artworks/branch.jpg',
+    style: 'atmosphere',
+  },
+};
+
+const stepInfo = [
+  { label: 'Step 1 / 5', desc: 'Source painting. The algorithm starts with the full image — every pixel is a data point in RGB color space.' },
+  { label: 'Step 2 / 5', desc: 'Pixels sampled and plotted in RGB space (R = horizontal, G = vertical, B = dot brightness). Each dot is one pixel from the painting.' },
+  { label: 'Step 3 / 5', desc: 'MEDIANCUT: Find the color channel (R, G, or B) with the greatest range across all pixels. Split the set at the median value along that channel.' },
+  { label: 'Step 4 / 5', desc: 'Recursive partitioning continues — each sub-partition is split along its own widest channel until 5 partitions remain.' },
+  { label: 'Step 5 / 5', desc: 'Each partition is represented by one color (its centroid). Pixels are counted per partition — the final palette, sorted by pixel area.' },
+];
+
+function hexToRgb(hex) {
+  return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+}
+
+// ---- Load source image or generate synthetic fallback ----
+let sourceImageLoaded = false;
+
+function loadSourceImage(artist) {
+  return new Promise((resolve) => {
+    const data = artistData[artist];
+    if (data.image) {
+      const img = new Image();
+      img.onload = () => {
+        const W = 400, H = 400;
+        paintingCanvas.width = W; paintingCanvas.height = H;
+        // Draw image covering the canvas (maintain aspect ratio, crop to fill)
+        const scale = Math.max(W / img.width, H / img.height);
+        const sw = W / scale, sh = H / scale;
+        const sx = (img.width - sw) / 2, sy = (img.height - sh) / 2;
+        paintCtx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+        sourceImageLoaded = true;
+        resolve();
+      };
+      img.onerror = () => {
+        // Fallback to synthetic
+        generateSyntheticPainting(artist);
+        resolve();
+      };
+      img.src = data.image;
+    } else {
+      generateSyntheticPainting(artist);
+      resolve();
+    }
+  });
+}
+
+function generateSyntheticPainting(artist) {
+  const data = artistData[artist];
+  const W = 400, H = 400;
+  paintingCanvas.width = W; paintingCanvas.height = H;
+  const ctx = paintCtx;
+  const cols = data.allColors.map(hexToRgb);
+  sourceImageLoaded = false;
+
+  // Rothko-style horizontal bands (only fallback currently needed)
+  const bands = cols.slice(0, 6);
+  const bandH = H / bands.length;
+  bands.forEach((c, i) => {
+    const grad = ctx.createLinearGradient(0, i * bandH, 0, (i+1) * bandH + bandH * 0.3);
+    grad.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},0.95)`);
+    grad.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0.5)`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, i * bandH - 10, W, bandH + 20);
+  });
+  for (let i = 0; i < 3000; i++) {
+    const c = cols[Math.floor(Math.random() * cols.length)];
+    ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},0.04)`;
+    ctx.fillRect(Math.random()*W - 20, Math.random()*H - 5, 40 + Math.random()*60, 8 + Math.random()*12);
+  }
+}
+
+// ---- Sample pixels from the painting canvas ----
+function samplePixels() {
+  const W = paintingCanvas.width, H = paintingCanvas.height;
+  sampledPixels = [];
+  const count = 800;
+  try {
+    const imgData = paintCtx.getImageData(0, 0, W, H).data;
+    for (let i = 0; i < count; i++) {
+      const px = Math.floor(Math.random() * W);
+      const py = Math.floor(Math.random() * H);
+      const idx = (py * W + px) * 4;
+      sampledPixels.push({
+        r: imgData[idx], g: imgData[idx+1], b: imgData[idx+2],
+        srcX: px, srcY: py,
+        partition: 0,
+      });
+    }
+  } catch (e) {
+    // Canvas tainted by cross-origin image (file:// security) —
+    // fall back to sampling from the known palette colors
+    const data = artistData[currentArtist];
+    const cols = data.allColors.map(hexToRgb);
+    for (let i = 0; i < count; i++) {
+      const c = cols[Math.floor(Math.random() * cols.length)];
+      // Add slight per-pixel noise so the scatter isn't just 10 dots
+      const jitter = () => Math.max(0, Math.min(255, Math.round((Math.random() - 0.5) * 30)));
+      sampledPixels.push({
+        r: Math.min(255, Math.max(0, c[0] + jitter())),
+        g: Math.min(255, Math.max(0, c[1] + jitter())),
+        b: Math.min(255, Math.max(0, c[2] + jitter())),
+        srcX: Math.floor(Math.random() * W),
+        srcY: Math.floor(Math.random() * H),
+        partition: 0,
+      });
+    }
+  }
+}
+
+// ---- Isometric projection for RGB cube ----
+function projectRGB(r, g, b, w, h) {
+  // Map 0-255 to unit cube, then isometric project
+  const nr = r/255, ng = g/255, nb = b/255;
+  const angle = Math.PI / 6;
+  const scale = Math.min(w, h) * 0.38;
+  const cx = w * 0.5, cy = h * 0.55;
+  const x = cx + scale * (nr - nb) * Math.cos(angle);
+  const y = cy - scale * ng * 0.9 + scale * (nr + nb) * Math.sin(angle) * 0.45;
+  return [x, y];
+}
+
+// ---- Draw RGB space with pixels ----
+function drawRGBSpace(highlightPartitions, animProgress) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = rgbCanvas.getBoundingClientRect();
+  rgbCanvas.width = rect.width * dpr;
+  rgbCanvas.height = rect.height * dpr;
+  rgbCtx.scale(dpr, dpr);
+  const w = rect.width, h = rect.height;
+
+  // Background
+  rgbCtx.fillStyle = '#0d0d12';
+  rgbCtx.fillRect(0, 0, w, h);
+
+  // Draw axis labels
+  rgbCtx.font = '500 10px Plus Jakarta Sans, sans-serif';
+  rgbCtx.fillStyle = 'rgba(255,255,255,0.3)';
+  const [rx, ry] = projectRGB(255, 0, 0, w, h);
+  const [gx, gy] = projectRGB(0, 255, 0, w, h);
+  const [bx, by] = projectRGB(0, 0, 255, w, h);
+  rgbCtx.fillText('R', rx + 6, ry);
+  rgbCtx.fillText('G', gx, gy - 8);
+  rgbCtx.fillText('B', bx - 14, by);
+
+  // Draw faint cube edges
+  rgbCtx.strokeStyle = 'rgba(255,255,255,0.07)';
+  rgbCtx.lineWidth = 1;
+  const corners = [[0,0,0],[255,0,0],[255,255,0],[0,255,0],[0,0,255],[255,0,255],[255,255,255],[0,255,255]];
+  const edges = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+  edges.forEach(([a,b]) => {
+    const [x1,y1] = projectRGB(...corners[a], w, h);
+    const [x2,y2] = projectRGB(...corners[b], w, h);
+    rgbCtx.beginPath(); rgbCtx.moveTo(x1,y1); rgbCtx.lineTo(x2,y2); rgbCtx.stroke();
+  });
+
+  // Partition colors for visual distinction
+  const partColors = ['#FF6B6B','#4ECDC4','#FFE66D','#95E1D3','#F38181'];
+
+  // Draw partition bounding boxes if requested
+  if (highlightPartitions && partitions.length > 1) {
+    partitions.forEach((part, pi) => {
+      if (!part.pixels.length) return;
+      const col = partColors[pi % 5];
+      // Draw a convex-hull-ish boundary using min/max projected positions
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      part.pixels.forEach(p => {
+        const [px, py] = projectRGB(p.r, p.g, p.b, w, h);
+        minX = Math.min(minX, px); maxX = Math.max(maxX, px);
+        minY = Math.min(minY, py); maxY = Math.max(maxY, py);
+      });
+      const pad = 8;
+      rgbCtx.strokeStyle = col;
+      rgbCtx.lineWidth = 1.5;
+      rgbCtx.globalAlpha = 0.5;
+      rgbCtx.setLineDash([4, 3]);
+      rgbCtx.strokeRect(minX - pad, minY - pad, maxX - minX + pad*2, maxY - minY + pad*2);
+      rgbCtx.setLineDash([]);
+      rgbCtx.globalAlpha = 1;
+
+      // Partition label
+      rgbCtx.font = '600 9px Plus Jakarta Sans, sans-serif';
+      rgbCtx.fillStyle = col;
+      rgbCtx.fillText(`P${pi+1}`, minX - pad, minY - pad - 4);
+    });
+  }
+
+  // Draw pixels
+  const ap = typeof animProgress === 'number' ? animProgress : 1;
+  sampledPixels.forEach(p => {
+    const [x, y] = projectRGB(p.r, p.g, p.b, w, h);
+    const col = highlightPartitions && partitions.length > 1
+      ? partColors[p.partition % 5]
+      : `rgb(${p.r},${p.g},${p.b})`;
+    rgbCtx.globalAlpha = 0.7 * ap;
+    rgbCtx.fillStyle = col;
+    rgbCtx.beginPath();
+    rgbCtx.arc(x, y, 2.5, 0, Math.PI * 2);
+    rgbCtx.fill();
+  });
+  rgbCtx.globalAlpha = 1;
+
+  // Draw centroids if we're at step 5
+  if (highlightPartitions && partitions.length === 5 && demoStep >= 4) {
+    partitions.forEach((part, pi) => {
+      if (!part.pixels.length) return;
+      const cr = part.centroid[0], cg = part.centroid[1], cb = part.centroid[2];
+      const [cx, cy] = projectRGB(cr, cg, cb, w, h);
+      // Outer ring
+      rgbCtx.strokeStyle = '#fff';
+      rgbCtx.lineWidth = 2;
+      rgbCtx.beginPath(); rgbCtx.arc(cx, cy, 8, 0, Math.PI*2); rgbCtx.stroke();
+      // Filled center
+      rgbCtx.fillStyle = `rgb(${cr},${cg},${cb})`;
+      rgbCtx.beginPath(); rgbCtx.arc(cx, cy, 6, 0, Math.PI*2); rgbCtx.fill();
+    });
+  }
+}
+
+// ---- Actual MEDIANCUT algorithm ----
+function medianCutSplit(pixels, nPartitions) {
+  // Start with all pixels in one partition
+  let parts = [{ pixels: pixels.slice(), centroid: [0,0,0] }];
+
+  while (parts.length < nPartitions) {
+    // Find partition with widest channel range
+    let bestIdx = 0, bestRange = -1, bestChannel = 0;
+    parts.forEach((part, i) => {
+      ['r','g','b'].forEach((ch, ci) => {
+        const vals = part.pixels.map(p => p[ch]);
+        const range = Math.max(...vals) - Math.min(...vals);
+        if (range > bestRange) { bestRange = range; bestIdx = i; bestChannel = ci; }
+      });
+    });
+
+    // Split that partition at median of the widest channel
+    const ch = ['r','g','b'][bestChannel];
+    const toSplit = parts[bestIdx];
+    toSplit.pixels.sort((a, b) => a[ch] - b[ch]);
+    const mid = Math.floor(toSplit.pixels.length / 2);
+    const left = { pixels: toSplit.pixels.slice(0, mid), centroid: [0,0,0] };
+    const right = { pixels: toSplit.pixels.slice(mid), centroid: [0,0,0] };
+
+    parts.splice(bestIdx, 1, left, right);
+
+    // Update centroids
+    parts.forEach(part => {
+      if (!part.pixels.length) return;
+      const n = part.pixels.length;
+      part.centroid = [
+        Math.round(part.pixels.reduce((s,p) => s+p.r, 0) / n),
+        Math.round(part.pixels.reduce((s,p) => s+p.g, 0) / n),
+        Math.round(part.pixels.reduce((s,p) => s+p.b, 0) / n),
+      ];
+    });
+  }
+
+  // Assign partition index back to pixels
+  parts.forEach((part, pi) => {
+    part.pixels.forEach(p => { p.partition = pi; });
+  });
+
+  return parts;
+}
+
+function runPartialMedianCut(nSplits) {
+  partitions = medianCutSplit(sampledPixels, nSplits);
+}
+
+// ---- Demo controller ----
+async function initDemo(artist, btn) {
+  if (demoAnim) cancelAnimationFrame(demoAnim);
+  currentArtist = artist;
+  demoStep = 0;
+
+  document.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else document.querySelector(`.demo-btn[onclick*="${artist}"]`)?.classList.add('active');
+
+  document.getElementById('extractedPalette').innerHTML = '';
+  document.getElementById('btnReset').style.display = 'none';
+  document.getElementById('btnNext').disabled = true;
+
+  // Load the real source image (or synthetic fallback)
+  await loadSourceImage(artist);
+  samplePixels();
+  partitions = [{ pixels: sampledPixels.slice(), centroid: [0,0,0] }];
+
+  document.getElementById('btnNext').disabled = false;
+  updateStepUI();
+
+  // Update step 1 description based on whether real image loaded
+  if (sourceImageLoaded) {
+    stepInfo[0].desc = `Source painting: ${artistData[artist].name}. The algorithm starts with the full image — every pixel is a data point in RGB color space.`;
+  } else {
+    stepInfo[0].desc = 'Synthetic painting generated from the artist palette (source image not available). Every pixel is a data point in RGB color space.';
+  }
+  updateStepUI();
+
+  // Draw empty RGB space
+  const dpr = window.devicePixelRatio || 1;
+  const rect = rgbCanvas.getBoundingClientRect();
+  rgbCanvas.width = rect.width * dpr;
+  rgbCanvas.height = rect.height * dpr;
+  rgbCtx.scale(dpr, dpr);
+  rgbCtx.fillStyle = '#0d0d12';
+  rgbCtx.fillRect(0, 0, rect.width, rect.height);
+
+  rgbCtx.font = '400 13px Plus Jakarta Sans, sans-serif';
+  rgbCtx.fillStyle = 'rgba(255,255,255,0.25)';
+  rgbCtx.textAlign = 'center';
+  rgbCtx.fillText('Press "Next Step" to begin extraction', rect.width/2, rect.height/2);
+  rgbCtx.textAlign = 'start';
+}
+
+function updateStepUI() {
+  const info = stepInfo[demoStep];
+  document.getElementById('stepLabel').textContent = info.label;
+  document.getElementById('stepDesc').textContent = info.desc;
+  document.getElementById('stepIndicator').textContent = '';
+}
+
+function advanceStep() {
+  if (demoAnim) cancelAnimationFrame(demoAnim);
+  demoStep++;
+  if (demoStep > 4) demoStep = 4;
+  updateStepUI();
+
+  if (demoStep === 1) {
+    // Animate pixels appearing in RGB space
+    let frame = 0;
+    const total = 60;
+    function anim() {
+      frame++;
+      const p = Math.min(frame / total, 1);
+      drawRGBSpace(false, p);
+      if (frame < total) demoAnim = requestAnimationFrame(anim);
+    }
+    anim();
+  } else if (demoStep === 2) {
+    // First split (2 partitions)
+    runPartialMedianCut(2);
+    animatePartitionTransition();
+  } else if (demoStep === 3) {
+    // Continue to 5 partitions
+    runPartialMedianCut(5);
+    animatePartitionTransition();
+  } else if (demoStep === 4) {
+    // Final: show centroids and palette
+    runPartialMedianCut(5);
+    drawRGBSpace(true);
+    showFinalPalette();
+    document.getElementById('btnNext').disabled = true;
+    document.getElementById('btnReset').style.display = 'inline-block';
+  }
+}
+
+function animatePartitionTransition() {
+  let frame = 0;
+  const total = 45;
+  function anim() {
+    frame++;
+    drawRGBSpace(true, Math.min(frame / 20, 1));
+    if (frame < total) demoAnim = requestAnimationFrame(anim);
+  }
+  anim();
+}
+
+function showFinalPalette() {
+  const data = artistData[currentArtist];
+  const paletteEl = document.getElementById('extractedPalette');
+  paletteEl.innerHTML = '';
+
+  // Sort partitions by pixel count (most first) — this is the actual post-quantization step
+  const sorted = partitions.slice().sort((a, b) => b.pixels.length - a.pixels.length);
+  sorted.forEach((part, i) => {
+    const [r, g, b] = part.centroid;
+    const hex = `#${[r,g,b].map(v => v.toString(16).padStart(2,'0').toUpperCase()).join('')}`;
+    const pct = Math.round(part.pixels.length / sampledPixels.length * 100);
+    const swatch = document.createElement('div');
+    swatch.className = 'palette-swatch';
+    swatch.style.backgroundColor = `rgb(${r},${g},${b})`;
+    swatch.innerHTML = `<span class="swatch-label">${hex}<br>${pct}%</span>`;
+    paletteEl.appendChild(swatch);
+    setTimeout(() => swatch.classList.add('appear'), i * 120);
+  });
+
+  // Show actual extracted colors for comparison
+  const note = document.createElement('div');
+  note.style.cssText = 'width:100%; margin-top:1rem; font-size:0.75rem; color:var(--text-light);';
+  note.innerHTML = `<em>Actual script output for ${data.name}: ${data.colors.join(', ')}</em>`;
+  paletteEl.appendChild(note);
+}
+
+// Auto-start demo when visible
+const pixelObserver = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) {
+    initDemo('rothko');
+    pixelObserver.disconnect();
+  }
+}, { threshold: 0.3 });
+pixelObserver.observe(document.querySelector('.pixel-demo'));
+</script>
+
+</body>
+</html>
