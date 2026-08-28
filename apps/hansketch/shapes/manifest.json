@@ -1,0 +1,69 @@
+{
+  "schema": "hansketch.preset-shape-manifest",
+  "version": "1.0.0",
+  "shapes": [
+    {
+      "id": "lobed-drop",
+      "name": "Lobed Drop",
+      "category": "organic",
+      "note": "Three-lobed asymmetric blob. Placeholder for a traced Arp form.",
+      "file": "lobed-drop.json"
+    },
+    {
+      "id": "split-leaf",
+      "name": "Split Leaf",
+      "category": "organic",
+      "note": "Elongated two-lobed leaf on a diagonal.",
+      "file": "split-leaf.json"
+    },
+    {
+      "id": "pebble",
+      "name": "Pebble",
+      "category": "organic",
+      "note": "Near-elliptical form with a single soft swell.",
+      "file": "pebble.json"
+    },
+    {
+      "id": "cloud-mass",
+      "name": "Cloud Mass",
+      "category": "organic",
+      "note": "Five-lobed rounded mass, wider than tall.",
+      "file": "cloud-mass.json"
+    },
+    {
+      "id": "hollow-stone",
+      "name": "Hollow Stone",
+      "category": "organic",
+      "note": "Rounded outer form with one interior opening.",
+      "file": "hollow-stone.json"
+    },
+    {
+      "id": "disc",
+      "name": "Disc",
+      "category": "geometric",
+      "note": "True circle, 64 segments.",
+      "file": "disc.json"
+    },
+    {
+      "id": "oval",
+      "name": "Oval",
+      "category": "geometric",
+      "note": "Ellipse tilted off the vertical.",
+      "file": "oval.json"
+    },
+    {
+      "id": "rounded-triangle",
+      "name": "Rounded Triangle",
+      "category": "geometric",
+      "note": "Equilateral triangle with softened corners.",
+      "file": "rounded-triangle.json"
+    },
+    {
+      "id": "arch",
+      "name": "Arch",
+      "category": "geometric",
+      "note": "Flat base rising into a half-round head.",
+      "file": "arch.json"
+    }
+  ]
+}

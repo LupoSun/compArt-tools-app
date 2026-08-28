@@ -200,7 +200,8 @@
             <li><a href="#draw">Draw Tools</a></li>
             <li><a href="#edit">Edit Tools</a></li>
             <li><a href="#shape">Shape Settings</a></li>
-            <li><a href="#sliders">Physics Sliders</a></li>
+            <li><a href="#presets">Preset Library</a></li>
+            <li><a href="#sliders">Physics Dials</a></li>
             <li><a href="#canvas">Canvas Controls</a></li>
           </ul>
         </li>
@@ -215,38 +216,38 @@
   <main>
     <section id="intro">
       <h2>Overview</h2>
-      <p>HanSketch is a WebGL-based canvas for creating physics-driven blobs, lines, and repulsion circles. Draw shapes, tweak physics, then export to SVG or high-res JPG.</p>
+      <p>HanSketch is a WebGL-based canvas for creating physics-driven paths, circles, particles, and extracted-shape bindings. Draw forms, tune the motion, then export to SVG, JPG, or animation.</p>
     </section>
 
     <section id="interface">
       <h2>Interface</h2>
       <ul>
-        <li><strong>Toolbar (left)</strong> – icons for draw/edit modes and shape defaults.</li>
-        <li><strong>Canvas (center)</strong> – 500×500 px drawing area with always-on grid.</li>
-        <li><strong>Sliders (bottom)</strong> – real-time physics controls.</li>
+        <li><strong>Tool rail (left)</strong> – actions: Pen, Circle, Rectangle, Triangle, Particles, attractor/repulsor, and the editing tools.</li>
+        <li><strong>Canvas stage (center)</strong> – the artboard scales to the available viewport while preserving its internal pixel dimensions.</li>
+        <li><strong>Physics dials (bottom)</strong> – visible Form and Motion controls, with Blob Size, Spacing, and Bounce in Advanced.</li>
+        <li><strong>Inspector (right)</strong> – color and size, palettes, layers, topology, and Shape + Motion Binding Studio.</li>
       </ul>
     </section>
 
     <section id="draw">
       <h2>Draw Tools</h2>
       <ul>
-        <li><strong>Blob</strong> – closed shapes. Click-drag to draw; releases seal the shape.</li>
-        <li><strong>Line</strong> – open polylines. Click-drag to draw</li>
+        <li><strong>Pen</strong> – click-drag to draw. Release near the starting point and HanSketch closes the stroke into a blob; release elsewhere and it remains an open curve. The endpoint detection is intentionally forgiving and scales with the canvas.</li>
         <li><strong>Circle</strong> – draw a repulsion circle. Drag sets radius; blobs avoid inside. Wrap blobs around circles to create controlled shapes.</li>
         <li><strong>Rectangle</strong> – drag to size a rectangle. Corners are pinned so the shape holds its geometry while its edges still breathe.</li>
         <li><strong>Triangle</strong> – drag to size an isosceles triangle, apex centred on the top edge. Corners are pinned as with the rectangle.</li>
       </ul>
-      <p>Active tool shows an "ON" badge on its icon.</p>
+      <p>The active tool is marked with an accent rim.</p>
     </section>
 
     <section id="edit">
       <h2>Edit Tools</h2>
       <ul>
-        <li><strong>Drag</strong> – move blobs, lines or circles.</li>
-        <li><strong>Freeze</strong> – lock physics inside closed shapes (dashed rendering).</li>
+        <li><strong>Drag</strong> – move paths, circles, or other geometry.</li>
+        <li><strong>Freeze</strong> – lock physics in a shape (dashed rendering). Click inside a closed form, or on an open path.</li>
         <li><strong>Slice</strong> – click a chain segment to split the shape.</li>
         <li><strong>Pin</strong> – fix single points in place (red target ring). Click red target ring to release point.</li>
-        <li><strong>Delete</strong> – erase the nearest circle, line segment or blob.</li>
+        <li><strong>Delete</strong> – erase the nearest circle, path, or blob.</li>
       </ul>
       <p>Only one edit mode may be active at a time.</p>
     </section>
@@ -255,21 +256,29 @@
       <h2>Shape Settings</h2>
       <ul>
         <li><strong>Color</strong> – sets stroke/fill color.</li>
-        <li><strong>Size</strong> – sets the base blob / line size</li>
-        <li><strong>Variation</strong> – random size variation per drawn object</li>
+        <li><strong>Size</strong> – sets the base radius used for new paths and particles.</li>
+        <li><strong>Palette</strong> – load a <code>hansketch.color</code> export and click a swatch to use it.</li>
       </ul>
     </section>
 
+    <section id="presets">
+      <h2>Preset Library</h2>
+      <p>Open <strong>Presets</strong> from the title bar to add a starting study to the active layer. Search by name or description, then filter by category. Built-ins include circle/blob grids, Blob Face, Organic Garden, Gesture Ribbons, Hollow Seed, and Orbit Field. The procedural studies fit the current canvas and use the active palette when one is loaded. The <strong>Organic</strong> and <strong>Geometric</strong> categories come from the shape library — JSON outlines shipped alongside the app — and are fitted to the canvas without changing your physics dials.</p>
+      <p><strong>Save current</strong> stores the current chains and circles in this browser only. Saved cards can be deleted individually with × or all at once with <strong>Clear saved</strong>. Applying a saved preset aspect-fits it to the current canvas and resets its velocities; it does not alter the source scene or upload anything.</p>
+    </section>
+
     <section id="sliders">
-      <h2>Physics Sliders</h2>
+      <h2>Physics Dials</h2>
       <table>
         <thead><tr><th>Slider</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td>Blob Size</td><td>Scales blob size.</td></tr>
-          <tr><td>Excitability</td><td>Controls bounce/damping.</td></tr>
-          <tr><td>Rigidity</td><td>Spring tension between points on blob/line.</td></tr>
-          <tr><td>Turmoil</td><td>Repulsion strength to avoid overlaps.</td></tr>
-          <tr><td>Animation Speed</td><td>Adjusts the global timestep.</td></tr>
+          <tr><td>Blob Size</td><td>Changes vertex size, point spacing, and spring rest length, so existing forms can re-shape.</td></tr>
+          <tr><td>Bounce</td><td>Controls how much motion carries over from frame to frame. High keeps forms trembling; low lets them settle.</td></tr>
+          <tr><td>Inflation</td><td>Internal pressure that pushes closed forms outward; open paths are unaffected.</td></tr>
+          <tr><td>Stiffness</td><td>Spring strength that pulls vertices back toward their rest spacing.</td></tr>
+          <tr><td>Spacing</td><td>Repulsion strength that keeps points and forms from overlapping.</td></tr>
+          <tr><td>Chaos</td><td>An ambient noise field that pushes every vertex around, with a gentle pull back toward the centre. 0 is off.</td></tr>
+          <tr><td>Speed</td><td>How fast the simulation plays. 50% is real time; forms behave the same at any speed.</td></tr>
         </tbody>
       </table>
     </section>
@@ -277,20 +286,21 @@
     <section id="canvas">
       <h2>Canvas Controls</h2>
       <ul>
-        <li><strong>Thickness (T icon)</strong> – toggles 1 px/5 px stroke.</li>
-        <li><strong>Solid Fill (▣)</strong> In Fill mode, blob interiors render as filled.</li>
-        <li><strong>Undo (⎌)</strong> – removes last element.</li>
-        <li><strong>Repel ↔ </strong> – enables high repel mode, which adds more force to keep blobs from intersecting</li>
-        <li><strong>Reset (⟳)</strong> – clears all after confirmation.</li>
+        <li><strong>Appearance (🎨)</strong> – choose outline, fill, background, and stroke settings.</li>
+        <li><strong>Spacing</strong> – choose no, normal, or high repulsion between forms.</li>
+        <li><strong>Undo (⎌)</strong> – removes the last geometry edit.</li>
+        <li><strong>Topology</strong> – enable Self-intersection → hole for nested inner rings.</li>
+        <li><strong>Reset (🗑️)</strong> – clears the scene after confirmation.</li>
+        <li><strong>Shape + Motion</strong> – open Binding Studio to map an extracted shape to a continuous motion clip.</li>
       </ul>
     </section>
     <section id="shortcuts">
       <h2>Keyboard</h2>
       <ul>
-        <li><kbd>Q</kbd> Blob · <kbd>W</kbd> Line · <kbd>E</kbd> Circle · <kbd>T</kbd> Rectangle · <kbd>Y</kbd> Triangle · <kbd>R</kbd> Particles</li>
+        <li><kbd>Q</kbd> Pen · <kbd>E</kbd> Circle · <kbd>T</kbd> Rectangle · <kbd>Y</kbd> Triangle · <kbd>R</kbd> Particles</li>
         <li><kbd>A</kbd> Drag · <kbd>S</kbd> Freeze · <kbd>D</kbd> Pin · <kbd>Z</kbd> Slice · <kbd>X</kbd> Delete</li>
         <li><kbd>Mouse‑Wheel</kbd> over canvas / slider – adjust Blob Size smoothly.</li>
-        <li><kbd>Space</kbd> – Freezes animation -> toggles Excitability to 0 and back.</li>
+        <li><kbd>Space</kbd> – Pauses animation → toggles Speed to 0 and back.</li>
       </ul>
     </section>
     <section id="file">
@@ -333,7 +343,7 @@
       <ul>
         <li><strong>Desktop / Laptop (recommended)</strong> – any CPU from 2013‑onward with an
             integrated or discrete GPU that supports OpenGL 2.1 / WebGL 1.0.</li>
-        <li><strong>Tablets and Mobile Devices</strong> – Not Supported</li>
+        <li><strong>iPad</strong> – Supported with the touch-friendly overlay layout; iPhone is not supported.</li>
       </ul>
 
       <h3>Software</h3>
@@ -344,7 +354,7 @@
 
       <h3>Performance Tips</h3>
       <ul>
-        <li>Turn off <em>Thickness</em> or lower <em>Blob Size</em> on Intel HD 4000‑era GPUs.</li>
+        <li>Lower <em>Blob Size</em> or <em>Speed</em> on older integrated GPUs.</li>
         <li>Press <kbd>Space</kbd> to mute physics when previewing static artwork.</li>
         <li>Laptop users: disable high‑DPI rendering by setting browser zoom to 100 % for extra FPS.</li>
       </ul>
@@ -354,7 +364,7 @@
       <ul>
         <li><strong>No drawing?</strong> Ensure WebGL is enabled in your browser.</li>
         <li><strong>Red glow won’t go away?</strong> Click the active Edit‑Tool icon again to exit edit mode.</li>
-        <li><strong>Slow performance?</strong> Lower Blob Size or Animation Speed.</li>
+        <li><strong>Slow performance?</strong> Lower Blob Size or Speed, or press <kbd>Space</kbd> to pause temporarily.</li>
         <li><strong>Mobile warning?</strong> App requires a desktop browser.</li>
       </ul>
     </section>
