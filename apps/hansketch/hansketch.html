@@ -74,7 +74,7 @@
      These were hard-coded literals scattered through the sheet: a 780px
      window, a 172px toolbar, a 500px canvas. That is what made the app a
      small console floating in the middle of a large screen. */
-  --rail-w: 116px;
+  --rail-w: 132px;
   --inspector-w: 300px;
   --titlebar-h: 48px;
 
@@ -659,13 +659,15 @@ body::before {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
   border-radius: 0;
   border: none;
   border-right: 1px solid var(--hairline);
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
   overscroll-behavior: contain;
 }
 
@@ -718,10 +720,16 @@ body::before {
 }
 
 .toolbar-section .icon-group {
-  display: flex;
-  flex-wrap: wrap;
+  /* An explicit two-column grid, not a wrapping flex row. As a flex-wrap the
+     rail had only ~9px of slack over two 38px icons plus their gap, so any
+     scrollbar that reserves width — macOS "Show scroll bars: Always" is ~15px —
+     collapsed the tools to a single column, which made the rail taller and
+     guaranteed the scrolling it was already doing. A grid cannot reflow: the
+     icons shrink a little instead. */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--sp-2);
-  justify-content: flex-start;
+  justify-items: center;
   align-items: center;
 }
 
@@ -731,6 +739,7 @@ body::before {
 .icon {
   width: 38px;
   height: 38px;
+  max-width: 100%;
   border: 1px solid var(--hairline);
   background: var(--panel);
   cursor: pointer;
@@ -968,6 +977,33 @@ body::before {
 }
 
 .dial-group-heading { margin: 0; }
+
+/* The Advanced group folds away. <details> keeps its rows in the DOM while
+   closed, which the mouse-wheel Blob Size shortcut depends on. */
+.dial-group--collapsible > summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color var(--dur) var(--ease);
+}
+.dial-group--collapsible > summary::-webkit-details-marker { display: none; }
+.dial-group--collapsible > summary::before {
+  content: "\25B8";                     /* ▸ */
+  font-size: 9px;
+  transition: transform var(--dur) var(--ease);
+}
+.dial-group--collapsible[open] > summary::before { transform: rotate(90deg); }
+.dial-group--collapsible > summary:hover { color: var(--ink-2); }
+.dial-group--collapsible > summary:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+/* Closed, the group is just its summary — no empty control column. */
+.dial-group--collapsible:not([open]) > .dial-group-controls { display: none; }
 
 .dial-group-controls {
   display: grid;
@@ -1388,6 +1424,18 @@ canvas {
 .canvas-freeze-mode {
   cursor: url("images/freeze.png"), auto;
 }
+/* Recolor tool: the cursor is a paint bucket, the icon carries the colour. */
+.canvas-recolor-mode { cursor: cell; }
+
+.recolor-swatch {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--hairline-strong);
+  box-shadow: inset 0 0 0 1.5px var(--panel);
+}
+
 .canvas-delete-mode {
   cursor: url("images/delete.png"), auto;
 }
@@ -3514,6 +3562,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						<span id="saveBlobsOption">Save Blobs (JSON)</span>
 						<span id="loadBlobsOption">Load Blobs (JSON)</span>
 						<span id="importSVGOption">Import SVG (Illustrator)</span>
+						<span id="importShapeOption">Import Shape (Shape Extractor)</span>
 						<span id="presentationModeOption">Presentation Mode</span>
 					</div>
 				</span>
@@ -3590,6 +3639,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 							<img src="images/pin.png" alt="Pin Mode" />
 						</div>
 						<div id="iconSlice">
+						</div>
+						<div class="icon" id="iconRecolor" data-label="Recolor (C)">
+							<span class="recolor-swatch" id="recolorSwatch"></span>
 						</div>
 						<div class="icon" id="iconDelete" data-label="Delete (X)">
 							<img src="images/delete.png" alt="Delete">
@@ -4147,6 +4199,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 							<div class="appearance-control-group" style="margin-bottom: 12px;">
 								<label for="appearanceBackgroundColor" style="font-size: 12px; color: #666; margin-bottom: 6px;">Background Color</label>
 								<input type="color" id="appearanceBackgroundColor" value="#f8fbf3" style="width: 100%; height: 36px; cursor: pointer; border-radius: 4px;">
+								<div class="palette-swatches" id="appearancePaletteSwatches" style="margin-top:6px;"></div>
+								<p class="palette-note" id="appearancePaletteNote" style="margin:4px 0 0;"></p>
 							</div>
 
 							<div class="appearance-control-group" style="margin-bottom: 12px;">
@@ -6682,7 +6736,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						tpValue.textContent = "0%";
 					}
 
-					slicingMode = dragMode = pinMode = freezeMode = deleteMode = false;
+					slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = false;
 					$("editToolsSection").classList.remove("edit-on");
 					["iconSlice", "iconDrag", "iconPin", "iconFreeze", "iconDelete"]
 					.forEach(id => setIconActive($(id), false, "", ""));
@@ -7033,6 +7087,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					return;
 				}
 
+				if (recolorMode) {
+					performRecolor(x, y);
+					return; // single click, no drag
+				}
 				if (freezeMode) {
 					// Start lasso selection for freeze mode
 					freezeLassoActive = true;
@@ -7885,6 +7943,45 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				}
 			}
 
+			/* ── Recolor: give an existing form the current colour ──
+			   Until now the palette only set the colour of the *next* stroke, so an
+			   imported shape was stuck with whatever colour its file carried and there
+			   was no way to restyle a drawing after the fact. Same hit-test as freeze:
+			   closed forms by their interior, open paths by proximity. */
+			function performRecolor(x, y) {
+				const hits = [];
+				for (let i = 0; i < chains.length; i++) {
+					const ch = chains[i];
+					if (!isChainPickable(ch)) continue;
+					if (ch.isClosed) {
+						if (pointInPolygon(x, y, ch.chain)) hits.push(i);
+					} else if (distanceToChain(x, y, ch.chain) <= 6) {
+						hits.push(i);
+					}
+				}
+				if (!hits.length) return;
+
+				const rank = n => chains[n].isClosed ? polygonArea(chains[n].chain) : -1;
+				let best = hits[0], bestArea = rank(best);
+				for (let k = 1; k < hits.length; k++) {
+					const idx = hits[k], area = rank(idx);
+					if (area < bestArea) { best = idx; bestArea = area; }
+				}
+
+				const obj = chains[best];
+				const next = hexToRGBA(colorInput.value);
+				if (obj.color && obj.color.every((v, i) => Math.abs(v - next[i]) < 1e-4)) return;
+
+				// Remember the old colour so undo can put it back — the undo stack pops
+				// whole chains for "chain" entries, which would be wrong here.
+				history.push({ type: "recolor", chain: obj, prev: obj.color ? obj.color.slice() : null,
+					holes: (obj.holes || []).map(h => (h.color ? h.color.slice() : null)) });
+				obj.color = next;
+				// Holes are drawn with the parent's fill, so keep them in step.
+				for (const hole of obj.holes || []) hole.color = next.slice();
+				SFX.blobComplete(colorInput.value);
+			}
+
 			/* ── Single-click freeze (original behavior) ── */
 			/* ---------- polygon geometry helpers ----------
 			   These lived inside the old mouse-event block and were removed with it
@@ -8588,7 +8685,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				dragMode = false,
 				pinMode = false,
 				freezeMode = false,
-				deleteMode = false;
+				deleteMode = false,
+				recolorMode = false;
 
 			/* 5. Drag / hover helpers */
 			let draggingChainIndex = null,
@@ -8747,7 +8845,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					id: "dotScale",
 					settingKey: "dotScaleFactor",
 					label: "Blob Size",
-					group: "geometry",
+					group: "advanced",
 					groupOrder: 0,
 					tooltip: "Vertex size. Also sets point spacing and spring rest length, so changing it re-shapes forms that are already on the canvas.",
 					min: 0, max: 100, step: 0.5,
@@ -8760,10 +8858,13 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				{
 					id: "damping",
 					settingKey: "damping",
-					label: "Damping",
-					group: "material",
+					label: "Bounce",
+					group: "advanced",
 					groupOrder: 2,
-					tooltip: "How much motion carries over from one frame to the next. High keeps forms moving; low damps them quickly.",
+					// Named for what it does, not for the quantity. The value is velocity
+					// RETENTION, so labelling it "Damping" read backwards: 100 % "Damping"
+					// meant no damping at all, and the tooltip contradicted the label.
+					tooltip: "How much motion carries over between frames. High keeps forms trembling; low lets them settle. This is the material's springiness, not its speed.",
 					min: 0, max: 100, step: 0.5,
 					sfx: "sliderExcitability",
 					get: () => velocityRetention,
@@ -8803,7 +8904,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					id: "repulsionConstant",
 					settingKey: "repulsionConstant",
 					label: "Spacing",
-					group: "geometry",
+					group: "advanced",
 					groupOrder: 1,
 					tooltip: "How hard points refuse to overlap, within a form and between forms. Higher pushes shapes apart and makes them expand.",
 					min: 0, max: 100, step: 1,
@@ -8859,10 +8960,14 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			];
 
 			const _physicsParamById = new Map(PHYSICS_PARAMS.map(p => [p.id, p]));
+			/* Two groups are always visible; Advanced folds away. Seven equal-weight
+			   sliders in one bar made Speed and the retention dial read as two takes on
+			   "amount of movement". The four that shape a sketch stay out; the three that
+			   are set once and left alone go behind a disclosure. */
 			const PHYSICS_DIAL_GROUPS = [
-				{ id: "geometry", label: "Geometry" },
 				{ id: "material", label: "Material" },
-				{ id: "motion", label: "Motion" }
+				{ id: "motion", label: "Motion" },
+				{ id: "advanced", label: "Advanced", collapsed: true }
 			];
 
 			// Write one dial's percent through to both the physics variable and the UI.
@@ -8905,14 +9010,27 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				const host = $("sliders");
 				const controlsByGroup = new Map();
 				for (const group of PHYSICS_DIAL_GROUPS) {
-					const container = document.createElement("section");
-					container.className = "dial-group";
-					const heading = document.createElement("h3");
-					heading.className = "dial-group-heading";
-					heading.textContent = group.label;
 					const controls = document.createElement("div");
 					controls.className = "dial-group-controls";
-					container.append(heading, controls);
+					let container;
+					if (group.collapsed) {
+						// <details> rather than conditional rendering: the rows must stay in
+						// the DOM while folded, because the mouse-wheel-over-canvas shortcut
+						// caches $("dotScaleSlider") and reads its value.
+						container = document.createElement("details");
+						container.className = "dial-group dial-group--collapsible";
+						const summary = document.createElement("summary");
+						summary.className = "dial-group-heading";
+						summary.textContent = group.label;
+						container.append(summary, controls);
+					} else {
+						container = document.createElement("section");
+						container.className = "dial-group";
+						const heading = document.createElement("h3");
+						heading.className = "dial-group-heading";
+						heading.textContent = group.label;
+						container.append(heading, controls);
+					}
 					host.appendChild(container);
 					controlsByGroup.set(group.id, controls);
 				}
@@ -8978,7 +9096,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					toast(shapeMemoryEnabled ? "Shape Memory is on." : "Shape Memory is off.");
 				});
 				memoryRow.append(memoryHelp, memoryLabel, memoryToggle);
-				controlsByGroup.get("geometry").appendChild(memoryRow);
+				// Fall back rather than throw: this block runs inside DOMContentLoaded, and
+				// a missing group id would abort every handler registered after it.
+				(controlsByGroup.get("material") || controlsByGroup.values().next().value)
+					?.appendChild(memoryRow);
 
 				// Seed every dial from the variables' declared defaults.
 				syncAllPhysicsDials();
@@ -9064,7 +9185,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					b.title = hex;
 					b.onclick = () => {
 						colorInput.value = hex;
-						renderPalette();
+						// Assigning .value in code fires no event, so anything listening to the
+						// picker — the active ring, the Recolor tool's swatch — would go stale.
+						colorInput.dispatchEvent(new Event("input", { bubbles: true }));
 					};
 					strip.appendChild(b);
 				});
@@ -9076,6 +9199,35 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					: "Load a palette from Color Extractor.";
 			}
 
+			// The palette used to feed only the draw colour, so the canvas background
+			// could not be set from an imported Color Extractor palette without reading
+			// a hex off a swatch and typing it into the picker.
+			function renderAppearancePalette() {
+				const strip = $("appearancePaletteSwatches");
+				const note = $("appearancePaletteNote");
+				if (!strip) return;
+				strip.textContent = "";
+				const input = $("appearanceBackgroundColor");
+				const active = normaliseHex(input ? input.value : "");
+				palette.forEach(hex => {
+					const b = document.createElement("button");
+					b.type = "button";
+					b.className = "palette-swatch" + (hex === active ? " is-active" : "");
+					b.style.background = hex;
+					b.title = hex;
+					b.onclick = () => {
+						input.value = hex;
+						// Same event the picker fires, so the live preview follows.
+						input.dispatchEvent(new Event("input", { bubbles: true }));
+						renderAppearancePalette();
+					};
+					strip.appendChild(b);
+				});
+				if (note) note.textContent = palette.length
+					? "Click a palette colour to use it as the background."
+					: "Load a palette in Shape Settings to pick a background from it.";
+			}
+
 			function applyPaletteDocument(text, fileName) {
 				const parsed = parsePaletteDocument(text, fileName);
 				if (!parsed) {
@@ -9085,6 +9237,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				palette = parsed.colors;
 				paletteLabel = parsed.label || "";
 				renderPalette();
+				renderAppearancePalette();
 				toast(`Loaded ${palette.length} color${palette.length === 1 ? "" : "s"}.`, 2000);
 			}
 
@@ -9109,6 +9262,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				palette = [];
 				paletteLabel = "";
 				renderPalette();
+				renderAppearancePalette();
 			};
 
 			// Keep the active-swatch ring in sync when the color is changed by the picker.
@@ -9157,11 +9311,12 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			    (toolName === "drag"   && dragMode)    ||
 			    (toolName === "pin"    && pinMode)     ||
 			    (toolName === "freeze" && freezeMode)  ||
-			    (toolName === "delete" && deleteMode)
+			    (toolName === "delete" && deleteMode)  ||
+			    (toolName === "recolor" && recolorMode)
 			  );
 
 			  // Turn everything off first
-			  slicingMode = dragMode = pinMode = freezeMode = deleteMode = false;
+			  slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = false;
 
 			  // Turn the requested tool on (unless user toggled it off)
 			  if (forceOn || !isAlreadyActive) {
@@ -9170,10 +9325,11 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			    if (toolName === "pin")    pinMode = true;
 			    if (toolName === "freeze") freezeMode = true;
 			    if (toolName === "delete") deleteMode = true;
+			    if (toolName === "recolor") recolorMode = true;
 			  }
 
 			  // ✅ If no draw mode is active, we ALWAYS fall back to drag
-			  const anyEditOn = slicingMode || dragMode || pinMode || freezeMode || deleteMode;
+			  const anyEditOn = slicingMode || dragMode || pinMode || freezeMode || deleteMode || recolorMode;
 
 				if (anyEditOn) {
   // ✅ If any edit tool is active, drawing must be OFF
@@ -9185,13 +9341,14 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			  // UI updates (same as your existing code)
 			  const editFrame = $("editToolsSection");
-			  editFrame.classList.toggle("edit-on", slicingMode || dragMode || pinMode || freezeMode || deleteMode);
+			  editFrame.classList.toggle("edit-on", slicingMode || dragMode || pinMode || freezeMode || deleteMode || recolorMode);
 
 			  setIconActive($("iconSlice"),  slicingMode, "Slicing Mode (On)", "Slicing Mode (Off)");
 			  setIconActive($("iconDrag"),   dragMode,    "Disable Drag Mode", "Enable Drag Mode");
 			  setIconActive($("iconPin"),    pinMode,     "Disable Pin Mode",  "Enable Pin Mode");
 			  setIconActive($("iconFreeze"), freezeMode,  "Disable Freeze Mode","Enable Freeze Mode");
 			  setIconActive($("iconDelete"), deleteMode,  "Disable Delete Mode","Enable Delete Mode");
+			  setIconActive($("iconRecolor"), recolorMode, "Disable Recolor Mode","Enable Recolor Mode");
 
 			  updateCanvasCursor();
 
@@ -9214,6 +9371,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			  setIconActive($("iconPin"),    false, "Disable Pin Mode",  "Enable Pin Mode");
 			  setIconActive($("iconFreeze"), false, "Disable Freeze Mode","Enable Freeze Mode");
 			  setIconActive($("iconDelete"), false, "Disable Delete Mode","Enable Delete Mode");
+			  setIconActive($("iconRecolor"), false, "Disable Recolor Mode","Enable Recolor Mode");
 			}
 
 			function clearDrawModeUIOnly() {
@@ -9257,7 +9415,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			    toast("Draw: OFF (Drag)", 1600);
 			  } else {
 			    // Entering a draw mode: turn off edit tools to avoid blocking drawing
-			    slicingMode = dragMode = pinMode = freezeMode = deleteMode = false;
+			    slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = false;
 			    clearAllEditToolsUIOnly();
 			    toast(`Draw mode: ${drawMode.toUpperCase()}`, 1600);
 			  }
@@ -9286,11 +9444,24 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			$("iconDelete").onclick = function() {
 				setEditTool("delete");
 			};
+			$("iconRecolor").onclick = function() {
+				setEditTool("recolor");
+			};
+
+			// The tool's icon *is* the current colour, so it is obvious what a click
+			// will apply — including after picking a palette swatch.
+			function refreshRecolorSwatch() {
+				const sw = $("recolorSwatch");
+				if (sw) sw.style.background = colorInput.value;
+			}
+			colorInput.addEventListener("input", refreshRecolorSwatch);
+			refreshRecolorSwatch();
 
 			/* -----------------------------------
 			   APPEARANCE DIALOG
 			----------------------------------- */
 			$("iconAppearance").onclick = () => {
+				renderAppearancePalette();
 				// Initialize dialog with current values
 				$("appearanceOutline").checked = showOutline;
 				$("appearanceFilled").checked = showFilled;
@@ -9716,6 +9887,12 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					if (last.type === "chain") chains.pop();
 					if (last.type === "circle") circles.pop();
 					if (last.type === "rigidPolygon") rigidPolygons.pop();
+					if (last.type === "recolor" && last.chain) {
+						if (last.prev) last.chain.color = last.prev;
+						(last.chain.holes || []).forEach((h, i) => {
+							if (last.holes && last.holes[i]) h.color = last.holes[i];
+						});
+					}
 					SFX.undo();
 				}
 				toast("Undo", 1200);
@@ -11766,7 +11943,8 @@ window.addEventListener("keydown", (e) => {
 					"canvas-pin-mode",
 					"canvas-slicing-mode",
 					"canvas-freeze-mode",
-					"canvas-delete-mode"
+					"canvas-delete-mode",
+					"canvas-recolor-mode"
 				);
 				// Draw mode
 				if (drawMode === 'path') canvas.classList.add("canvas-path-mode");
@@ -11777,6 +11955,7 @@ window.addEventListener("keydown", (e) => {
 				if (drawMode === 'repulsor') canvas.classList.add("canvas-repulsor-mode");
 
 				// Edit tools
+				if (recolorMode) canvas.classList.add("canvas-recolor-mode");
 				if (slicingMode) canvas.classList.add("canvas-slicing-mode");
 				if (dragMode) canvas.classList.add("canvas-drag-mode");
 				if (pinMode) canvas.classList.add("canvas-pin-mode");
@@ -12030,6 +12209,17 @@ window.addEventListener("keydown", (e) => {
 
 			/* ---------- IMPORT (file ➜ dialog) ---------- */
 			let pendingImport = null; // temp storage
+
+			// Shape import used to be reachable only inside Binding Studio, which is a
+			// movement-binding tool — confusing if you only want the form. The import
+			// lands on the ACTIVE layer, so add and select a layer first to build up a
+			// composition from several Shape Extractor exports.
+			$("importShapeOption").onclick = e => {
+				e.stopPropagation();
+				$("fileSubmenu").style.display = "none";
+				stampUnassignedChains(); // anything drawn this frame keeps its own layer
+				bindingOpenFile("shape");
+			};
 
 			$("importSVGOption").onclick = e => {
 				e.stopPropagation();
@@ -12289,9 +12479,15 @@ window.addEventListener("keydown", (e) => {
 				const shape = bindingNormaliseShape(data);
 				const bounds = bindingBounds(shape.outer);
 				const scale = Math.min(canvas.width * 0.65 / bounds.width, canvas.height * 0.65 / bounds.height);
+				// Every import used to land dead centre, so a second shape sat exactly on
+				// top of the first and looked like nothing had happened. Cascade each one
+				// by a small step, clamped so it cannot walk off the canvas.
+				const nth = movementBinding.shapes.length;
+				const step = Math.min(canvas.width, canvas.height) * 0.06;
+				const spread = Math.min(nth, 5) * step;
 				const transform = {
-					cx: canvas.width * 0.5,
-					cy: canvas.height * 0.5,
+					cx: canvas.width * 0.5 + spread,
+					cy: canvas.height * 0.5 + spread,
 					sourceCx: (bounds.minX + bounds.maxX) * 0.5,
 					sourceCy: (bounds.minY + bounds.maxY) * 0.5,
 					scale
@@ -17663,6 +17859,9 @@ window.addEventListener("keydown", (e) => {
 					case "x":
 						setEditTool("delete");
 						break; // Delete
+					case "c":
+						setEditTool("recolor");
+						break; // Recolor
 				}
 			});
 
