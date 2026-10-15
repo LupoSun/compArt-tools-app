@@ -10,6 +10,10 @@
 <body>
   <header class="topbar">
     <div class="brand"><strong>Shape Extractor</strong><span class="subtitle">image → abstract boundary</span></div>
+    <div class="mode-switch" role="tablist" aria-label="Mode">
+      <button data-mode="single" role="tab" aria-selected="true" class="active" title="One form from a marked area of an image">Single form</button>
+      <button data-mode="composition" role="tab" aria-selected="false" title="Every coloured form of an artwork, stacked on planes">Composition</button>
+    </div>
     <nav aria-label="Project actions">
       <button id="newProject">New project</button>
       <button id="clearAutosave" title="Delete only the browser's saved Shape Extractor project">Clear autosave</button>
@@ -19,7 +23,7 @@
     </nav>
   </header>
 
-  <main class="workspace">
+  <main class="workspace" id="singleWorkspace">
     <aside class="panel controls">
       <section>
         <h2>Source image</h2>
@@ -111,7 +115,70 @@
     </aside>
   </main>
 
+  <!-- Composition mode (composition.js): a flat-colour artwork becomes several
+       coloured forms stacked on planes, exported as an SVG HanSketch can import. -->
+  <main class="workspace" id="compositionWorkspace" hidden>
+    <aside class="panel controls">
+      <section>
+        <h2>Artwork</h2>
+        <div id="compSourceMeta" class="muted">No image loaded</div>
+        <label class="button full-button">Choose image<input id="compImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden></label>
+        <p class="hint">Works best on flat colour: prints, collages, flat reproductions. Photos of reliefs work too, but their real shadows can turn into forms.</p>
+      </section>
+
+      <section>
+        <h2>Colours</h2>
+        <label class="slider">Colours to look for<span class="slider-row"><input id="compColours" type="range" min="2" max="10" step="1"><output id="compColoursOut"></output></span></label>
+        <label class="slider">Merge similar colours<span class="slider-row"><input id="compMerge" type="range" min="0" max="40" step="1"><output id="compMergeOut"></output></span></label>
+        <label class="slider">Smooth texture<span class="slider-row"><input id="compTexture" type="range" min="0" max="6" step="1"><output id="compTextureOut"></output></span></label>
+        <p class="hint">Raise Merge when one painted colour splits into light and dark patches; lower it when two different colours become one.</p>
+      </section>
+
+      <section>
+        <h2>Forms</h2>
+        <label class="slider">Ignore specks below<span class="slider-row"><input id="compMinArea" type="range" min="0.02" max="2" step="0.02"><output id="compMinAreaOut"></output></span></label>
+        <label class="check-row"><input id="compDropEdge" type="checkbox"> Leave out forms cut by the image edge</label>
+        <label class="slider">Contour smoothing<span class="slider-row"><input id="compSmoothing" type="range" min="0" max="8" step="1"><output id="compSmoothingOut"></output></span></label>
+        <label class="slider">Outline point spacing<span class="slider-row"><input id="compDetail" type="range" min="3" max="20" step="1"><output id="compDetailOut"></output></span></label>
+        <button id="compReset" class="full-button">Reset settings</button>
+      </section>
+    </aside>
+
+    <section class="stage-column">
+      <div id="compStage" class="editor-stage comp-stage" aria-label="Composition analysis">
+        <canvas id="compCanvas"></canvas>
+        <div id="compEmpty" class="empty-state">
+          <strong>Drop in an artwork</strong>
+          <span>Each coloured form becomes a shape; forms inside forms are stacked on planes.</span>
+        </div>
+      </div>
+      <div class="stage-footer">
+        <span id="compStatus">Click a form to leave it out or bring it back.</span>
+        <span id="compReadout" class="mono"></span>
+      </div>
+    </section>
+
+    <aside class="panel output-panel">
+      <section>
+        <h2>Composition</h2>
+        <div class="preview-frame"><canvas id="compPreview" width="420" height="420"></canvas></div>
+        <div id="compInfo" class="shape-info">Open an artwork to digitise its forms.</div>
+      </section>
+      <section>
+        <h2>Forms</h2>
+        <div id="compFormList" class="comp-form-list"></div>
+      </section>
+      <section>
+        <h2>Into HanSketch</h2>
+        <button id="compSendBtn" class="primary" disabled>Open in HanSketch</button>
+        <button id="compExportSvg" disabled>Download SVG</button>
+        <p class="hint">Open in HanSketch hands the composition straight to your open HanSketch tab, or opens one. Each plane becomes a layer, with the forms in their colours and places. Download SVG keeps a file, also for Illustrator.</p>
+      </section>
+    </aside>
+  </main>
+
   <div id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="app.js?rev=20260816f"></script>
+  <script type="module" src="app.js?rev=20261014a"></script>
+  <script type="module" src="composition.js?rev=20261014a"></script>
 </body>
 </html>

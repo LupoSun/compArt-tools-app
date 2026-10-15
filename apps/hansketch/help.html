@@ -206,6 +206,8 @@
           </ul>
         </li>
         <li><a href="#layers">Layers</a></li>
+        <li><a href="#shadow">Relief Shadow</a></li>
+        <li><a href="#chance">Laws of Chance</a></li>
         <li><a href="#requirements">System Requirements</a></li>
         <li><a href="#file">File &amp; Export</a></li>
         <li><a href="#troubleshooting">Troubleshooting</a></li>
@@ -225,17 +227,17 @@
         <li><strong>Tool rail (left)</strong> – actions: Pen, Circle, Rectangle, Triangle, Particles, attractor/repulsor, and the editing tools.</li>
         <li><strong>Canvas stage (center)</strong> – the artboard scales to the available viewport while preserving its internal pixel dimensions.</li>
         <li><strong>Physics dials (bottom)</strong> – visible Form and Motion controls, with Blob Size, Spacing, and Bounce in Advanced.</li>
-        <li><strong>Inspector (right)</strong> – color and size, palettes, layers, topology, and Shape + Motion Binding Studio.</li>
+        <li><strong>Inspector (right)</strong> – the current selection, colour, size and smoothing, palettes, layers, relief shadow, topology, and Shape + Motion Binding Studio.</li>
       </ul>
     </section>
 
     <section id="draw">
       <h2>Draw Tools</h2>
       <ul>
-        <li><strong>Pen</strong> – click-drag to draw. Release near the starting point and HanSketch closes the stroke into a blob; release elsewhere and it remains an open curve. The endpoint detection is intentionally forgiving and scales with the canvas.</li>
+        <li><strong>Pen</strong> – click-drag to draw. Release near the starting point and HanSketch closes the stroke into a blob; release elsewhere and it remains an open curve. The endpoint detection is intentionally forgiving and scales with the canvas. Strokes are smoothed when you lift the pen; set how much under <strong>Smoothing</strong> in Shape Settings.</li>
         <li><strong>Circle</strong> – draw a repulsion circle. Drag sets radius; blobs avoid inside. Wrap blobs around circles to create controlled shapes.</li>
-        <li><strong>Rectangle</strong> – drag to size a rectangle. Corners are pinned so the shape holds its geometry while its edges still breathe.</li>
-        <li><strong>Triangle</strong> – drag to size an isosceles triangle, apex centred on the top edge. Corners are pinned as with the rectangle.</li>
+        <li><strong>Rectangle</strong> – drag to size a rectangle. Corners are pinned so the shape holds its geometry while its edges still breathe, and they are drawn as real, sharp corners.</li>
+        <li><strong>Triangle</strong> – drag to size an isosceles triangle, apex centred on the top edge. Corners are pinned and sharp, as with the rectangle.</li>
       </ul>
       <p>The active tool is marked with an accent rim.</p>
     </section>
@@ -243,14 +245,16 @@
     <section id="edit">
       <h2>Edit Tools</h2>
       <ul>
-        <li><strong>Drag</strong> – move paths, circles, or other geometry.</li>
+        <li><strong>Select (V)</strong> – click a form to select it. Drag it to move; drag a corner to scale from the opposite corner (hold <kbd>Alt</kbd> to scale from the centre); drag the round handle to rotate (hold <kbd>Shift</kbd> for 15° steps). Arrow keys nudge. The Selection panel in the inspector duplicates, deletes, and moves the form forward or back within its layer. A scaled form keeps its new size; the physics treats it as the form's natural shape. <strong>Corners:</strong> as with Illustrator's Curvature tool, double-click a point on an outline to make it a sharp corner, and double-click it again to make it smooth (the point under the cursor is ringed). Every corner keeps a small diamond marker on the canvas, so it can always be found again; Pin, Drag and this double-click snap to a corner when you click near its diamond. The Pen always draws smooth; corners are added afterwards. A corner stays sharp while the form moves, and Push or Drag can pull it into a point. Markers are hidden in Presentation Mode and never exported.</li>
+        <li><strong>Drag</strong> – pull a single point of a form; the rest follows through the physics. Also moves circles and other geometry.</li>
+        <li><strong>Push (P)</strong> – a liquify brush: drag across an edge to push it in or out, strongest at the centre of the circle. <kbd>[</kbd> and <kbd>]</kbd> change the brush size. The pushed outline becomes the form's remembered shape.</li>
         <li><strong>Freeze</strong> – lock physics in a shape (dashed rendering). Click inside a closed form, or on an open path.</li>
         <li><strong>Slice</strong> – click a chain segment to split the shape.</li>
         <li><strong>Pin</strong> – fix single points in place (red target ring). Click red target ring to release point.</li>
         <li><strong>Recolor</strong> – give an existing form the current colour. Pick a colour or a palette swatch in Shape Settings, then click the shape. Works on imported shapes too, and undo restores the previous colour.</li>
-        <li><strong>Delete</strong> – erase the nearest circle, path, or blob.</li>
+        <li><strong>Delete</strong> – click a line, particle, blob or guide to erase it, or drag a lasso around several. Locked and hidden layers are left alone.</li>
       </ul>
-      <p>Only one edit mode may be active at a time.</p>
+      <p>Only one edit mode may be active at a time. <strong>Undo</strong> (⎌ or <kbd>Cmd/Ctrl</kbd>+<kbd>Z</kbd>) reverses deletes, moves, scaling, pushes, imports and chance drops as well as new shapes.</p>
     </section>
 
     <section id="shape">
@@ -258,6 +262,7 @@
       <ul>
         <li><strong>Color</strong> – sets stroke/fill color.</li>
         <li><strong>Size</strong> – sets the base radius used for new paths and particles.</li>
+        <li><strong>Smoothing</strong> – how much hand tremor is taken out of a Pen stroke when you lift the pen. 0% keeps every wobble; the stroke's point density is unchanged either way.</li>
         <li><strong>Palette</strong> – load a <code>hansketch.color</code> export and click a swatch to use it.</li>
       </ul>
     </section>
@@ -290,7 +295,7 @@
       <ul>
         <li><strong>Appearance (🎨)</strong> – choose outline, fill, background, and stroke settings.</li>
         <li><strong>Spacing</strong> – choose no, normal, or high repulsion between forms.</li>
-        <li><strong>Undo (⎌)</strong> – removes the last geometry edit.</li>
+        <li><strong>Undo (⎌)</strong> – reverses the last edit (<kbd>Cmd/Ctrl</kbd>+<kbd>Z</kbd>).</li>
         <li><strong>Topology</strong> – enable Self-intersection → hole for nested inner rings.</li>
         <li><strong>Reset (🗑️)</strong> – clears the scene after confirmation.</li>
         <li><strong>Shape + Motion</strong> – open Binding Studio to map an extracted shape to a continuous motion clip.</li>
@@ -300,21 +305,27 @@
       <h2>Keyboard</h2>
       <ul>
         <li><kbd>Q</kbd> Pen · <kbd>E</kbd> Circle · <kbd>T</kbd> Rectangle · <kbd>Y</kbd> Triangle · <kbd>R</kbd> Particles</li>
-        <li><kbd>A</kbd> Drag · <kbd>S</kbd> Freeze · <kbd>D</kbd> Pin · <kbd>C</kbd> Recolor · <kbd>Z</kbd> Slice · <kbd>X</kbd> Delete</li>
+        <li><kbd>V</kbd> Select · <kbd>A</kbd> Drag · <kbd>P</kbd> Push · <kbd>S</kbd> Freeze · <kbd>D</kbd> Pin · <kbd>C</kbd> Recolor · <kbd>Z</kbd> Slice · <kbd>X</kbd> Delete</li>
+        <li><kbd>Cmd/Ctrl</kbd>+<kbd>Z</kbd> Undo</li>
+        <li>With a selection: <kbd>Cmd/Ctrl</kbd>+<kbd>D</kbd> duplicate · <kbd>Backspace</kbd> delete · arrows nudge (<kbd>Shift</kbd> ×10) · <kbd>Esc</kbd> deselect</li>
+        <li>Push brush: <kbd>[</kbd> smaller · <kbd>]</kbd> larger</li>
         <li><kbd>Mouse‑Wheel</kbd> over canvas / slider – adjust Blob Size smoothly.</li>
-        <li><kbd>Space</kbd> – Pauses animation → toggles Speed to 0 and back.</li>
+        <li><kbd>Space</kbd> – physics on / off. A badge on the canvas shows when it is off (click it to resume); no dial moves. If every visible layer is set to stay still (◇ — for example a placed artwork), the badge offers to let them move.</li>
       </ul>
     </section>
     <section id="file">
       <h2>File &amp; Export</h2>
       <h3>File Menu</h3>
       <ul>
+        <li><strong>Autosave</strong> – the sketch and all its settings (background colour included) are kept in this browser and reopened on your next visit. It is a safety net, not a file: use Save to keep or share a sketch.</li>
+        <li>New Sketch – clears the autosaved sketch and starts again with default settings.</li>
         <li>Save Blobs – saves shapes + settings (including layers) to JSON.</li>
         <li>Load Blobs – import shapes + settings from JSON.</li>
         <li>Import SVG – open an Illustrator SVG. Top-level groups become layers,
             per-shape fill colours are kept, and hidden groups arrive hidden.
             Imported layers start with physics off so the artwork matches the
-            source file; switch a layer's physics on when you want it to move.</li>
+            source file; switch a layer's physics on when you want it to move. You can also drop an SVG straight onto the canvas.</li>
+        <li><strong>Digitise an Artwork…</strong> – opens Shape Extractor in Composition mode. Its <em>Open in HanSketch</em> button sends the digitised artwork back here without a file; a dialog with a preview then asks how to place it (a new sketch in the artwork's proportions or added to this one, the artwork's ground as background, flat colour, Relief Shadow, physics). Each plane becomes a layer. A composition SVG imported or dropped here opens the same dialog.</li>
       </ul>
       <h3>Export Menu</h3>
       <ul>
@@ -322,6 +333,9 @@
         <li>Fill → SVG/JPG – fills closed shapes.</li>
         <li>Background Color – when on, exports paint the canvas background colour
             instead of white. Toggle it from the Export menu.</li>
+        <li>Relief shadows are exported to both. In SVG each layer gets a shadow
+            group (an ordinary group in Illustrator); re-importing the SVG skips it.</li>
+        <li>Hidden layers are left out of JPG exports, as on screen.</li>
       </ul>
       <p>Exported SVGs write one group per layer, named the way Illustrator names
          its own, so opening the file in Illustrator reconstructs the layers.</p>
@@ -339,6 +353,16 @@
         <li><strong>▲</strong> – move the layer up one step. The top of the list draws last.</li>
       </ul>
     </section>
+    <section id="shadow">
+      <h2>Relief Shadow</h2>
+      <p>Tick <strong>Layers cast shadows</strong> in the inspector and every layer casts one soft shadow onto the layers below it, like the cut planes of a painted wood relief. Forms on the same layer are one plane, so their shadows merge rather than darken where they overlap. Distance, Angle, Softness, Opacity and Colour update live and are saved with the sketch. Put forms on separate layers to lift them off one another. Particles cast no shadow.</p>
+    </section>
+
+    <section id="chance">
+      <h2>Laws of Chance</h2>
+      <p>After Arp's collages arranged "according to the laws of chance" (1916–17), for which he let torn paper fall onto a sheet and glued it where it landed. Open <strong>Chance</strong> in the title bar, choose how many pieces, which forms (torn paper squares, the organic library forms, or both) and their size, then <strong>Drop</strong>. The pieces fall one after another onto a new layer, at random positions, turns and sizes, in your palette's colours (or a default set). The layer's physics is off unless you tick <em>Let them settle</em>, so the pieces stay where chance put them. <strong>Drop again</strong> takes the last drop back and rolls again; Undo removes a drop in one step.</p>
+    </section>
+
     <section id="requirements">
       <h2>System Requirements</h2>
       <h3>Hardware</h3>
@@ -357,7 +381,7 @@
       <h3>Performance Tips</h3>
       <ul>
         <li>Lower <em>Blob Size</em> or <em>Speed</em> on older integrated GPUs.</li>
-        <li>Press <kbd>Space</kbd> to mute physics when previewing static artwork.</li>
+        <li>Press <kbd>Space</kbd> to switch physics off when previewing static artwork.</li>
         <li>Laptop users: disable high‑DPI rendering by setting browser zoom to 100 % for extra FPS.</li>
       </ul>
     </section>
@@ -366,7 +390,7 @@
       <ul>
         <li><strong>No drawing?</strong> Ensure WebGL is enabled in your browser.</li>
         <li><strong>Red glow won’t go away?</strong> Click the active Edit‑Tool icon again to exit edit mode.</li>
-        <li><strong>Slow performance?</strong> Lower Blob Size or Speed, or press <kbd>Space</kbd> to pause temporarily.</li>
+        <li><strong>Slow performance?</strong> Lower Blob Size or Speed, or press <kbd>Space</kbd> to switch physics off for a moment.</li>
         <li><strong>Mobile warning?</strong> App requires a desktop browser.</li>
       </ul>
     </section>

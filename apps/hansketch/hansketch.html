@@ -425,6 +425,40 @@ body::before {
   accent-color: var(--accent);
 }
 
+.shadow-controls {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.shadow-controls.is-on { display: flex; }
+.shadow-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.shadow-controls label span {
+  font-weight: 400;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.shadow-controls input[type="range"] { width: 100%; accent-color: var(--accent); }
+.shadow-controls .shadow-color-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.shadow-controls input[type="color"] {
+  width: 44px;
+  height: 24px;
+  padding: 1px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-sm);
+  background: var(--panel);
+}
 .topology-note {
   margin: 0;
   color: var(--ink-3);
@@ -512,6 +546,27 @@ body::before {
   cursor: pointer;
 }
 .layer-actions button:hover {
+  border-color: var(--hairline-strong);
+  color: var(--ink);
+}
+.selection-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: var(--sp-1);
+}
+.selection-actions button {
+  padding: 5px 6px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--panel);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.selection-actions button:hover {
   border-color: var(--hairline-strong);
   color: var(--ink);
 }
@@ -849,6 +904,11 @@ body::before {
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
+.shape-settings input[type="range"] {
+  width: 120px;
+  accent-color: var(--accent);
+}
+
 .shape-settings input[type="number"] {
   padding: 4px 6px;
   font-family: var(--font-ui);
@@ -1159,15 +1219,56 @@ input[type="range"]::-moz-range-thumb {
   outline-offset: 2px;
 }
 
+/* Composition arrival dialog */
+.arrival-dialog { max-width: 520px; text-align: left; }
+.arrival-dialog h3 { text-align: center; }
+.arrival-body { display: flex; gap: 16px; align-items: flex-start; }
+.arrival-preview { width: 170px; height: 170px; object-fit: contain; flex: none; background: var(--paper-2); border: 1px solid var(--hairline); border-radius: var(--r-sm); }
+.arrival-options { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.arrival-options label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+.arrival-options input { accent-color: var(--accent); margin: 0; }
+.arrival-options hr { width: 100%; border: 0; border-top: 1px solid var(--hairline); margin: 3px 0; }
+.arrival-options .is-disabled { opacity: .45; }
+.arrival-summary { margin: 0 0 4px; font-size: 12px; line-height: 1.4; color: var(--ink-2); }
+.arrival-note { min-height: 0; margin: 10px 0 0; font-size: 11.5px; line-height: 1.4; color: var(--accent); }
+.arrival-note:empty { display: none; }
+#canvasStage.drop-target { outline: 2px dashed var(--accent); outline-offset: -10px; }
+#canvasStage { position: relative; }
+.paused-badge {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  display: inline-block; white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis;
+  padding: 6px 12px; border: 1px solid var(--hairline-strong); border-radius: 999px;
+  background: var(--panel); color: var(--ink); box-shadow: var(--shadow-1);
+  font: 600 12px/1 var(--font-ui); cursor: pointer; z-index: 5;
+}
+.paused-badge[hidden] { display: none; }
+.paused-badge kbd { font: 600 10px/1 var(--font-ui); padding: 2px 5px; border: 1px solid var(--hairline-strong); border-radius: 4px; background: var(--paper); }
+.paused-badge:hover { border-color: var(--ink-3); }
+body.presentation-mode .paused-badge { display: none; }
+@media (max-width: 560px) { .arrival-body { flex-direction: column; } }
+
+/* Laws of Chance dialog */
+.chance-dialog { max-width: 360px; text-align: left; }
+.chance-dialog h3 { text-align: center; }
+.chance-intro, .chance-note { margin: 0 0 10px; font-size: 12px; line-height: 1.45; color: var(--ink-2); }
+.chance-note { color: var(--ink-3); margin-top: 10px; }
+.chance-grid { display: flex; flex-direction: column; gap: 8px; }
+.chance-grid label { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; }
+.chance-grid label span { margin-left: auto; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.chance-grid input[type="number"] { width: 70px; }
+.chance-grid input[type="range"] { width: 150px; accent-color: var(--accent); }
+.chance-grid .chance-check { justify-content: flex-start; }
+.chance-check input { accent-color: var(--accent); }
+
 /* Primary dialog actions — single accent */
 .dialog-content :is(#particleSettingsApply,#applyGrid,#applyBlobGrid,#closeAbout,
-  #confirmSaveBtn,#confirmImportBtn,#appearanceApplyBtn,#repelModeApplyBtn,#gradientCurveApplyBtn) {
+  #confirmSaveBtn,#confirmImportBtn,#appearanceApplyBtn,#repelModeApplyBtn,#gradientCurveApplyBtn,#chanceDropBtn,#arrivalImportBtn) {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--on-accent);
 }
 .dialog-content :is(#particleSettingsApply,#applyGrid,#applyBlobGrid,#closeAbout,
-  #confirmSaveBtn,#confirmImportBtn,#appearanceApplyBtn,#repelModeApplyBtn,#gradientCurveApplyBtn):hover {
+  #confirmSaveBtn,#confirmImportBtn,#appearanceApplyBtn,#repelModeApplyBtn,#gradientCurveApplyBtn,#chanceDropBtn,#arrivalImportBtn):hover {
   background: var(--accent-press);
   border-color: var(--accent-press);
 }
@@ -1426,6 +1527,10 @@ canvas {
 }
 /* Recolor tool: the cursor is a paint bucket, the icon carries the colour. */
 .canvas-recolor-mode { cursor: cell; }
+.canvas-select-mode { cursor: default; }
+/* The push brush draws its own circle on the canvas. */
+.canvas-push-mode { cursor: none; }
+.tool-glyph { width: 20px; height: 20px; display: block; color: var(--ink); }
 
 .recolor-swatch {
   display: block;
@@ -3559,10 +3664,12 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			<div class="menu-bar">
 				<span id="menuFile">File
 					<div class="submenu" id="fileSubmenu">
+						<span id="newSketchOption">New Sketch</span>
 						<span id="saveBlobsOption">Save Blobs (JSON)</span>
 						<span id="loadBlobsOption">Load Blobs (JSON)</span>
 						<span id="importSVGOption">Import SVG (Illustrator)</span>
 						<span id="importShapeOption">Import Shape (Shape Extractor)</span>
+						<span id="digitiseOption" title="Open Shape Extractor in Composition mode; its Open in HanSketch button sends the result back here">Digitise an Artwork…</span>
 						<span id="presentationModeOption">Presentation Mode</span>
 					</div>
 				</span>
@@ -3574,6 +3681,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					</div>
 				</span>
 				<span id="menuPresets">Presets</span>
+				<span id="menuChance" title="Laws of Chance: drop pieces onto the sheet">Chance</span>
 				<span id="menuAbout">About</span>
 				<span id="menuHelp">Help</span>
 			</div>
@@ -3629,8 +3737,14 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				<div class="toolbar-section" id="editToolsSection">
 					<h4>Edit Tools</h4>
 					<div class="icon-group">
+						<div class="icon" id="iconSelect" data-label="Select · move, scale, rotate; double-click a point for a corner (V)">
+							<svg class="tool-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l13 8-6 1.5L9 19z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+						</div>
 						<div class="icon" id="iconDrag" data-label="Drag (A)">
 							<img src="images/gloveIcon.png" alt="Drag Mode" />
+						</div>
+						<div class="icon" id="iconPush" data-label="Push · liquify edges (P) — [ ] brush size">
+							<svg class="tool-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 2.4"/><path d="M8 12h8m-3-3l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
 						</div>
 						<div class="icon" id="iconFreeze" data-label="Freeze (S)">
 							<img src="images/freeze.png" alt="Freeze Mode" />
@@ -3665,6 +3779,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			<div class="main-area">
 				<div class="canvas-stage" id="canvasStage">
 					<canvas id="glCanvas" width="500" height="500"></canvas>
+					<button type="button" id="physicsPausedBadge" class="paused-badge" hidden></button>
 				</div>
 
 				<!-- Bottom Panel: Sliders (below the canvas, inside the right column) -->
@@ -3679,6 +3794,21 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			<!-- Inspector: settings for the current document and selection. -->
 			<aside class="inspector" id="inspector">
+				<!-- Shown while the Select tool has a form selected. Buttons rather than only
+				     shortcuts: Cmd+[ / Cmd+] are the browser's own back/forward keys. -->
+				<div class="toolbar-section" id="selectionSection" style="display:none;">
+					<h4>Selection</h4>
+					<div class="selection-actions">
+						<button id="selDuplicateBtn" title="Duplicate (Cmd/Ctrl+D)">Duplicate</button>
+						<button id="selDeleteBtn" title="Delete (Backspace)">Delete</button>
+						<button id="selFrontBtn" title="Bring to front of its layer">To front</button>
+						<button id="selForwardBtn" title="Bring forward">Forward</button>
+						<button id="selBackwardBtn" title="Send backward">Backward</button>
+						<button id="selBackBtn" title="Send to back of its layer">To back</button>
+					</div>
+					<p class="layer-note">Drag to move · corners scale (Alt: from centre) · round handle rotates (Shift: 15°) · arrows nudge · double-click a point on the outline: corner ↔ smooth.</p>
+				</div>
+
 				<div class="toolbar-section" id="shapeSettingsSection">
 					<h4>Shape Settings</h4>
 					<div class="shape-settings">
@@ -3689,6 +3819,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						<div>
 							<label for="radiusAvgInput">Size</label>
 							<input type="number" id="radiusAvgInput" min="0.0" max="20" step="0.2" value="5">
+						</div>
+						<div title="Smooths hand-drawn Pen strokes when you lift the pen. 0 keeps every wobble.">
+							<label for="penSmoothingInput">Smoothing <span id="penSmoothingValue">40%</span></label>
+							<input type="range" id="penSmoothingInput" min="0" max="100" step="5" value="40">
 						</div>
 					</div>
 
@@ -3714,6 +3848,27 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						<button id="layerDeleteBtn" title="Delete the active layer and everything on it">Delete</button>
 					</div>
 					<p class="layer-note">Drawing goes to the highlighted layer.</p>
+				</div>
+
+				<div class="toolbar-section" id="shadowSection">
+					<h4>Relief Shadow</h4>
+					<label class="topology-toggle" title="Each layer casts a shadow onto the layers below it.">
+						<input type="checkbox" id="shadowToggle">
+						Layers cast shadows
+					</label>
+					<div class="shadow-controls" id="shadowControls">
+						<label>Distance <span id="shadowDistanceValue"></span>
+							<input type="range" id="shadowDistance" min="0" max="40" step="1"></label>
+						<label>Angle <span id="shadowAngleValue"></span>
+							<input type="range" id="shadowAngle" min="0" max="355" step="5"></label>
+						<label>Softness <span id="shadowSoftnessValue"></span>
+							<input type="range" id="shadowSoftness" min="0" max="30" step="1"></label>
+						<label>Opacity <span id="shadowOpacityValue"></span>
+							<input type="range" id="shadowOpacity" min="0" max="100" step="5"></label>
+						<label class="shadow-color-row">Colour
+							<input type="color" id="shadowColor"></label>
+					</div>
+					<p class="topology-note">Like the cut planes of a painted wood relief. Shadows are exported to SVG and JPG.</p>
 				</div>
 
 				<!-- CANVAS TOOLS -->
@@ -4031,6 +4186,56 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				<label><input type="checkbox" id="saveIncludeSettings"> Physics & UI Settings</label><br>
 				<button id="confirmSaveBtn">Save</button>
 				<button id="cancelSaveBtn">Cancel</button>
+			</div>
+		</div>
+
+		<!-- Composition arrival (Shape Extractor → HanSketch) -->
+		<div class="dialog-backdrop" id="arrivalBackdrop">
+			<div class="dialog-content arrival-dialog">
+				<h3>Composition arrived</h3>
+				<div class="arrival-body">
+					<img id="arrivalPreview" class="arrival-preview" alt="Preview of the digitised composition">
+					<div class="arrival-options">
+						<p id="arrivalSummary" class="arrival-summary"></p>
+						<label><input type="radio" name="arrivalPlace" id="arrivalPlaceNew"> Start a new sketch with it</label>
+						<label><input type="radio" name="arrivalPlace" id="arrivalPlaceAdd"> Add it to this sketch</label>
+						<hr>
+						<label><input type="checkbox" id="arrivalGround"> Artwork's ground as background</label>
+						<label id="arrivalFitRow"><input type="checkbox" id="arrivalFit"> Canvas in the artwork's proportions</label>
+						<label><input type="checkbox" id="arrivalFlat"> Flat colour, no outlines</label>
+						<label><input type="checkbox" id="arrivalShadow"> Relief shadow</label>
+						<label><input type="checkbox" id="arrivalPhysics"> Physics on (forms start to move)</label>
+					</div>
+				</div>
+				<p id="arrivalNote" class="arrival-note"></p>
+				<button id="arrivalImportBtn">Place composition</button>
+				<button id="arrivalCancelBtn">Not now</button>
+			</div>
+		</div>
+
+		<!-- Laws of Chance composer -->
+		<div class="dialog-backdrop" id="chanceBackdrop">
+			<div class="dialog-content chance-dialog">
+				<h3>Laws of Chance</h3>
+				<p class="chance-intro">After Arp's collages “arranged according to the laws of chance” (1916–17):
+					pieces are dropped onto the sheet and stay where they land.</p>
+				<div class="chance-grid">
+					<label>Pieces <input type="number" id="chanceCount" min="1" max="60" step="1" value="9"></label>
+					<label>Forms
+						<select id="chanceForms">
+							<option value="torn">Torn paper squares</option>
+							<option value="library">Organic library forms</option>
+							<option value="mixed">Both</option>
+						</select>
+					</label>
+					<label>Size <span id="chanceSizeValue">16%</span>
+						<input type="range" id="chanceSize" min="5" max="40" step="1" value="16"></label>
+					<label class="chance-check"><input type="checkbox" id="chanceSettle"> Let them settle (physics on)</label>
+				</div>
+				<p class="chance-note" id="chanceColorsNote"></p>
+				<button id="chanceDropBtn">Drop</button>
+				<button id="chanceAgainBtn" title="Take back the last drop and drop again">Drop again</button>
+				<button id="chanceCloseBtn">Close</button>
 			</div>
 		</div>
 
@@ -6027,7 +6232,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			// makeCircleBlob is circle-only, buildPolygonChain is corner-only, and the
 			// other two builders are closure-scoped to their importers.
 			function makeChainFromPoints(points, { color, closed = true, radius = globalRadiusAvg } = {}) {
-				const chain = points.map(pt => ({ x: pt.x, y: pt.y, vx: 0, vy: 0, pinned: false }));
+				const chain = points.map(pt => pt.corner
+					? { x: pt.x, y: pt.y, vx: 0, vy: 0, pinned: false, corner: true }
+					: { x: pt.x, y: pt.y, vx: 0, vy: 0, pinned: false });
 				if (closed && chain.length) chain.push({ ...chain[0] }); // match freehand + SVG import
 				const { L, A } = measurePerimeterArea(chain, closed);
 				return {
@@ -6547,9 +6754,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 				/* ── 3. Edit tools OFF ── */
 				slicingMode = dragMode = pinMode =
-					freezeMode = deleteMode = false; // clear flags
+					freezeMode = deleteMode = recolorMode = selectMode = pushMode = false; // clear flags
 				$("editToolsSection").classList.remove("edit-on");
-				["iconSlice", "iconDrag", "iconPin", "iconFreeze", "iconDelete"]
+				["iconSlice", "iconDrag", "iconPin", "iconFreeze", "iconDelete", "iconRecolor", "iconSelect", "iconPush"]
 				.forEach(id => setIconActive($(id), false, "", ""));
 				updateCanvasCursor();
 
@@ -6736,9 +6943,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						tpValue.textContent = "0%";
 					}
 
-					slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = false;
+					slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = selectMode = pushMode = false;
 					$("editToolsSection").classList.remove("edit-on");
-					["iconSlice", "iconDrag", "iconPin", "iconFreeze", "iconDelete"]
+					["iconSlice", "iconDrag", "iconPin", "iconFreeze", "iconDelete", "iconRecolor", "iconSelect", "iconPush"]
 					.forEach(id => setIconActive($(id), false, "", ""));
 					updateCanvasCursor();
 				}
@@ -6845,7 +7052,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 							x: a.x + (b.x - a.x) * t,
 							y: a.y + (b.y - a.y) * t,
 							vx: 0, vy: 0,
-							pinned: s === 0 // the corner itself
+							pinned: s === 0, // the corner itself
+							corner: s === 0  // ...drawn as a real corner, not rounded
 						});
 					}
 				}
@@ -6928,11 +7136,78 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			   and the two had drifted: only the dead copy seeded the turgor baselines,
 			   so Inflation measured "the size it was drawn at" from whatever shape the
 			   blob happened to have on the first frame Inflation was raised. */
+			/* ── Pen smoothing ──
+			   Takes hand tremor out of a stroke on release. The stroke keeps its own
+			   point density, so the physics treats a smoothed stroke exactly like a raw
+			   one: only the wobble is gone. 0 leaves strokes exactly as drawn. */
+
+			// Evenly spaced points along a polyline (straight segments). A closed ring
+			// walks its closing edge too and does not repeat its first point.
+			function resamplePolyline(points, closed, step) {
+				const pts = closed ? [...points, points[0]] : points;
+				const out = [{ x: pts[0].x, y: pts[0].y, vx: 0, vy: 0, pinned: false }];
+				let carry = 0;
+				for (let i = 1; i < pts.length; i++) {
+					const a = pts[i - 1], b = pts[i];
+					const len = Math.hypot(b.x - a.x, b.y - a.y);
+					let d = step - carry;
+					while (d <= len) {
+						const t = d / len;
+						out.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, vx: 0, vy: 0, pinned: false });
+						d += step;
+					}
+					carry = len - (d - step);
+				}
+				if (closed) {
+					const last = out[out.length - 1];
+					if (out.length > 1 && Math.hypot(last.x - out[0].x, last.y - out[0].y) < step * 0.5) out.pop();
+				} else {
+					const end = pts[pts.length - 1], last = out[out.length - 1];
+					if (Math.hypot(end.x - last.x, end.y - last.y) > step * 0.25) {
+						out.push({ x: end.x, y: end.y, vx: 0, vy: 0, pinned: false });
+					} else {
+						last.x = end.x; last.y = end.y;
+					}
+				}
+				return out;
+			}
+
+			// Moving average over `radius` samples each side. An open stroke keeps its
+			// ends where they were drawn by narrowing the window towards them.
+			function boxFilterPoints(points, radius, closed) {
+				const n = points.length;
+				const out = new Array(n);
+				for (let i = 0; i < n; i++) {
+					const k = closed ? Math.min(radius, Math.floor((n - 1) / 2)) : Math.min(radius, i, n - 1 - i);
+					let sx = 0, sy = 0;
+					for (let j = -k; j <= k; j++) {
+						const p = points[closed ? (i + j + n) % n : i + j];
+						sx += p.x; sy += p.y;
+					}
+					out[i] = { x: sx / (2 * k + 1), y: sy / (2 * k + 1), vx: 0, vy: 0, pinned: false };
+				}
+				return out;
+			}
+
+			function smoothStroke(points, closed, amount) {
+				if (!(amount > 0) || points.length < 4) return points;
+				const spacing = averageSpacing(points, closed);
+				const ps = getPhysicsScale();
+				const step = Math.max(0.5, ps);
+				let pts = resamplePolyline(points, closed, step);
+				if (pts.length < 4) return points;
+				// Two box passes approximate a Gaussian; up to ±12 px at full strength.
+				const radius = Math.max(1, Math.round(amount * 12 * ps / step));
+				for (let pass = 0; pass < 2; pass++) pts = boxFilterPoints(pts, radius, closed);
+				return resamplePolyline(pts, closed, Math.max(spacing, 0.5));
+			}
+
 			function finalizeFreehandPath() {
 				let r = globalRadiusAvg + (Math.random() * 2 - 1) * globalRadiusVar;
 				if (r < 1) r = 1;
 
 				const isClosed = freehandPathIsClosed(currentPathPoints);
+				if (penSmoothing > 0) currentPathPoints = smoothStroke(currentPathPoints, isClosed, penSmoothing);
 				if (isClosed) {
 					// Closed rings repeat their first point, matching buildPolygonChain and
 					// the SVG importer.
@@ -7024,6 +7299,12 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				pointerDownY = y;
 				pointerDownType = e.pointerType; // Track if this is pen, touch, or mouse
 
+				// Select and Push own the whole gesture.
+				if (!filmstripData.crosshairsMode) {
+					if (selectMode) { selectPointerDown(x, y, e); return; }
+					if (pushMode) { pushPointerDown(x, y); return; }
+				}
+
 				// Long-press detection for attractor gradient curve editor (iPad/touch)
 				if (longPressAttractorTimer) { clearTimeout(longPressAttractorTimer); longPressAttractorTimer = null; }
 				longPressAttractorIndex = null;
@@ -7105,27 +7386,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				}
 
 				if (pinMode) {
-					let bestChainIndex = null;
-					let bestDotIndex = null;
-					let bestDist = Infinity;
-					const pickRadius = 20; // same radius you use in mousedown
-
-					for (let c = 0; c < chains.length; c++) {
-						if (!isChainPickable(chains[c])) continue;
-						const ch = chains[c].chain;
-						for (let i = 0; i < ch.length; i++) {
-							const dx = x - ch[i].x;
-							const dy = y - ch[i].y;
-							const d = Math.hypot(dx, dy);
-							if (d < pickRadius && d < bestDist) {
-								bestDist = d;
-								bestChainIndex = c;
-								bestDotIndex = i;
-							}
-						}
-					}
-					if (bestChainIndex !== null) {
-						const dot = chains[bestChainIndex].chain[bestDotIndex];
+					const hit = pickChainPoint(x, y, 20); // corners snap; see pickChainPoint
+					if (hit) {
+						const dot = chains[hit.chainIndex].chain[hit.dotIndex];
 						dot.pinned = !dot.pinned; // toggle
 						SFX.pin();
 					}
@@ -7135,31 +7398,11 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				const wantDrag = (dragMode || drawMode === "none");
 
 				if (wantDrag) {
-				  // 1) Prefer dragging blob dots first
-				  let bestChainIndex = null;
-				  let bestDotIndex = null;
-				  let bestDist = Infinity;
-				  const pickRadius = 20;
-
-				  for (let c = 0; c < chains.length; c++) {
-				    if (!isChainPickable(chains[c])) continue;
-				    const ch = chains[c].chain;
-				    for (let i = 0; i < ch.length; i++) {
-				      const dot = ch[i];
-				      const dx = x - dot.x;
-				      const dy = y - dot.y;
-				      const dist = Math.sqrt(dx * dx + dy * dy);
-				      if (dist < pickRadius && dist < bestDist) {
-				        bestDist = dist;
-				        bestChainIndex = c;
-				        bestDotIndex = i;
-				      }
-				    }
-				  }
-
-				  if (bestChainIndex !== null) {
-				    draggingChainIndex = bestChainIndex;
-				    draggingDotIndex = bestDotIndex;
+				  // 1) Prefer dragging blob dots first (corners snap; see pickChainPoint)
+				  const hit = pickChainPoint(x, y, 20);
+				  if (hit) {
+				    draggingChainIndex = hit.chainIndex;
+				    draggingDotIndex = hit.dotIndex;
 				    return;
 				  }
 
@@ -7236,6 +7479,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				// Use the main event, not coalesced events, to maintain consistent vertex spacing
 				// Coalesced events can create too many vertices in Chrome
 				let { x, y } = getCanvasXY(e);
+
+				if (selectMode && selectDrag) { cornerHover = null; selectPointerMove(x, y, e); return; }
+				if (selectMode) cornerHover = nearestOutlinePoint(x, y);
+				if (pushMode) { pushPointerMove(x, y); return; }
 
 				// Update shift key state from event (in case it changed during drawing)
 				if (e.shiftKey && !shiftKeyHeld && isDrawing && !straightLineStart) {
@@ -7395,26 +7642,18 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 				// pin/drag hover highlight
 				if ((pinMode || dragMode) && (e.movementX || e.movementY)) {
-					pinHoverChainIndex = null;
-					pinHoverDotIndex = null;
-					let bestDist = Infinity;
-					const hoverRad = 20;
-					for (let c = 0; c < chains.length; c++) {
-						const ch = chains[c].chain;
-						for (let i = 0; i < ch.length; i++) {
-							const d = Math.hypot(x - ch[i].x, y - ch[i].y);
-							if (d < hoverRad && d < bestDist) {
-								bestDist = d;
-								pinHoverChainIndex = c;
-								pinHoverDotIndex = i;
-							}
-						}
-					}
+					// Same pick as the click, so the ring marks the point that will be taken.
+					const hit = pickChainPoint(x, y, 20);
+					pinHoverChainIndex = hit ? hit.chainIndex : null;
+					pinHoverDotIndex = hit ? hit.dotIndex : null;
 				}
 			}, { passive: false });
 
 			function finalizePointer(e) {
 				if (activePointerId !== null && e.pointerId !== activePointerId) return;
+
+				if (selectDrag) selectPointerUp();
+				if (pushStroke) pushPointerUp();
 
 				if (drawMode === 'hardCircle' && isCircleDrawing && currentCircle) {
 					if (currentCircle.radius > 5) {
@@ -7466,7 +7705,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						temporalAmplitude: 0.5, // Amplitude of temporal variation (0-1)
 						shiftDirection: 'forward' // 'forward' or 'backward' for shift mode
 					});
-					history.push({ type: "attractorRepulsor" });
+					recordAddition({ attractorsRepulsors: [attractorsRepulsors[attractorsRepulsors.length - 1]] });
 				}
 
 				isDrawing = false;
@@ -7653,6 +7892,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			
 			// Reusable function to handle double-click/tap conversion logic
 			function handleDoubleTapConversion(x, y, shiftKey = false) {
+				// In Select mode a double-click edits the outline (corner ↔ smooth); it
+				// must not offer to turn the form into an attractor.
+				if (selectMode) { toggleCornerAt(x, y); return; }
 
 				// First, check if an attractor was clicked (only for attractors, not repulsors)
 				let clickedAttractorIndex = null;
@@ -7702,6 +7944,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					
 					// Regular double-click: cycle gradient mode
 					// Cycle: null -> 'forward' -> 'backward' -> null
+					history.push({ type: "edit", target: ar, prev: { gradientMode: ar.gradientMode } });
 					if (ar.gradientMode === null) {
 						ar.gradientMode = 'forward';
 						toast("Gradient mode: Forward", 1500);
@@ -7712,7 +7955,6 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						ar.gradientMode = null;
 						toast("Gradient mode: Off", 1500);
 					}
-					history.push({ type: "attractorRepulsor" });
 					return; // Don't process chain conversion
 				}
 
@@ -7786,7 +8028,11 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				const { x, y } = getCanvasXY(e);
 				handleDoubleTapConversion(x, y, e.shiftKey);
 			});
+			canvas.addEventListener("pointerleave", () => { pushHover = null; cornerHover = null; });
+
 			canvas.addEventListener("lostpointercapture", () => {
+				if (selectDrag) selectPointerUp();
+				if (pushStroke) pushPointerUp();
 				isDrawing = false;
 				draggingChainIndex = null;
 				draggingDotIndex = null;
@@ -7799,11 +8045,122 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				freezeLassoPath = [];
 			});
 
+			/* ── Deletion undo ──
+			   Deletions used to push {type:"chain"}, which undo answers with chains.pop():
+			   undoing a delete threw away the newest shape and never brought the deleted
+			   one back. A deletion now records each removed item with the index it held,
+			   so undo can put everything back where it was. */
+			function recordDeletion(removed, layer) {
+				history.push({ type: "delete", removed, layer });
+			}
+
+			// Additions that cannot rely on chains.pop(): a batch (SVG import, chance
+			// composition), anything inserted mid-array (duplicate), or anything that
+			// also created layers. Undo removes exactly these objects, wherever layer
+			// regrouping has moved them since.
+			function additionEntry(added) {
+				return { type: "added", added };
+			}
+			function recordAddition(added) {
+				history.push(additionEntry(added));
+			}
+
+			function undoAddition(entry) {
+				const a = entry.added;
+				const drop = (arr, items) => {
+					for (const item of items || []) {
+						const i = arr.indexOf(item);
+						if (i !== -1) arr.splice(i, 1);
+					}
+				};
+				drop(chains, a.chains);
+				drop(circles, a.circles);
+				drop(rigidPolygons, a.rigidPolygons);
+				drop(attractorsRepulsors, a.attractorsRepulsors);
+				if (a.layers?.length) {
+					drop(layers, a.layers);
+					refreshLayerIndex();
+					if (!_layerById.has(activeLayerId)) activeLayerId = layers[layers.length - 1].id;
+					renderLayerPanel();
+				}
+				if (selectedChain && !chains.includes(selectedChain)) selectedChain = null;
+			}
+
+			// Geometry undo. Transforms and the push brush can change how many points a
+			// chain has, so the whole point list is kept, along with everything derived
+			// from it that the edit rewrites. `points` are value copies (also the source
+			// positions for a transform in progress); `refs` are the point objects
+			// themselves. Restoring puts those same objects back with their old values,
+			// so earlier undo entries that point at a point object — a corner toggle —
+			// still find it in the chain.
+			function snapshotGeometry(chainObj) {
+				const capture = pts => ({ points: pts.map(p => ({ ...p })), refs: pts.slice() });
+				return {
+					chain: chainObj,
+					...capture(chainObj.chain),
+					holes: (chainObj.holes || []).map(h => ({
+						...capture(h.chain),
+						memory: h._shapeMemory ? h._shapeMemory.slice() : null,
+						L0: h._L0, A0: h._A0
+					})),
+					memory: chainObj._shapeMemory ? chainObj._shapeMemory.slice() : null,
+					L0: chainObj._L0,
+					A0: chainObj._A0
+				};
+			}
+
+			function restoreGeometry(snap) {
+				const restore = (target, cap, memory, L0, A0) => {
+					target.chain = cap.refs.map((ref, i) => {
+						const values = cap.points[i];
+						for (const key of Object.keys(ref)) if (!(key in values)) delete ref[key];
+						return Object.assign(ref, values, { vx: 0, vy: 0 });
+					});
+					target._forces = null;
+					if (memory) target._shapeMemory = memory.slice();
+					else delete target._shapeMemory;
+					target._L0 = L0;
+					target._A0 = A0;
+				};
+				const obj = snap.chain;
+				restore(obj, snap, snap.memory, snap.L0, snap.A0);
+				(obj.holes || []).forEach((hole, i) => {
+					const h = snap.holes[i];
+					if (h) restore(hole, h, h.memory, h.L0, h.A0);
+				});
+			}
+
+			function restoreDeletion(entry) {
+				if (entry.layer) {
+					const [layerIndex, layer] = entry.layer;
+					layers.splice(Math.min(layerIndex, layers.length), 0, layer);
+					refreshLayerIndex();
+					activeLayerId = layer.id;
+				}
+				const targets = { chains, circles, rigidPolygons, attractorsRepulsors };
+				for (const key in targets) {
+					const entries = entry.removed[key];
+					if (!entries) continue;
+					const arr = targets[key];
+					// Ascending order rebuilds the original sequence one index at a time.
+					entries.slice().sort((a, b) => a[0] - b[0]).forEach(([index, item]) => {
+						arr.splice(Math.min(index, arr.length), 0, item);
+					});
+				}
+				if (entry.layer) {
+					reorderChainsByLayer(); // layers may have been reordered since the delete
+					renderLayerPanel();
+				}
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
 			/* ── Single-click delete (original behavior) ── */
 			function performSingleDelete(x, y) {
 				SFX.deleteSound();
 				// a) delete attractors/repulsors first
-				const AR_SEG_TOL = 6;
+				const AR_SEG_TOL = pickSlack() + 5; // half the drawn path thickness
 				for (let i = 0; i < attractorsRepulsors.length; i++) {
 					const ar = attractorsRepulsors[i];
 					for (let j = 0; j < ar.path.length - 1; j++) {
@@ -7815,8 +8172,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						const px = p1.x + clamped * (p2.x - p1.x);
 						const py = p1.y + clamped * (p2.y - p1.y);
 						if (Math.hypot(x - px, y - py) < AR_SEG_TOL) {
+							recordDeletion({ attractorsRepulsors: [[i, ar]] });
 							attractorsRepulsors.splice(i, 1);
-							history.push({ type: "attractorRepulsor" });
 							return;
 						}
 					}
@@ -7825,61 +8182,27 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				for (let i = 0; i < circles.length; i++) {
 					const c = circles[i];
 					if (Math.hypot(x - c.x, y - c.y) < c.radius) {
+						recordDeletion({ circles: [[i, c]] });
 						circles.splice(i, 1);
-						history.push({ type: "circle" });
 						return;
 					}
 				}
 				// c) delete hard polygons
 				const rigidPolygonIndex = pickRigidPolygonIndex(x, y);
 				if (rigidPolygonIndex !== null) {
+					recordDeletion({ rigidPolygons: [[rigidPolygonIndex, rigidPolygons[rigidPolygonIndex]]] });
 					rigidPolygons.splice(rigidPolygonIndex, 1);
-					history.push({ type: "rigidPolygon" });
 					return;
 				}
-				// d) delete open lines if near a segment
-				const SEG_TOL = 6;
-				for (let k = 0; k < chains.length; k++) {
-					const obj = chains[k];
-					if (obj.isClosed) continue;
-					const pts = obj.chain;
-					for (let i = 0; i < pts.length - 1; i++) {
-						const a = pts[i], b = pts[i + 1];
-						const denom = (b.x - a.x) ** 2 + (b.y - a.y) ** 2 || 1;
-						const t = ((x - a.x) * (b.x - a.x) + (y - a.y) * (b.y - a.y)) / denom;
-						const clamped = Math.max(0, Math.min(1, t));
-						const px = a.x + clamped * (b.x - a.x);
-						const py = a.y + clamped * (b.y - a.y);
-						if (Math.hypot(x - px, y - py) < SEG_TOL) {
-							chains.splice(k, 1);
-							splineCache.clear();
-							spatialHashCache.needsRebuild = true;
-							_gpuTexturesDirty = true;
-							history.push({ type: "chain" });
-							return;
-						}
-					}
-				}
-				// e) delete the smallest closed blob under the point
-				const hits = [];
-				for (let i = 0; i < chains.length; i++) {
-					const ch = chains[i];
-					if (!ch.isClosed) continue;
-					if (!isChainPickable(ch)) continue;
-					if (pointInPolygon(x, y, ch.chain)) hits.push(i);
-				}
-				if (hits.length) {
-					let best = hits[0], bestArea = polygonArea(chains[best].chain);
-					for (let j = 1; j < hits.length; j++) {
-						const idx = hits[j];
-						const area = polygonArea(chains[idx].chain);
-						if (area < bestArea) { best = idx; bestArea = area; }
-					}
+				// d) delete the line, particle or blob under the point — the same pick
+				// as Freeze and Recolor, so locked and hidden layers stay untouched.
+				const best = pickChainAt(x, y);
+				if (best !== -1) {
+					recordDeletion({ chains: [[best, chains[best]]] });
 					chains.splice(best, 1);
 					splineCache.clear();
 					spatialHashCache.needsRebuild = true;
 					_gpuTexturesDirty = true;
-					history.push({ type: "chain" });
 				}
 			}
 
@@ -7888,12 +8211,14 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				if (lasso.length < 3) return;
 				SFX.deleteSound();
 				let deletedAny = false;
+				const removed = { chains: [], circles: [], rigidPolygons: [], attractorsRepulsors: [] };
 
 				// Delete attractors/repulsors whose any path point is inside the lasso
 				for (let i = attractorsRepulsors.length - 1; i >= 0; i--) {
 					const ar = attractorsRepulsors[i];
 					const inside = ar.path.some(p => pointInPolygon(p.x, p.y, lasso));
 					if (inside) {
+						removed.attractorsRepulsors.push([i, ar]);
 						attractorsRepulsors.splice(i, 1);
 						deletedAny = true;
 					}
@@ -7903,6 +8228,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				for (let i = circles.length - 1; i >= 0; i--) {
 					const c = circles[i];
 					if (pointInPolygon(c.x, c.y, lasso)) {
+						removed.circles.push([i, c]);
 						circles.splice(i, 1);
 						deletedAny = true;
 					}
@@ -7918,6 +8244,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					centerX /= polygon.points.length;
 					centerY /= polygon.points.length;
 					if (pointInPolygon(centerX, centerY, lasso) || polygon.points.some(point => pointInPolygon(point.x, point.y, lasso))) {
+						removed.rigidPolygons.push([i, polygon]);
 						rigidPolygons.splice(i, 1);
 						deletedAny = true;
 					}
@@ -7929,6 +8256,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					if (!isChainPickable(obj)) continue;
 					const inside = obj.chain.some(p => pointInPolygon(p.x, p.y, lasso));
 					if (inside) {
+						removed.chains.push([k, obj]);
 						chains.splice(k, 1);
 						deletedAny = true;
 					}
@@ -7938,7 +8266,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					splineCache.clear();
 					spatialHashCache.needsRebuild = true;
 					_gpuTexturesDirty = true;
-					history.push({ type: "chain" });
+					recordDeletion(removed);
 					toast("Deleted selected objects", 1500);
 				}
 			}
@@ -7946,27 +8274,11 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			/* ── Recolor: give an existing form the current colour ──
 			   Until now the palette only set the colour of the *next* stroke, so an
 			   imported shape was stuck with whatever colour its file carried and there
-			   was no way to restyle a drawing after the fact. Same hit-test as freeze:
-			   closed forms by their interior, open paths by proximity. */
+			   was no way to restyle a drawing after the fact. Same hit-test as freeze
+			   and delete: pickChainAt(). */
 			function performRecolor(x, y) {
-				const hits = [];
-				for (let i = 0; i < chains.length; i++) {
-					const ch = chains[i];
-					if (!isChainPickable(ch)) continue;
-					if (ch.isClosed) {
-						if (pointInPolygon(x, y, ch.chain)) hits.push(i);
-					} else if (distanceToChain(x, y, ch.chain) <= 6) {
-						hits.push(i);
-					}
-				}
-				if (!hits.length) return;
-
-				const rank = n => chains[n].isClosed ? polygonArea(chains[n].chain) : -1;
-				let best = hits[0], bestArea = rank(best);
-				for (let k = 1; k < hits.length; k++) {
-					const idx = hits[k], area = rank(idx);
-					if (area < bestArea) { best = idx; bestArea = area; }
-				}
+				const best = pickChainAt(x, y);
+				if (best === -1) return;
 
 				const obj = chains[best];
 				const next = hexToRGBA(colorInput.value);
@@ -8032,6 +8344,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			// have no interior, so proximity is the only way to hit one; the delete
 			// tool has always done this inline.
 			function distanceToChain(x, y, pts) {
+				// A particle is a single point; with no segment it would otherwise be unreachable.
+				if (pts.length === 1) return Math.hypot(x - pts[0].x, y - pts[0].y);
 				let best = Infinity;
 				for (let i = 0; i < pts.length - 1; i++) {
 					const a = pts[i], c = pts[i + 1];
@@ -8044,32 +8358,528 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				return best;
 			}
 
-			function performSingleFreeze(x, y) {
-				const hits = [];
+			// Click slack in canvas pixels. The canvas is usually larger than its CSS box,
+			// so a fixed canvas-pixel tolerance (it was 6) shrank to a few screen pixels
+			// and thin lines were close to impossible to click.
+			const PICK_SLACK_CSS_PX = 8;
+			function pickSlack() {
+				return PICK_SLACK_CSS_PX * cssToCanvasScale();
+			}
+
+			// Canvas pixels per CSS pixel: handle sizes, brush radii and click slack are
+			// thought of in screen pixels and converted here.
+			function cssToCanvasScale() {
+				const rect = canvas.getBoundingClientRect();
+				return rect.width > 0 ? canvas.width / rect.width : 1;
+			}
+
+			// The chain under a click, or -1. Shared by Delete, Freeze and Recolor so the
+			// three tools always agree on what was clicked.
+			function pickChainAt(x, y) {
+				const slack = pickSlack();
+				let best = -1, bestArea = Infinity;
 				for (let i = 0; i < chains.length; i++) {
 					const ch = chains[i];
 					if (!isChainPickable(ch)) continue;
 					// Closed forms are hit by their interior; open paths have none, so
-					// they are hit by proximity. Before Path unified the two tools an
-					// open line could not be click-frozen at all, which would now read
-					// as one tool behaving two different ways.
+					// they are hit by proximity to the stroke as drawn, and particles by
+					// their disc.
+					let hit;
 					if (ch.isClosed) {
-						if (pointInPolygon(x, y, ch.chain)) hits.push(i);
-					} else if (distanceToChain(x, y, ch.chain) <= 6) {
-						hits.push(i);
+						hit = pointInPolygon(x, y, ch.chain);
+					} else {
+						const reach = ch.chain.length === 1
+							? (ch.particleRenderSize || 4) * getDotScale()
+							: outlineWidth / 2;
+						hit = distanceToChain(x, y, ch.chain) <= slack + reach;
 					}
-				}
-				if (hits.length) {
+					if (!hit) continue;
 					// Smallest enclosing form wins so a blob inside a blob stays
 					// reachable. An open path has no area; rank it smallest so a line
 					// lying across a blob is still the thing you grab.
-					const rank = n => chains[n].isClosed ? polygonArea(chains[n].chain) : -1;
-					let bestIndex = hits[0];
-					let bestArea = rank(bestIndex);
-					for (let k = 1; k < hits.length; k++) {
-						const idx = hits[k], area = rank(idx);
-						if (area < bestArea) { bestIndex = idx; bestArea = area; }
+					const area = ch.isClosed ? polygonArea(ch.chain) : -1;
+					if (area < bestArea) { best = i; bestArea = area; }
+				}
+				return best;
+			}
+
+			/* ── Direct geometry edits: shared by Select and Push ─────────────
+			   Both tools move points by hand rather than through forces, so afterwards
+			   the physics has to be told the new shape is the intended one. */
+
+			// A ring is the chain itself or one of its holes.
+			function forEachRing(chainObj, fn) {
+				fn(chainObj, true);
+				(chainObj.holes || []).forEach(hole => fn(hole, false));
+			}
+
+			function isSinglePoint(chainObj) {
+				return chainObj.isParticle || chainObj.chain.length === 1;
+			}
+
+			// Closed chains usually repeat their first point at the end; the helpers
+			// below work on the ring without that duplicate.
+			function ringWithoutClosure(points, closed) {
+				const last = points[points.length - 1];
+				const dup = closed && points.length > 2 &&
+					Math.hypot(last.x - points[0].x, last.y - points[0].y) < 1e-6;
+				return { ring: dup ? points.slice(0, -1) : points.slice(), dup };
+			}
+
+			function averageSpacing(points, closed) {
+				const { ring } = ringWithoutClosure(points, closed);
+				const edges = closed ? ring.length : ring.length - 1;
+				if (edges < 1) return 0;
+				let total = 0;
+				for (let i = 0; i < edges; i++) {
+					const a = ring[i], b = ring[(i + 1) % ring.length];
+					total += Math.hypot(b.x - a.x, b.y - a.y);
+				}
+				return total / edges;
+			}
+
+			// Re-sample a ring at `target` spacing after an edit stretched or squeezed it.
+			// Spacing is physical here: springs pull each edge toward a Blob-Size rest
+			// length and neighbours repel within a fixed radius, so a ring scaled up with
+			// the same points would shrink back, and one left denser than before buckles
+			// into wrinkles. Pinned points (and an open path's ends) stay exactly where
+			// they are, and so do corner points; each stretch between them is
+			// re-sampled evenly along a Catmull-Rom curve, so the outline keeps its
+			// curvature.
+			function respacePoints(points, closed, target) {
+				if (points.length < 3 || !(target > 0)) return points;
+				const { ring, dup } = ringWithoutClosure(points, closed);
+				const n = ring.length;
+				const at = i => closed ? ring[((i % n) + n) % n] : ring[Math.max(0, Math.min(n - 1, i))];
+				const cr = (q0, q1, q2, q3, t) => {
+					const t2 = t * t, t3 = t2 * t;
+					return 0.5 * (2 * q1 + (q2 - q0) * t + (2 * q0 - 5 * q1 + 4 * q2 - q3) * t2 + (3 * q1 - q0 - 3 * q2 + q3) * t3);
+				};
+
+				const anchors = [];
+				for (let i = 0; i < n; i++) {
+					if (ring[i].pinned || ring[i].corner || (!closed && (i === 0 || i === n - 1))) anchors.push(i);
+				}
+				if (closed && !anchors.length) anchors.push(0); // one span, all the way round
+
+				const SUB = 8;
+				const out = [];
+				const spans = closed ? anchors.length : anchors.length - 1;
+				for (let s = 0; s < spans; s++) {
+					const i0 = anchors[s];
+					let i1 = closed ? anchors[(s + 1) % anchors.length] : anchors[s + 1];
+					if (closed && i1 <= i0) i1 += n;
+
+					const xs = [], ys = [];
+					for (let i = i0; i < i1; i++) {
+						const p0 = at(i - 1), a = at(i), b = at(i + 1), p3 = at(i + 2);
+						for (let k = 0; k < SUB; k++) {
+							const t = k / SUB;
+							xs.push(cr(p0.x, a.x, b.x, p3.x, t));
+							ys.push(cr(p0.y, a.y, b.y, p3.y, t));
+						}
 					}
+					xs.push(at(i1).x); ys.push(at(i1).y);
+					const cum = [0];
+					for (let j = 1; j < xs.length; j++) cum.push(cum[j - 1] + Math.hypot(xs[j] - xs[j - 1], ys[j] - ys[j - 1]));
+					const length = cum[cum.length - 1];
+
+					out.push(at(i0));
+					const pieces = Math.max(1, Math.round(length / target));
+					let j = 1;
+					for (let k = 1; k < pieces; k++) {
+						const d = length * k / pieces;
+						while (j < cum.length - 1 && cum[j] < d) j++;
+						const span = cum[j] - cum[j - 1] || 1;
+						const u = (d - cum[j - 1]) / span;
+						out.push({ x: xs[j - 1] + (xs[j] - xs[j - 1]) * u, y: ys[j - 1] + (ys[j] - ys[j - 1]) * u,
+							vx: 0, vy: 0, pinned: false });
+					}
+				}
+				if (!closed) out.push(at(anchors[anchors.length - 1]));
+				if (dup) out.push({ ...out[0] });
+				return out;
+			}
+
+			// After an edit: drop stale velocities and the force buffer, and — when the
+			// outline itself changed — make the new outline what Shape Memory and
+			// Inflation treat as the form's natural shape and size.
+			function settleEditedChain(chainObj, outlineChanged) {
+				forEachRing(chainObj, (ring, isParent) => {
+					for (const p of ring.chain) { p.vx = 0; p.vy = 0; }
+					ring._forces = null;
+					const closed = isParent ? chainObj.isClosed : true;
+					if (outlineChanged && ring.chain.length >= 3) {
+						delete ring._shapeMemory;
+						if (closed) ensureShapeMemory(ring);
+						const { L, A } = measurePerimeterArea(ring.chain, closed);
+						ring._L0 = Math.max(L, 1e-6);
+						ring._A0 = Math.max(Math.abs(A), 1e-6);
+					}
+				});
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
+			function chainBounds(chainObj) {
+				let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+				for (const p of chainObj.chain) {
+					if (p.x < minX) minX = p.x;
+					if (p.x > maxX) maxX = p.x;
+					if (p.y < minY) minY = p.y;
+					if (p.y > maxY) maxY = p.y;
+				}
+				const pad = isSinglePoint(chainObj)
+					? (chainObj.particleRenderSize || 4) * getDotScale()
+					: outlineWidth / 2;
+				minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+				return { minX, minY, maxX, maxY, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2 };
+			}
+
+			/* ── Select tool (V): move, scale, rotate, duplicate, arrange ─────
+			   Drag a form to move it, a corner handle to scale it (from the opposite
+			   corner; Alt scales from the centre), the round handle to rotate it (Shift
+			   snaps to 15°). The form is held still while it is being transformed. */
+			const SELECT_HANDLE_CSS_PX = 5;
+			const SELECT_ROTATE_OFFSET_CSS_PX = 24;
+
+			function selectionFrame(chainObj) {
+				const b = chainBounds(chainObj);
+				const k = cssToCanvasScale();
+				return {
+					...b,
+					corners: [[b.minX, b.minY], [b.maxX, b.minY], [b.maxX, b.maxY], [b.minX, b.maxY]],
+					rotate: { x: b.cx, y: b.minY - SELECT_ROTATE_OFFSET_CSS_PX * k },
+					handle: SELECT_HANDLE_CSS_PX * k
+				};
+			}
+
+			function selectionIsLive() {
+				if (selectedChain && (!chains.includes(selectedChain) || !isChainPickable(selectedChain))) {
+					selectedChain = null;
+					refreshSelectionPanel();
+				}
+				return !!selectedChain;
+			}
+
+			function setSelection(chainObj) {
+				selectedChain = chainObj;
+				refreshSelectionPanel();
+			}
+
+			function selectPointerDown(x, y, e) {
+				if (selectionIsLive() && !isSinglePoint(selectedChain)) {
+					const f = selectionFrame(selectedChain);
+					const grab = f.handle * 2.2;
+					if (Math.hypot(x - f.rotate.x, y - f.rotate.y) <= grab) {
+						beginSelectDrag("rotate", x, y, { cx: f.cx, cy: f.cy });
+						return;
+					}
+					for (let i = 0; i < 4; i++) {
+						const [hx, hy] = f.corners[i];
+						if (Math.abs(x - hx) <= grab && Math.abs(y - hy) <= grab) {
+							const [ax, ay] = f.corners[(i + 2) % 4];
+							beginSelectDrag("scale", x, y, { ax, ay, cx: f.cx, cy: f.cy });
+							return;
+						}
+					}
+				}
+				const hit = pickChainAt(x, y);
+				if (hit !== -1) {
+					setSelection(chains[hit]);
+					beginSelectDrag("move", x, y, {});
+					return;
+				}
+				if (selectedChain) {
+					const f = selectionFrame(selectedChain);
+					if (x >= f.minX && x <= f.maxX && y >= f.minY && y <= f.maxY) {
+						beginSelectDrag("move", x, y, {});
+						return;
+					}
+				}
+				setSelection(null);
+			}
+
+			function beginSelectDrag(kind, x, y, frame) {
+				selectDrag = { kind, startX: x, startY: y, ...frame, moved: false,
+					before: snapshotGeometry(selectedChain) };
+				selectedChain._held = true;
+			}
+
+			function selectPointerMove(x, y, e) {
+				const d = selectDrag;
+				if (!d.moved && Math.hypot(x - d.startX, y - d.startY) < pickSlack() * 0.5) return;
+				d.moved = true;
+
+				let map;
+				if (d.kind === "move") {
+					let dx = x - d.startX, dy = y - d.startY;
+					if (e.shiftKey) { if (Math.abs(dx) > Math.abs(dy)) dy = 0; else dx = 0; }
+					map = (px, py) => [px + dx, py + dy];
+				} else if (d.kind === "rotate") {
+					let angle = Math.atan2(y - d.cy, x - d.cx) - Math.atan2(d.startY - d.cy, d.startX - d.cx);
+					if (e.shiftKey) angle = Math.round(angle / (Math.PI / 12)) * (Math.PI / 12);
+					const cos = Math.cos(angle), sin = Math.sin(angle);
+					map = (px, py) => {
+						const rx = px - d.cx, ry = py - d.cy;
+						return [d.cx + rx * cos - ry * sin, d.cy + rx * sin + ry * cos];
+					};
+				} else {
+					const ax = e.altKey ? d.cx : d.ax, ay = e.altKey ? d.cy : d.ay;
+					const s0 = Math.hypot(d.startX - ax, d.startY - ay) || 1;
+					const s = Math.max(0.05, Math.min(20, Math.hypot(x - ax, y - ay) / s0));
+					d.scale = s;
+					map = (px, py) => [ax + (px - ax) * s, ay + (py - ay) * s];
+				}
+
+				const apply = (target, source) => {
+					const n = Math.min(target.length, source.length);
+					for (let i = 0; i < n; i++) {
+						const [nx, ny] = map(source[i].x, source[i].y);
+						target[i].x = nx; target[i].y = ny;
+						target[i].vx = 0; target[i].vy = 0;
+					}
+				};
+				apply(selectedChain.chain, d.before.points);
+				(selectedChain.holes || []).forEach((hole, i) => {
+					if (d.before.holes[i]) apply(hole.chain, d.before.holes[i].points);
+				});
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
+			function selectPointerUp() {
+				const d = selectDrag;
+				selectDrag = null;
+				if (!selectedChain) return;
+				selectedChain._held = false;
+				if (!d.moved) return;
+				if (d.kind === "scale" && d.scale && Math.abs(d.scale - 1) > 1e-3) {
+					// Respace to the spacing the form had before, so the springs keep the
+					// new size instead of pulling it back to the old one.
+					const obj = selectedChain;
+					obj.chain = respacePoints(obj.chain, obj.isClosed, averageSpacing(d.before.points, obj.isClosed));
+					(obj.holes || []).forEach((hole, i) => {
+						if (d.before.holes[i]) hole.chain = respacePoints(hole.chain, true, averageSpacing(d.before.holes[i].points, true));
+					});
+					settleEditedChain(obj, true);
+				} else {
+					settleEditedChain(selectedChain, false);
+				}
+				history.push({ type: "geometry", snapshots: [d.before] });
+			}
+
+			function translateSelected(dx, dy) {
+				if (!selectionIsLive()) return;
+				const before = snapshotGeometry(selectedChain);
+				forEachRing(selectedChain, ring => {
+					for (const p of ring.chain) { p.x += dx; p.y += dy; }
+				});
+				settleEditedChain(selectedChain, false);
+				history.push({ type: "geometry", snapshots: [before] });
+			}
+
+			function deleteSelected() {
+				if (!selectionIsLive()) return;
+				const i = chains.indexOf(selectedChain);
+				recordDeletion({ chains: [[i, selectedChain]] });
+				chains.splice(i, 1);
+				setSelection(null);
+				SFX.deleteSound();
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
+			// The copy lands just above the original on the same layer, nudged so it is
+			// visibly a second form.
+			function duplicateSelected() {
+				if (!selectionIsLive()) return;
+				const src = selectedChain;
+				const copy = JSON.parse(JSON.stringify(src, (key, value) =>
+					(key === "_forces" || key === "_held") ? undefined : value));
+				const off = 16 * cssToCanvasScale();
+				forEachRing(copy, ring => {
+					for (const p of ring.chain) { p.x += off; p.y += off; p.vx = 0; p.vy = 0; }
+				});
+				chains.splice(chains.indexOf(src) + 1, 0, copy);
+				recordAddition({ chains: [copy] });
+				setSelection(copy);
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+				toast("Duplicated", 1000);
+			}
+
+			// Stacking order within the selection's own layer; layers keep their order.
+			// Particles are always drawn above other forms, so this only affects lines
+			// and blobs.
+			function arrangeSelected(direction, toEnd) {
+				if (!selectionIsLive()) return;
+				const obj = selectedChain;
+				const from = chains.indexOf(obj);
+				const layer = layerOf(obj);
+				const same = [];
+				chains.forEach((c, i) => { if (layerOf(c) === layer) same.push(i); });
+				const pos = same.indexOf(from);
+				let target = toEnd ? (direction > 0 ? same.length - 1 : 0) : pos + direction;
+				target = Math.max(0, Math.min(same.length - 1, target));
+				if (target === pos) {
+					toast(direction > 0 ? "Already at the front of its layer" : "Already at the back of its layer", 1200);
+					return;
+				}
+				chains.splice(from, 1);
+				chains.splice(same[target], 0, obj);
+				history.push({ type: "order", chain: obj, from });
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
+			// Nearest point of any pickable chain within `radius` (canvas px), for Pin
+			// and Drag. A corner point within CORNER_SNAP_CSS_PX wins even when an
+			// ordinary point is a little closer: corners carry a visible marker and are
+			// deliberate targets, while on a densely sampled Pen stroke the neighbouring
+			// points are only a pixel or two away from them.
+			const CORNER_SNAP_CSS_PX = 12;
+			function pickChainPoint(x, y, radius) {
+				const snap = CORNER_SNAP_CSS_PX * cssToCanvasScale();
+				let best = null, bestD = radius, corner = null, cornerD = snap;
+				for (let c = 0; c < chains.length; c++) {
+					if (!isChainPickable(chains[c])) continue;
+					const ch = chains[c].chain;
+					for (let i = 0; i < ch.length; i++) {
+						const d = Math.hypot(x - ch[i].x, y - ch[i].y);
+						if (d < bestD) { bestD = d; best = { chainIndex: c, dotIndex: i }; }
+						if (ch[i].corner && d < cornerD) { cornerD = d; corner = { chainIndex: c, dotIndex: i }; }
+					}
+				}
+				return corner || best;
+			}
+
+			/* ── Corner points (Select tool, double-click) ──
+			   Like Illustrator's Curvature tool: double-click a point on an outline to
+			   make it a corner, double-click it again to make it smooth. The curve breaks
+			   at a corner (see getClosedSmoothCurve); the point moves with the physics
+			   like any other, so the corner stays sharp while the form wobbles. */
+			function nearestOutlinePoint(x, y) {
+				const reach = pickSlack() * 1.5 + outlineWidth / 2;
+				const snap = CORNER_SNAP_CSS_PX * cssToCanvasScale();
+				let best = null, bestD = reach, corner = null, cornerD = snap;
+				const consider = obj => {
+					if (!isChainPickable(obj) || isSinglePoint(obj)) return;
+					forEachRing(obj, ring => {
+						const pts = ring.chain;
+						for (let i = 0; i < pts.length; i++) {
+							const d = Math.hypot(pts[i].x - x, pts[i].y - y);
+							if (d < bestD) { bestD = d; best = { chain: obj, ring, index: i }; }
+							// An existing corner is snapped to, as in pickChainPoint, so
+							// double-clicking its marker turns that exact point back.
+							if (pts[i].corner && d < cornerD) { cornerD = d; corner = { chain: obj, ring, index: i }; }
+						}
+					});
+				};
+				// The selected form wins when its outline is in reach.
+				if (selectionIsLive()) consider(selectedChain);
+				if (!best && !corner) chains.forEach(consider);
+				return corner || best;
+			}
+
+			// A mouse double-click arrives twice — through the double-tap path in
+			// finalizePointer and through the native dblclick — so a second call
+			// straight after the first is the same gesture, not a second toggle.
+			let _lastCornerToggle = 0;
+
+			function toggleCornerAt(x, y) {
+				const now = performance.now();
+				if (now - _lastCornerToggle < 450) return;
+				_lastCornerToggle = now;
+				const hit = nearestOutlinePoint(x, y);
+				if (!hit) {
+					toast("Double-click a point on an outline to make it a corner", 1600);
+					return;
+				}
+				const point = hit.ring.chain[hit.index];
+				history.push({ type: "edit", target: point, prev: { corner: point.corner } });
+				if (point.corner) delete point.corner;
+				else point.corner = true;
+				setSelection(hit.chain);
+				splineCache.clear(); // the curve changed though no point moved
+				toast(point.corner ? "Corner point" : "Smooth point", 900);
+			}
+
+			function refreshSelectionPanel() {
+				const panel = $("selectionSection");
+				if (!panel) return;
+				panel.style.display = selectedChain ? "" : "none";
+			}
+
+			/* ── Push brush (P): liquify edges ────────────────────────────────
+			   Dragging carries every point under the brush along with it, strongest at
+			   the centre. Pushed forms are held still during the stroke; on release they
+			   are respaced and the pushed outline becomes the remembered shape. */
+			function pushPointerDown(x, y) {
+				pushStroke = { lastX: x, lastY: y, touched: new Map() };
+				pushHover = { x, y };
+			}
+
+			function pushPointerMove(x, y) {
+				pushHover = { x, y };
+				const s = pushStroke;
+				if (!s) return;
+				const cx = s.lastX, cy = s.lastY;
+				const dx = x - cx, dy = y - cy;
+				s.lastX = x; s.lastY = y;
+				if (dx === 0 && dy === 0) return;
+				const R = pushRadiusCss * cssToCanvasScale();
+				const R2 = R * R;
+				for (let ci = 0; ci < chains.length; ci++) {
+					const obj = chains[ci];
+					if (!isChainPickable(obj)) continue;
+					let hit = false;
+					forEachRing(obj, ring => {
+						for (const p of ring.chain) {
+							const d2 = (p.x - cx) * (p.x - cx) + (p.y - cy) * (p.y - cy);
+							if (d2 >= R2) continue;
+							if (!hit && !s.touched.has(obj)) {
+								s.touched.set(obj, snapshotGeometry(obj));
+								obj._held = true;
+							}
+							hit = true;
+							const t = 1 - Math.sqrt(d2) / R;
+							const w = t * t * (3 - 2 * t);
+							p.x += dx * w; p.y += dy * w;
+							p.vx = 0; p.vy = 0;
+						}
+					});
+					if (hit) splineCache.delete(ci);
+				}
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
+			function pushPointerUp() {
+				const s = pushStroke;
+				pushStroke = null;
+				if (!s || !s.touched.size) return;
+				const snapshots = [];
+				s.touched.forEach((before, obj) => {
+					obj._held = false;
+					obj.chain = respacePoints(obj.chain, obj.isClosed, averageSpacing(before.points, obj.isClosed));
+					(obj.holes || []).forEach((hole, i) => {
+						if (before.holes[i]) hole.chain = respacePoints(hole.chain, true, averageSpacing(before.holes[i].points, true));
+					});
+					settleEditedChain(obj, true);
+					snapshots.push(before);
+				});
+				history.push({ type: "geometry", snapshots });
+			}
+
+			function performSingleFreeze(x, y) {
+				const bestIndex = pickChainAt(x, y);
+				if (bestIndex !== -1) {
 					const obj = chains[bestIndex];
 					obj.frozen = !obj.frozen;
 					obj.alpha = obj.frozen ? 0.3 : 1.0;
@@ -8108,6 +8918,113 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			}
 
 			/* ── Draw lasso selection overlay ── */
+			/* ── Select / Push overlays (editor only, never exported) ── */
+			const _accentRGBA = [0.753, 0.325, 0.231, 1];
+			const _handleFillRGBA = [1, 1, 1, 1];
+
+			function drawOverlayVerts(verts, mode, rgba) {
+				gl.bufferData(gl.ARRAY_BUFFER, verts, gl.DYNAMIC_DRAW);
+				gl.vertexAttribPointer(linePosLoc, 2, gl.FLOAT, false, 0, 0);
+				gl.uniform4fv(lineColorLoc, rgba);
+				gl.drawArrays(mode, 0, verts.length / 2);
+			}
+
+			function circleVerts(cx, cy, r, seg) {
+				const v = new Float32Array(seg * 2);
+				for (let i = 0; i < seg; i++) {
+					const t = i * 2 * Math.PI / seg;
+					v[i * 2] = cx + r * Math.cos(t);
+					v[i * 2 + 1] = cy + r * Math.sin(t);
+				}
+				return v;
+			}
+
+			function beginOverlayDraw() {
+				gl.useProgram(lineProgram);
+				gl.enableVertexAttribArray(linePosLoc);
+				gl.uniform2f(lineResLoc, canvas.width, canvas.height);
+				gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+				gl.enable(gl.BLEND);
+				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+			}
+
+			// Every corner point carries a small diamond (with a white halo, so it reads
+			// on any fill or outline) for as long as it exists, so it can be found
+			// again — to pin it, drag it, or turn it back to smooth. Editor only:
+			// hidden in Presentation Mode and never exported.
+			const _cornerDiamond = new Float32Array(8);
+			const _cornerHaloRGBA = [1, 1, 1, 0.95];
+			function drawDiamond(x, y, r, rgba) {
+				_cornerDiamond[0] = x;     _cornerDiamond[1] = y - r;
+				_cornerDiamond[2] = x + r; _cornerDiamond[3] = y;
+				_cornerDiamond[4] = x;     _cornerDiamond[5] = y + r;
+				_cornerDiamond[6] = x - r; _cornerDiamond[7] = y;
+				drawOverlayVerts(_cornerDiamond, gl.TRIANGLE_FAN, rgba);
+			}
+
+			function drawCornerIndicators() {
+				if (isPresentationMode || filmstripData.isExporting) return;
+				let begun = false;
+				const k = cssToCanvasScale();
+				for (let ci = 0; ci < chains.length; ci++) {
+					const obj = chains[ci];
+					if (obj.isParticle || !isChainVisible(obj)) continue;
+					forEachRing(obj, ring => {
+						for (const p of ring.chain) {
+							if (!p.corner) continue;
+							if (!begun) { beginOverlayDraw(); begun = true; }
+							drawDiamond(p.x, p.y, 6 * k, _cornerHaloRGBA);
+							drawDiamond(p.x, p.y, 4.5 * k, _accentRGBA);
+							// A pinned corner keeps its pin ring visible on top.
+							if (p.pinned) drawPinnedIndicator(p.x, p.y);
+						}
+					});
+				}
+			}
+
+			function drawCornerMarkers() {
+				const k = cssToCanvasScale();
+				if (cornerHover && !selectDrag) {
+					const p = cornerHover.ring.chain[cornerHover.index];
+					if (p) drawOverlayVerts(circleVerts(p.x, p.y, 4.5 * k, 16), gl.LINE_LOOP, _accentRGBA);
+				}
+			}
+
+			function drawSelectionOverlay() {
+				if (isPresentationMode || filmstripData.isExporting) return;
+				if (!selectMode) return;
+				if (cornerHover && !chains.includes(cornerHover.chain)) cornerHover = null;
+				if (!selectionIsLive()) {
+					if (cornerHover) { beginOverlayDraw(); drawCornerMarkers(); }
+					return;
+				}
+				beginOverlayDraw();
+				drawCornerMarkers();
+				const f = selectionFrame(selectedChain);
+				drawOverlayVerts(new Float32Array(f.corners.flat()), gl.LINE_LOOP, _accentRGBA);
+				if (isSinglePoint(selectedChain)) return; // a dot can only be moved
+				const h = f.handle;
+				f.corners.forEach(([hx, hy]) => {
+					const sq = new Float32Array([hx - h, hy - h, hx + h, hy - h, hx + h, hy + h, hx - h, hy + h]);
+					drawOverlayVerts(sq, gl.TRIANGLE_FAN, _handleFillRGBA);
+					drawOverlayVerts(sq, gl.LINE_LOOP, _accentRGBA);
+				});
+				drawOverlayVerts(new Float32Array([f.cx, f.minY, f.rotate.x, f.rotate.y + h]), gl.LINES, _accentRGBA);
+				const ring = circleVerts(f.rotate.x, f.rotate.y, h * 1.15, 20);
+				drawOverlayVerts(ring, gl.TRIANGLE_FAN, _handleFillRGBA);
+				drawOverlayVerts(ring, gl.LINE_LOOP, _accentRGBA);
+			}
+
+			function drawPushBrush() {
+				if (isPresentationMode || filmstripData.isExporting) return;
+				if (!pushMode || !pushHover) return;
+				beginOverlayDraw();
+				const R = pushRadiusCss * cssToCanvasScale();
+				drawOverlayVerts(circleVerts(pushHover.x, pushHover.y, R, 48), gl.LINE_LOOP,
+					pushStroke ? _accentRGBA : [0.11, 0.09, 0.07, 0.55]);
+				drawOverlayVerts(circleVerts(pushHover.x, pushHover.y, 1.5 * cssToCanvasScale(), 8), gl.TRIANGLE_FAN, _accentRGBA);
+			}
+
 			function drawEditLassoSelect() {
 				if (isPresentationMode) return;
 				if (filmstripData.isExporting) return;
@@ -8507,7 +9424,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			// into the existing `frozen` checkpoints means attractors, noise, circle repulsion
 			// and inter-chain repulsion all honour it without each growing its own test.
 			function isChainStatic(chainObj) {
-				if (chainObj.frozen) return true;
+				// _held: being transformed or pushed by hand right now.
+				if (chainObj.frozen || chainObj._held) return true;
 				const l = layerOf(chainObj);
 				return !!(l && !l.physicsEnabled);
 			}
@@ -8686,7 +9604,21 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				pinMode = false,
 				freezeMode = false,
 				deleteMode = false,
-				recolorMode = false;
+				recolorMode = false,
+				selectMode = false,
+				pushMode = false;
+
+			// Select tool: the chain object itself, so the selection survives the array
+			// being regrouped by layer. selectDrag is the gesture in progress, if any.
+			let selectedChain = null;
+			let selectDrag = null;
+			// Outline point under the cursor in Select mode: what a double-click would
+			// turn into a corner (or back). { chain, ring, index } or null.
+			let cornerHover = null;
+			// Push brush: radius in CSS px so it feels the same at any canvas size.
+			let pushRadiusCss = 40;
+			let pushStroke = null;
+			let pushHover = null;
 
 			/* 5. Drag / hover helpers */
 			let draggingChainIndex = null,
@@ -8702,6 +9634,18 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			// When true, SVG/JPG exports paint canvasBackgroundColor behind the artwork instead
 			// of the legacy hardcoded white. Toggled from the Export menu, persisted in scenes.
 			let exportWithBackground = true;
+			// Relief shadow: every layer casts one soft shadow onto the layers below it,
+			// the way the cut planes of Arp's painted wood reliefs do. Distance and
+			// softness are canvas px at the 500-px baseline; angle is the direction the
+			// shadow falls, clockwise from the right.
+			const reliefShadow = {
+				enabled: false,
+				distance: 8,
+				angle: 45,
+				softness: 6,
+				opacity: 0.35,
+				color: "#1c1813"
+			};
 			let showGrid = false; // Grid is available in Appearance, but starts hidden
 			let selfPerforationEnabled = false;
 			let selfIntersectionCheckFrame = 0;
@@ -8776,7 +9720,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			   frame, 2 = twice per frame. Fractional rates are carried in an
 			   accumulator so slow speeds stay smooth rather than stuttering. */
 			let simSpeed = 1.0;
-			let prevSpeed = simSpeed; // remembers the speed before Space pauses
+			// Physics on/off (Space). A flag of its own rather than a dial set to zero:
+			// pausing used to zero Speed, which the autosave then kept, so a reload came
+			// back frozen and the chosen speed was gone. No dial moves now.
+			let physicsPaused = false;
 			let _simAccumulator = 0;
 			const MAX_SUBSTEPS = 4; // frame-budget guard; prevents a death spiral
 
@@ -8812,6 +9759,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			let noiseActive = false;
 
 			/* 9. Global shape settings */
+			// Pen smoothing strength, 0..1 (see smoothStroke).
+			let penSmoothing = 0.4;
 			let globalRadiusAvg = 5,
 				globalRadiusVar = 0;
 
@@ -9312,11 +10261,13 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			    (toolName === "pin"    && pinMode)     ||
 			    (toolName === "freeze" && freezeMode)  ||
 			    (toolName === "delete" && deleteMode)  ||
-			    (toolName === "recolor" && recolorMode)
+			    (toolName === "recolor" && recolorMode) ||
+			    (toolName === "select" && selectMode)  ||
+			    (toolName === "push"   && pushMode)
 			  );
 
 			  // Turn everything off first
-			  slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = false;
+			  slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = selectMode = pushMode = false;
 
 			  // Turn the requested tool on (unless user toggled it off)
 			  if (forceOn || !isAlreadyActive) {
@@ -9326,10 +10277,13 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			    if (toolName === "freeze") freezeMode = true;
 			    if (toolName === "delete") deleteMode = true;
 			    if (toolName === "recolor") recolorMode = true;
+			    if (toolName === "select") selectMode = true;
+			    if (toolName === "push")   pushMode = true;
 			  }
+			  if (!selectMode) { selectedChain = null; refreshSelectionPanel(); }
 
 			  // ✅ If no draw mode is active, we ALWAYS fall back to drag
-			  const anyEditOn = slicingMode || dragMode || pinMode || freezeMode || deleteMode || recolorMode;
+			  const anyEditOn = slicingMode || dragMode || pinMode || freezeMode || deleteMode || recolorMode || selectMode || pushMode;
 
 				if (anyEditOn) {
   // ✅ If any edit tool is active, drawing must be OFF
@@ -9341,7 +10295,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			  // UI updates (same as your existing code)
 			  const editFrame = $("editToolsSection");
-			  editFrame.classList.toggle("edit-on", slicingMode || dragMode || pinMode || freezeMode || deleteMode || recolorMode);
+			  editFrame.classList.toggle("edit-on", anyEditOn);
 
 			  setIconActive($("iconSlice"),  slicingMode, "Slicing Mode (On)", "Slicing Mode (Off)");
 			  setIconActive($("iconDrag"),   dragMode,    "Disable Drag Mode", "Enable Drag Mode");
@@ -9349,6 +10303,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			  setIconActive($("iconFreeze"), freezeMode,  "Disable Freeze Mode","Enable Freeze Mode");
 			  setIconActive($("iconDelete"), deleteMode,  "Disable Delete Mode","Enable Delete Mode");
 			  setIconActive($("iconRecolor"), recolorMode, "Disable Recolor Mode","Enable Recolor Mode");
+			  setIconActive($("iconSelect"), selectMode, "Disable Select","Enable Select");
+			  setIconActive($("iconPush"),   pushMode,   "Disable Push","Enable Push");
 
 			  updateCanvasCursor();
 
@@ -9372,6 +10328,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			  setIconActive($("iconFreeze"), false, "Disable Freeze Mode","Enable Freeze Mode");
 			  setIconActive($("iconDelete"), false, "Disable Delete Mode","Enable Delete Mode");
 			  setIconActive($("iconRecolor"), false, "Disable Recolor Mode","Enable Recolor Mode");
+			  setIconActive($("iconSelect"), false, "Disable Select","Enable Select");
+			  setIconActive($("iconPush"),   false, "Disable Push","Enable Push");
+			  selectedChain = null;
+			  refreshSelectionPanel();
 			}
 
 			function clearDrawModeUIOnly() {
@@ -9415,7 +10375,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			    toast("Draw: OFF (Drag)", 1600);
 			  } else {
 			    // Entering a draw mode: turn off edit tools to avoid blocking drawing
-			    slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = false;
+			    slicingMode = dragMode = pinMode = freezeMode = deleteMode = recolorMode = selectMode = pushMode = false;
 			    clearAllEditToolsUIOnly();
 			    toast(`Draw mode: ${drawMode.toUpperCase()}`, 1600);
 			  }
@@ -9446,6 +10406,18 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			};
 			$("iconRecolor").onclick = function() {
 				setEditTool("recolor");
+			};
+			$("iconSelect").onclick = function() {
+				setEditTool("select");
+			};
+			$("selDuplicateBtn").onclick = duplicateSelected;
+			$("selDeleteBtn").onclick = deleteSelected;
+			$("selFrontBtn").onclick = () => arrangeSelected(1, true);
+			$("selForwardBtn").onclick = () => arrangeSelected(1, false);
+			$("selBackwardBtn").onclick = () => arrangeSelected(-1, false);
+			$("selBackBtn").onclick = () => arrangeSelected(-1, true);
+			$("iconPush").onclick = function() {
+				setEditTool("push");
 			};
 
 			// The tool's icon *is* the current colour, so it is obvious what a click
@@ -9881,22 +10853,50 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			   UNDO & RESET
 			----------------------------------- */
 
-			$("iconUndo").onclick = () => {
-				if (history.length > 0) {
-					const last = history.pop();
-					if (last.type === "chain") chains.pop();
-					if (last.type === "circle") circles.pop();
-					if (last.type === "rigidPolygon") rigidPolygons.pop();
-					if (last.type === "recolor" && last.chain) {
-						if (last.prev) last.chain.color = last.prev;
-						(last.chain.holes || []).forEach((h, i) => {
-							if (last.holes && last.holes[i]) h.color = last.holes[i];
-						});
+			/* Entry types:
+			   chain / circle / rigidPolygon — one item appended at the end; undo pops it.
+			   added    — items appended anywhere (and possibly new layers); removed by identity.
+			   delete   — items removed with their indices; see restoreDeletion().
+			   edit     — fields of one object overwritten; `prev` holds the old values.
+			   geometry — a chain's points replaced (transform, push brush); see snapshotGeometry().
+			   order    — a chain moved within chains[]; `from` is where it was.
+			   compound — several of the above, undone last-first.
+			   recolor  — a chain's colour changed. */
+			function undoEntry(last) {
+				if (last.type === "chain") chains.pop();
+				if (last.type === "circle") circles.pop();
+				if (last.type === "rigidPolygon") rigidPolygons.pop();
+				if (last.type === "delete") restoreDeletion(last);
+				if (last.type === "added") undoAddition(last);
+				if (last.type === "edit") Object.assign(last.target, last.prev);
+				if (last.type === "geometry") last.snapshots.forEach(restoreGeometry);
+				if (last.type === "order") {
+					const i = chains.indexOf(last.chain);
+					if (i !== -1) {
+						chains.splice(i, 1);
+						chains.splice(Math.min(last.from, chains.length), 0, last.chain);
 					}
+				}
+				if (last.type === "compound") last.entries.slice().reverse().forEach(undoEntry);
+				if (last.type === "recolor" && last.chain) {
+					if (last.prev) last.chain.color = last.prev;
+					(last.chain.holes || []).forEach((h, i) => {
+						if (last.holes && last.holes[i]) h.color = last.holes[i];
+					});
+				}
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
+			function undoLast() {
+				if (history.length > 0) {
+					undoEntry(history.pop());
 					SFX.undo();
 				}
 				toast("Undo", 1200);
-			};
+			}
+			$("iconUndo").onclick = undoLast;
 
 			$("resetIcon").onclick = () => {
 				if (confirm("Are you sure you want to clear the entire canvas?")) {
@@ -10788,11 +11788,11 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						const strokeWidth = vectorData.outlineWidth * Math.min(scaleX, scaleY);
 
 						if (shouldFill && shouldStroke) {
-							svgParts.push(`<path d="${pathData}" fill="rgb(${rr},${gg},${bb})" fill-opacity="${alpha}" stroke="rgb(0,0,0)" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" />`);
+							svgParts.push(`<path d="${pathData}" fill="rgb(${rr},${gg},${bb})" fill-opacity="${alpha}" stroke="rgb(0,0,0)" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
 						} else if (shouldFill) {
 							svgParts.push(`<path d="${pathData}" fill="rgb(${rr},${gg},${bb})" fill-opacity="${alpha}" stroke="none" />`);
 						} else if (shouldStroke) {
-							svgParts.push(`<path d="${pathData}" stroke="rgb(${rr},${gg},${bb})" stroke-opacity="${alpha}" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" />`);
+							svgParts.push(`<path d="${pathData}" stroke="rgb(${rr},${gg},${bb})" stroke-opacity="${alpha}" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
 						}
 					});
 
@@ -11572,6 +12572,15 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			$("gradientCurveApplyBtn").onclick = () => {
 				if (currentEditingAttractorIndex !== null) {
 					const ar = attractorsRepulsors[currentEditingAttractorIndex];
+					history.push({ type: "edit", target: ar, prev: {
+						gradientMode: ar.gradientMode,
+						gradientCurve: ar.gradientCurve,
+						gradientCurveControlPoints: ar.gradientCurveControlPoints,
+						temporalMode: ar.temporalMode,
+						temporalFrequency: ar.temporalFrequency,
+						temporalAmplitude: ar.temporalAmplitude,
+						shiftDirection: ar.shiftDirection
+					} });
 					
 					// Store the original control points (sorted)
 					const sortedPoints = [...curvePoints].sort((a, b) => a.x - b.x);
@@ -11590,8 +12599,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					ar.temporalFrequency = parseFloat($("temporalFrequencySlider").value);
 					ar.temporalAmplitude = parseFloat($("temporalAmplitudeSlider").value);
 					ar.shiftDirection = $("shiftDirectionSelect").value;
-					
-					history.push({ type: "attractorRepulsor" });
+
 					toast("Gradient curve updated", 1500);
 					
 					stopCurveEditorAnimation();
@@ -11782,20 +12790,70 @@ window.addEventListener("keydown", (e) => {
 				const doomed = chains.filter(c => c.layerId === layer.id).length;
 				if (doomed > 0 && !confirm(`Delete "${layer.name}" and its ${doomed} shape${doomed === 1 ? "" : "s"}?`)) return;
 
+				const removedChains = [];
 				for (let i = chains.length - 1; i >= 0; i--) {
-					if (chains[i].layerId === layer.id) chains.splice(i, 1);
+					if (chains[i].layerId === layer.id) {
+						removedChains.push([i, chains[i]]);
+						chains.splice(i, 1);
+					}
 				}
-				layers.splice(layers.indexOf(layer), 1);
+				const layerIndex = layers.indexOf(layer);
+				layers.splice(layerIndex, 1);
 				refreshLayerIndex();
 				activeLayerId = layers[layers.length - 1].id;
 				splineCache.clear();
 				spatialHashCache.needsRebuild = true;
 				_gpuTexturesDirty = true;
-				history.push({ type: "chain" });
+				recordDeletion({ chains: removedChains }, [layerIndex, layer]);
 				renderLayerPanel();
 			};
 
 			renderLayerPanel();
+
+			/* Relief shadow controls (inspector). Live: every change shows immediately. */
+			function syncReliefShadowUI() {
+				const set = (id, v) => { const el = $(id); if (el) el.value = v; };
+				const text = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+				$("shadowToggle").checked = reliefShadow.enabled;
+				$("shadowControls").classList.toggle("is-on", reliefShadow.enabled);
+				set("shadowDistance", reliefShadow.distance);
+				set("shadowAngle", reliefShadow.angle);
+				set("shadowSoftness", reliefShadow.softness);
+				set("shadowOpacity", Math.round(reliefShadow.opacity * 100));
+				set("shadowColor", reliefShadow.color);
+				text("shadowDistanceValue", `${reliefShadow.distance} px`);
+				text("shadowAngleValue", `${reliefShadow.angle}°`);
+				text("shadowSoftnessValue", `${reliefShadow.softness} px`);
+				text("shadowOpacityValue", `${Math.round(reliefShadow.opacity * 100)}%`);
+			}
+
+			// Accepts a saved scene's values, ignoring anything malformed.
+			function applyReliefShadowSettings(saved) {
+				const num = (v, lo, hi) => (typeof v === "number" && isFinite(v)) ? Math.max(lo, Math.min(hi, v)) : null;
+				if (typeof saved.enabled === "boolean") reliefShadow.enabled = saved.enabled;
+				const d = num(saved.distance, 0, 40); if (d !== null) reliefShadow.distance = d;
+				const a = num(saved.angle, 0, 360); if (a !== null) reliefShadow.angle = a;
+				const sf = num(saved.softness, 0, 30); if (sf !== null) reliefShadow.softness = sf;
+				const o = num(saved.opacity, 0, 1); if (o !== null) reliefShadow.opacity = o;
+				const c = normaliseHex(saved.color); if (c) reliefShadow.color = c;
+				syncReliefShadowUI();
+			}
+
+			$("shadowToggle").onchange = e => {
+				reliefShadow.enabled = e.target.checked;
+				syncReliefShadowUI();
+			};
+			[["shadowDistance", "distance", 1], ["shadowAngle", "angle", 1],
+			 ["shadowSoftness", "softness", 1], ["shadowOpacity", "opacity", 0.01]].forEach(([id, key, k]) => {
+				$(id).oninput = e => {
+					reliefShadow[key] = parseFloat(e.target.value) * k;
+					syncReliefShadowUI();
+				};
+			});
+			$("shadowColor").oninput = e => {
+				reliefShadow.color = e.target.value;
+			};
+			syncReliefShadowUI();
 
 			// Particle emitter icon — show settings dialog
 			$("iconParticle").onclick = () => {
@@ -11857,9 +12915,12 @@ window.addEventListener("keydown", (e) => {
 						shiftDirection: 'forward'
 					});
 
-					// Remove the original chain
+					// Remove the original chain; undo takes the field away and returns the line.
+					history.push({ type: "compound", entries: [
+						{ type: "delete", removed: { chains: [[chainToConvertIndex, chain]] } },
+						additionEntry({ attractorsRepulsors: [attractorsRepulsors[attractorsRepulsors.length - 1]] })
+					] });
 					chains.splice(chainToConvertIndex, 1);
-					history.push({ type: "attractorRepulsor" });
 					chainToConvertIndex = null;
 					toast("Converted to Attractor", 1500);
 				} else {
@@ -11890,9 +12951,12 @@ window.addEventListener("keydown", (e) => {
 						shiftDirection: 'forward'
 					});
 
-					// Remove the original chain
+					// Remove the original chain; undo takes the field away and returns the line.
+					history.push({ type: "compound", entries: [
+						{ type: "delete", removed: { chains: [[chainToConvertIndex, chain]] } },
+						additionEntry({ attractorsRepulsors: [attractorsRepulsors[attractorsRepulsors.length - 1]] })
+					] });
 					chains.splice(chainToConvertIndex, 1);
-					history.push({ type: "attractorRepulsor" });
 					chainToConvertIndex = null;
 					toast("Converted to Repulsor", 1500);
 				} else {
@@ -11944,7 +13008,9 @@ window.addEventListener("keydown", (e) => {
 					"canvas-slicing-mode",
 					"canvas-freeze-mode",
 					"canvas-delete-mode",
-					"canvas-recolor-mode"
+					"canvas-recolor-mode",
+					"canvas-select-mode",
+					"canvas-push-mode"
 				);
 				// Draw mode
 				if (drawMode === 'path') canvas.classList.add("canvas-path-mode");
@@ -11961,6 +13027,8 @@ window.addEventListener("keydown", (e) => {
 				if (pinMode) canvas.classList.add("canvas-pin-mode");
 				if (freezeMode) canvas.classList.add("canvas-freeze-mode");
 				if (deleteMode) canvas.classList.add("canvas-delete-mode");
+				if (selectMode) canvas.classList.add("canvas-select-mode");
+				if (pushMode) canvas.classList.add("canvas-push-mode");
 			}
 
 			/* -----------------------------------
@@ -12000,6 +13068,8 @@ window.addEventListener("keydown", (e) => {
 				showGrid,
 				selfPerforationEnabled,
 				shapeMemoryEnabled,
+				penSmoothing,
+				reliefShadow: { ...reliefShadow },
 				travelingSegmentEnabled,
 			        travelingSegmentLength,
 			        travelingSegmentSpeed,
@@ -12055,6 +13125,13 @@ window.addEventListener("keydown", (e) => {
 						thicknessIcon.style.backgroundColor = (currentLineThickness === 5) ? "#D3D3D3" : "";
 						toggleActiveIcon(thicknessIcon, currentLineThickness > 1);
 					}
+				}
+				if (typeof obj.penSmoothing === "number" && isFinite(obj.penSmoothing)) {
+					penSmoothing = Math.max(0, Math.min(1, obj.penSmoothing));
+					if (typeof syncPenSmoothingUI === "function") syncPenSmoothingUI();
+				}
+				if (obj.reliefShadow && typeof obj.reliefShadow === "object") {
+					applyReliefShadowSettings(obj.reliefShadow);
 				}
 				if (typeof obj.globalRadiusAvg === "number") {
 					globalRadiusAvg = obj.globalRadiusAvg;
@@ -12219,6 +13296,14 @@ window.addEventListener("keydown", (e) => {
 				$("fileSubmenu").style.display = "none";
 				stampUnassignedChains(); // anything drawn this frame keeps its own layer
 				bindingOpenFile("shape");
+			};
+
+			// Opens Shape Extractor straight in Composition mode. Its "Open in HanSketch"
+			// sends the digitised artwork back to this tab (see COMPOSITION ARRIVAL).
+			$("digitiseOption").onclick = e => {
+				e.stopPropagation();
+				$("fileSubmenu").style.display = "none";
+				window.open("../shape-extractor/?mode=composition", "shape-extractor");
 			};
 
 			$("importSVGOption").onclick = e => {
@@ -13759,8 +14844,9 @@ window.addEventListener("keydown", (e) => {
 			const vsSource = `
     attribute vec2 a_position;
     uniform vec2 u_resolution;
+    uniform vec2 u_offset; // relief-shadow passes only; 0 everywhere else
     void main(){
-      vec2 clipSpace = (a_position / u_resolution)*2.0 - 1.0;
+      vec2 clipSpace = ((a_position + u_offset) / u_resolution)*2.0 - 1.0;
       clipSpace.y = -clipSpace.y;
       gl_Position = vec4(clipSpace,0,1);
     }
@@ -13776,6 +14862,7 @@ window.addEventListener("keydown", (e) => {
 			const linePosLoc = gl.getAttribLocation(lineProgram, "a_position");
 			const lineResLoc = gl.getUniformLocation(lineProgram, "u_resolution");
 			const lineColorLoc = gl.getUniformLocation(lineProgram, "u_color");
+			const lineOffsetLoc = gl.getUniformLocation(lineProgram, "u_offset");
 			const positionBuffer = gl.createBuffer();
 			let thickScratch = new Float32Array(0);
 
@@ -14627,10 +15714,15 @@ window.addEventListener("keydown", (e) => {
 				let idx = 0;
 				const invSeg = 1 / seg;
 				for (let i = 0; i < n; i++) {
-					const p0 = points[(i - 1 + n) % n],
+					let p0 = points[(i - 1 + n) % n],
 						p1 = points[i],
 						p2 = points[(i + 1) % n],
 						p3 = points[(i + 2) % n];
+					// A corner point (Illustrator's corner anchor) is left and entered
+					// along the straight line to its neighbour, so the curve breaks there
+					// instead of bending through it. Smooth points keep both neighbours.
+					if (p1.corner) p0 = p1;
+					if (p2.corner) p3 = p2;
 					const p0x = p0.x, p0y = p0.y, p1x = p1.x, p1y = p1.y;
 					const p2x = p2.x, p2y = p2.y, p3x = p3.x, p3y = p3.y;
 					const ax = -p0x + p2x, bx = 2*p0x - 5*p1x + 4*p2x - p3x, cx = -p0x + 3*p1x - 3*p2x + p3x;
@@ -14654,10 +15746,12 @@ window.addEventListener("keydown", (e) => {
 				let idx = 0;
 				const invSeg = 1 / seg;
 				for (let i = 0; i < n - 1; i++) {
-					const p0 = (i === 0 ? points[0] : points[i - 1]),
+					let p0 = (i === 0 ? points[0] : points[i - 1]),
 						p1 = points[i],
 						p2 = points[i + 1],
 						p3 = (i === n - 2 ? points[n - 1] : points[i + 2]);
+					if (p1.corner) p0 = p1; // see getClosedSmoothCurve
+					if (p2.corner) p3 = p2;
 					const p0x = p0.x, p0y = p0.y, p1x = p1.x, p1y = p1.y;
 					const p2x = p2.x, p2y = p2.y, p3x = p3.x, p3y = p3.y;
 					const ax = -p0x + p2x, bx = 2*p0x - 5*p1x + 4*p2x - p3x, cx = -p0x + 3*p1x - 3*p2x + p3x;
@@ -14691,32 +15785,57 @@ window.addEventListener("keydown", (e) => {
 				return arr;
 			}
 
+			// Stroke joins are mitred: along a smooth curve the miter is ~1 and nothing
+			// changes, but at a corner point the stroke keeps its full width instead of
+			// pinching to ~70% at a right angle. MITER_LIMIT caps the spike at very
+			// acute corners. Exports use the same join and limit.
+			const MITER_LIMIT = 3;
+
+			// The two offset vertices for spline point (cx, cy), from its neighbours
+			// before (ax, ay) and after (bx, by); either may be missing at an open end.
+			function writeStrokeJoin(out, base, cx, cy, ax, ay, hasA, bx, by, hasB, half) {
+				let n1x = 0, n1y = 0, n2x = 0, n2y = 0;
+				if (hasA) {
+					const l = Math.hypot(cx - ax, cy - ay);
+					if (l > 1e-9) { n1x = -(cy - ay) / l; n1y = (cx - ax) / l; } else hasA = false;
+				}
+				if (hasB) {
+					const l = Math.hypot(bx - cx, by - cy);
+					if (l > 1e-9) { n2x = -(by - cy) / l; n2y = (bx - cx) / l; } else hasB = false;
+				}
+				let mx = hasA ? n1x : n2x, my = hasA ? n1y : n2y, scale = 1;
+				if (hasA && hasB) {
+					const sx = n1x + n2x, sy = n1y + n2y, sl = Math.hypot(sx, sy);
+					if (sl > 1e-6) {
+						mx = sx / sl; my = sy / sl;
+						scale = 1 / Math.max(mx * n1x + my * n1y, 1 / MITER_LIMIT);
+					}
+				}
+				const h = half * scale;
+				out[base] = cx + mx * h;
+				out[base + 1] = cy + my * h;
+				out[base + 2] = cx - mx * h;
+				out[base + 3] = cy - my * h;
+			}
+
 			function getThickLineVertices(splinePts, thickness) {
 				const n = splinePts.length >> 1; // points count
 				const needed = n * 4; // 2 verts per point
 				if (thickScratch.length < needed) thickScratch = new Float32Array(needed);
 
 				const half = thickness * 0.5;
+				const same = (j, x, y) => Math.abs(splinePts[j * 2] - x) + Math.abs(splinePts[j * 2 + 1] - y) < 1e-6;
 				for (let i = 0; i < n; i++) {
 					const currX = splinePts[i * 2],
 						currY = splinePts[i * 2 + 1];
-					const prevX = splinePts[((i - 1 + n) % n) * 2],
-						prevY = splinePts[((i - 1 + n) % n) * 2 + 1];
-					const nextX = splinePts[((i + 1) % n) * 2],
-						nextY = splinePts[((i + 1) % n) * 2 + 1];
-
-					// tangential = next - prev
-					const tx = nextX - prevX,
-						ty = nextY - prevY;
-					const invLen = 1 / Math.hypot(tx, ty || 1); // avoid /0
-					const nx = -ty * invLen,
-						ny = tx * invLen; // normal
-
-					const base = i * 4;
-					thickScratch[base] = currX + nx * half;
-					thickScratch[base + 1] = currY + ny * half;
-					thickScratch[base + 2] = currX - nx * half;
-					thickScratch[base + 3] = currY - ny * half;
+					// Nearest *distinct* neighbours: a closed spline repeats points at its
+					// seam, and a zero-length neighbour used to pinch the stroke there.
+					let a = (i - 1 + n) % n, b = (i + 1) % n;
+					for (let k = 0; k < n && same(a, currX, currY); k++) a = (a - 1 + n) % n;
+					for (let k = 0; k < n && same(b, currX, currY); k++) b = (b + 1) % n;
+					writeStrokeJoin(thickScratch, i * 4, currX, currY,
+						splinePts[a * 2], splinePts[a * 2 + 1], true,
+						splinePts[b * 2], splinePts[b * 2 + 1], true, half);
 				}
 				return thickScratch.subarray(0, needed);
 			}
@@ -14729,42 +15848,16 @@ window.addEventListener("keydown", (e) => {
 				if (thickScratch.length < needed) thickScratch = new Float32Array(needed);
 
 				const half = thickness * 0.5;
+				const same = (j, x, y) => Math.abs(splinePts[j * 2] - x) + Math.abs(splinePts[j * 2 + 1] - y) < 1e-6;
 				for (let i = 0; i < n; i++) {
 					const currX = splinePts[i * 2],
 						currY = splinePts[i * 2 + 1];
-
-					let tx, ty;
-					if (i === 0) {
-						// First point: use direction to next
-						const nextX = splinePts[(i + 1) * 2],
-							nextY = splinePts[(i + 1) * 2 + 1];
-						tx = nextX - currX;
-						ty = nextY - currY;
-					} else if (i === n - 1) {
-						// Last point: use direction from previous
-						const prevX = splinePts[(i - 1) * 2],
-							prevY = splinePts[(i - 1) * 2 + 1];
-						tx = currX - prevX;
-						ty = currY - prevY;
-					} else {
-						// Middle points: average of both directions
-						const prevX = splinePts[(i - 1) * 2],
-							prevY = splinePts[(i - 1) * 2 + 1];
-						const nextX = splinePts[(i + 1) * 2],
-							nextY = splinePts[(i + 1) * 2 + 1];
-						tx = nextX - prevX;
-						ty = nextY - prevY;
-					}
-
-					const invLen = 1 / Math.hypot(tx, ty || 1); // avoid /0
-					const nx = -ty * invLen,
-						ny = tx * invLen; // normal
-
-					const base = i * 4;
-					thickScratch[base] = currX + nx * half;
-					thickScratch[base + 1] = currY + ny * half;
-					thickScratch[base + 2] = currX - nx * half;
-					thickScratch[base + 3] = currY - ny * half;
+					let a = i - 1, b = i + 1;
+					while (a >= 0 && same(a, currX, currY)) a--;
+					while (b < n && same(b, currX, currY)) b++;
+					writeStrokeJoin(thickScratch, i * 4, currX, currY,
+						a >= 0 ? splinePts[a * 2] : 0, a >= 0 ? splinePts[a * 2 + 1] : 0, a >= 0,
+						b < n ? splinePts[b * 2] : 0, b < n ? splinePts[b * 2 + 1] : 0, b < n, half);
 				}
 				return thickScratch.subarray(0, needed);
 			}
@@ -16407,27 +17500,154 @@ window.addEventListener("keydown", (e) => {
 				}
 			}
 
+			// PERFORMANCE: Cache spline calculations - only recalculate when positions change.
+			// Shared by drawChain and the relief-shadow pass, which runs first in a frame.
+			function getChainSpline(chainObj, chainIndex) {
+				const positionHash = getChainPositionHash(chainObj);
+				const cached = splineCache.get(chainIndex);
+				if (cached && cached.hash === positionHash && cached.isClosed === chainObj.isClosed) {
+					return cached.spline;
+				}
+				const spline = chainObj.isClosed ?
+					getClosedSmoothCurve(chainObj.chain, 10) :
+					getOpenSmoothCurve(chainObj.chain, 10);
+				splineCache.set(chainIndex, { spline, hash: positionHash, isClosed: chainObj.isClosed });
+				return spline;
+			}
+
+			/* ── Relief shadow pass ──
+			   Drawn once per layer, just before the layer's own forms, so it falls on
+			   everything below and is covered by the layer itself. Forms on one layer
+			   are one plane: their shadows merge rather than darkening where they
+			   overlap. The stencil collects that union — bit 0 holds one closed form's
+			   even-odd parity, which is folded into bit 1 before the next form — and
+			   the colour is laid down once over it. Softness is several such passes at
+			   offsets spread over a disc, each faint enough that the core adds up to the
+			   chosen opacity. Particles cast no shadow. */
+			let _shadowTaps = null, _shadowTapsKey = "";
+
+			function shadowGeometry() {
+				const ps = getPhysicsScale();
+				const a = reliefShadow.angle * Math.PI / 180;
+				return {
+					ox: Math.cos(a) * reliefShadow.distance * ps,
+					oy: Math.sin(a) * reliefShadow.distance * ps,
+					soft: reliefShadow.softness * ps
+				};
+			}
+
+			function shadowTaps() {
+				const { ox, oy, soft } = shadowGeometry();
+				const key = `${ox}|${oy}|${soft}|${reliefShadow.opacity}`;
+				if (key === _shadowTapsKey) return _shadowTaps;
+				const n = soft < 0.5 ? 1 : 12;
+				const offsets = [];
+				for (let i = 0; i < n; i++) {
+					const r = n === 1 ? 0 : soft * Math.sqrt((i + 0.5) / n);
+					const th = i * 2.399963; // golden angle: an even spread over the disc
+					offsets.push([ox + r * Math.cos(th), oy + r * Math.sin(th)]);
+				}
+				_shadowTapsKey = key;
+				_shadowTaps = { offsets, alpha: 1 - Math.pow(1 - reliefShadow.opacity, 1 / n) };
+				return _shadowTaps;
+			}
+
+			function quadVerts(x0, y0, x1, y1) {
+				return new Float32Array([x0, y0, x1, y0, x1, y1, x0, y0, x1, y1, x0, y1]);
+			}
+
+			function drawLayerShadow(start, layer) {
+				const items = [];
+				let ux0 = Infinity, uy0 = Infinity, ux1 = -Infinity, uy1 = -Infinity;
+				for (let ci = start; ci < chains.length; ci++) {
+					const obj = chains[ci];
+					if (layerOf(obj) !== layer) break;
+					if (obj.isParticle || obj.chain.length < 2) continue;
+					const spline = getChainSpline(obj, ci);
+					if (!spline || spline.length < 4) continue;
+					let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+					for (let i = 0; i < spline.length; i += 2) {
+						if (spline[i] < x0) x0 = spline[i];
+						if (spline[i] > x1) x1 = spline[i];
+						if (spline[i + 1] < y0) y0 = spline[i + 1];
+						if (spline[i + 1] > y1) y1 = spline[i + 1];
+					}
+					const pad = outlineWidth / 2 + 2;
+					x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+					if (obj.isClosed && showFilled) {
+						const rings = [spline];
+						(obj.holes || []).forEach(h => {
+							const hs = getClosedSmoothCurve(h.chain, 10);
+							if (hs.length >= 6) rings.push(hs);
+						});
+						items.push({ fill: true, tris: rings.map(r => buildStencilTris(r, x0, y0)), quad: quadVerts(x0, y0, x1, y1) });
+					} else {
+						const w = Math.max(outlineWidth, 1);
+						const strip = obj.isClosed ? getThickLineVertices(spline, w) : getThickLineVerticesOpen(spline, w);
+						items.push({ fill: false, strip: strip.slice() }); // the builder reuses its buffer
+					}
+					if (x0 < ux0) ux0 = x0;
+					if (y0 < uy0) uy0 = y0;
+					if (x1 > ux1) ux1 = x1;
+					if (y1 > uy1) uy1 = y1;
+				}
+				if (!items.length) return;
+
+				const { offsets, alpha } = shadowTaps();
+				const rgb = hexToRGBA(reliefShadow.color);
+				const union = quadVerts(ux0, uy0, ux1, uy1);
+				gl.useProgram(lineProgram);
+				gl.enableVertexAttribArray(linePosLoc);
+				gl.uniform2f(lineResLoc, canvas.width, canvas.height);
+				gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+				// Colour blends as usual but destination alpha stays 1. The plain
+				// blendFunc that the lasso overlay leaves behind also blends alpha, and
+				// a dozen faint passes would make the canvas see-through instead of dark.
+				gl.enable(gl.BLEND);
+				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+				gl.enable(gl.STENCIL_TEST);
+				const draw = (verts, mode) => {
+					gl.bufferData(gl.ARRAY_BUFFER, verts, gl.DYNAMIC_DRAW);
+					gl.vertexAttribPointer(linePosLoc, 2, gl.FLOAT, false, 0, 0);
+					gl.drawArrays(mode, 0, verts.length / 2);
+				};
+				for (const [tx, ty] of offsets) {
+					gl.uniform2f(lineOffsetLoc, tx, ty);
+					gl.colorMask(false, false, false, false);
+					for (const item of items) {
+						if (item.fill) {
+							gl.stencilMask(0x01);
+							gl.stencilFunc(gl.ALWAYS, 0, 0xFF);
+							gl.stencilOp(gl.KEEP, gl.KEEP, gl.INVERT);
+							item.tris.forEach(t => draw(t, gl.TRIANGLES));
+							// Inside (bit 0 set) → bit 1, clearing bit 0 for the next form.
+							gl.stencilMask(0x03);
+							gl.stencilFunc(gl.NOTEQUAL, 0x02, 0x01);
+							gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+							draw(item.quad, gl.TRIANGLES);
+						} else {
+							gl.stencilMask(0x02);
+							gl.stencilFunc(gl.ALWAYS, 0x02, 0xFF);
+							gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+							draw(item.strip, gl.TRIANGLE_STRIP);
+						}
+					}
+					gl.colorMask(true, true, true, true);
+					gl.stencilMask(0xFF);
+					gl.stencilFunc(gl.EQUAL, 0x02, 0x02);
+					gl.stencilOp(gl.KEEP, gl.KEEP, gl.ZERO); // leaves the stencil clean for drawChain
+					gl.uniform4f(lineColorLoc, rgb[0], rgb[1], rgb[2], alpha);
+					draw(union, gl.TRIANGLES);
+				}
+				gl.uniform2f(lineOffsetLoc, 0, 0);
+				gl.disable(gl.STENCIL_TEST);
+			}
+
 			function drawChain(chainObj, chainIndex) {
 				const ch = chainObj.chain;
 				if (ch.length < 2) return;
 
-				// PERFORMANCE: Cache spline calculations - only recalculate when positions change
-				let spline;
-				const positionHash = getChainPositionHash(chainObj);
-				const cacheKey = chainIndex;
-				const cached = splineCache.get(cacheKey);
-
-				if (cached && cached.hash === positionHash && cached.isClosed === chainObj.isClosed) {
-					// Use cached spline
-					spline = cached.spline;
-				} else {
-					// Recalculate spline
-					spline = chainObj.isClosed ?
-						getClosedSmoothCurve(ch, 10) :
-						getOpenSmoothCurve(ch, 10);
-					// Cache it
-					splineCache.set(cacheKey, { spline, hash: positionHash, isClosed: chainObj.isClosed });
-				}
+				const spline = getChainSpline(chainObj, chainIndex);
 
 				if (spline.length < 4) return;
 				const holeSplines = chainObj.holes?.map(hole => getClosedSmoothCurve(hole.chain, 10)).filter(ring => ring.length >= 6) || [];
@@ -16936,7 +18156,7 @@ window.addEventListener("keydown", (e) => {
 
 					// PERFORMANCE OPTIMIZATION: Skip physics when Damping/retention is 0.
 				// When blobs aren't moving, skip all physics calculations.
-				const isPhysicsActive = velocityRetention > 0.001 && simSpeed > 0.001;
+				const isPhysicsActive = !physicsPaused && velocityRetention > 0.001 && simSpeed > 0.001;
 
 				if (isPhysicsActive) {
 					// Speed is a tempo, not a step size: run the SAME fixed-dt pass
@@ -16997,6 +18217,9 @@ window.addEventListener("keydown", (e) => {
 
 				// PERFORMANCE: Single pass — draw chains inline, collect particles for batching
 				let _pbLen = 0; // particle batch length
+				// The shadow pass looks ahead along a layer, so every chain needs its layer first.
+				if (reliefShadow.enabled) stampUnassignedChains();
+				let shadowLayer = null;
 				for (let ci = 0; ci < chains.length; ci++) {
 					const chainObj = chains[ci];
 					// Adopt the active layer. Done here rather than at each of the dozen
@@ -17005,6 +18228,13 @@ window.addEventListener("keydown", (e) => {
 					// from a scene already carry their own layerId and are left alone.
 					if (chainObj.layerId === undefined) assignChainToActiveLayer(chainObj);
 					if (!isChainVisible(chainObj)) continue;
+					if (reliefShadow.enabled) {
+						const layer = layerOf(chainObj);
+						if (layer !== shadowLayer) {
+							shadowLayer = layer;
+							drawLayerShadow(ci, layer);
+						}
+					}
 					if (chainObj.isParticle) {
 						_particleBatch[_pbLen++] = chainObj;
 					} else {
@@ -17035,6 +18265,9 @@ window.addEventListener("keydown", (e) => {
 
 				// Draw lasso selection overlay (delete/freeze)
 				drawEditLassoSelect();
+				drawCornerIndicators();
+				drawSelectionOverlay();
+				drawPushBrush();
 
 				// Draw capture area bounding box (but not during export)
 				if (!filmstripData.isExporting && (filmstripData.crosshairsMode || filmstripData.captureArea)) {
@@ -17075,7 +18308,7 @@ window.addEventListener("keydown", (e) => {
 				/* 4 ─ Edit Tools */
 				{
 					el: "#editToolsSection",
-					text: "Edit items on the canvas with these tools: Drag, Freeze, Pin, or Delete existing items. Only one edit mode can be active at a time."
+					text: "Edit items on the canvas: Select (move, scale, rotate, duplicate), Drag, Push (liquify an edge), Freeze, Pin, Recolor, or Delete. Only one edit mode can be active at a time."
 				},
 
 				/* 5 ─ Shape Settings */
@@ -17093,7 +18326,7 @@ window.addEventListener("keydown", (e) => {
 				/* 7 ─ Layers */
 				{
 					el: "#layersSection",
-					text: "Use the inspector's Layers section to choose the active layer, toggle visibility, lock editing, or disable physics for a layer."
+					text: "Use the inspector's Layers section to choose the active layer, toggle visibility, lock editing, or disable physics for a layer. Relief Shadow, just below, lets each layer cast a shadow onto the ones beneath it."
 				},
 
 				/* 8 ─ Main Canvas */
@@ -17246,24 +18479,12 @@ window.addEventListener("keydown", (e) => {
 				// Emit one <g> per layer, named the way Illustrator names its own layer groups
 				// (sanitised id + data-name holding the original). Illustrator turns these into
 				// real layers on open, which is the whole point of the round trip.
-				const emitChain = obj => {
-					// Handle particle chains (single-vertex, rendered as circles)
-					if (obj.isParticle && obj.chain.length === 1) {
-						const dot = obj.chain[0];
-						const r = (obj.particleRenderSize || 4) * dotScaleFactor * getPhysicsScale();
-						const [rr, gg, bb] = obj.color.map(c => Math.floor(c * 255));
-						const cx = dot.x * scaleX;
-						const cy = dot.y * scaleY;
-						const sr = r * Math.min(scaleX, scaleY);
-						parts.push(`<circle cx="${cx}" cy="${cy}" r="${sr}" fill="rgb(${rr},${gg},${bb})" />`);
-						return;
-					}
-
-					if (obj.chain.length < 2) return;
+				// Path data for one chain, holes included; null when there is nothing to draw.
+				const chainPathData = obj => {
+					if (obj.chain.length < 2) return null;
 					const spline = obj.isClosed ? getClosedSmoothCurve(obj.chain, 10) :
 						getOpenSmoothCurve(obj.chain, 10);
-					if (spline.length < 4) return;
-					const [rr, gg, bb] = obj.color.map(c => Math.floor(c * 255));
+					if (spline.length < 4) return null;
 					// Scale coordinates to visual dimensions
 					let d = `M ${spline[0] * scaleX} ${spline[1] * scaleY}`;
 					for (let i = 2; i < spline.length; i += 2) {
@@ -17279,6 +18500,25 @@ window.addEventListener("keydown", (e) => {
 							d += " Z";
 						});
 					}
+					return d;
+				};
+
+				const emitChain = obj => {
+					// Handle particle chains (single-vertex, rendered as circles)
+					if (obj.isParticle && obj.chain.length === 1) {
+						const dot = obj.chain[0];
+						const r = (obj.particleRenderSize || 4) * dotScaleFactor * getPhysicsScale();
+						const [rr, gg, bb] = obj.color.map(c => Math.floor(c * 255));
+						const cx = dot.x * scaleX;
+						const cy = dot.y * scaleY;
+						const sr = r * Math.min(scaleX, scaleY);
+						parts.push(`<circle cx="${cx}" cy="${cy}" r="${sr}" fill="rgb(${rr},${gg},${bb})" />`);
+						return;
+					}
+
+					const d = chainPathData(obj);
+					if (!d) return;
+					const [rr, gg, bb] = obj.color.map(c => Math.floor(c * 255));
 
 					// Use current appearance settings
 					const shouldFill = (showFilled && obj.isClosed);
@@ -17287,14 +18527,40 @@ window.addEventListener("keydown", (e) => {
 
 					if (shouldFill && shouldStroke) {
 						// Both fill and outline - draw filled with black border
-						parts.push(`<path d="${d}" fill="rgb(${rr},${gg},${bb})" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="rgb(0,0,0)" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" />`);
+						parts.push(`<path d="${d}" fill="rgb(${rr},${gg},${bb})" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="rgb(0,0,0)" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
 					} else if (shouldFill) {
 						// Only fill
 						parts.push(`<path d="${d}" fill="rgb(${rr},${gg},${bb})" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="none" />`);
 					} else if (shouldStroke) {
 						// Only outline
-						parts.push(`<path d="${d}" stroke="rgb(${rr},${gg},${bb})" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" />`);
+						parts.push(`<path d="${d}" stroke="rgb(${rr},${gg},${bb})" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
 					}
+				};
+
+				// Relief shadow: one group per layer, its shapes in the shadow colour, moved
+				// by the offset. Group opacity (not per-shape opacity) is what keeps
+				// overlapping shadows from darkening, as on screen. Tagged so re-importing
+				// our own export skips them; in Illustrator they are an ordinary group.
+				const shadow = reliefShadow.enabled ? shadowGeometry() : null;
+				if (shadow && shadow.soft >= 0.5) {
+					const sd = shadow.soft * Math.min(scaleX, scaleY) / 2;
+					parts.push(`<defs><filter id="hansketch-shadow-soft" x="-25%" y="-25%" width="150%" height="150%">`
+						+ `<feGaussianBlur stdDeviation="${sd}"/></filter></defs>`);
+				}
+				const emitShadow = members => {
+					const strokeWidth = Math.max(outlineWidth, 1) * Math.min(scaleX, scaleY);
+					const body = members.map(obj => {
+						if (obj.isParticle || obj.chain.length === 1) return "";
+						const d = chainPathData(obj);
+						if (!d) return "";
+						return (obj.isClosed && showFilled)
+							? `<path d="${d}" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="none" />`
+							: `<path d="${d}" fill="none" stroke="${reliefShadow.color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`;
+					}).join("");
+					if (!body) return;
+					const blur = shadow.soft >= 0.5 ? ` filter="url(#hansketch-shadow-soft)"` : "";
+					parts.push(`<g data-hansketch="shadow" fill="${reliefShadow.color}" opacity="${reliefShadow.opacity}"`
+						+ ` transform="translate(${shadow.ox * scaleX} ${shadow.oy * scaleY})"${blur}>${body}</g>`);
 				};
 
 				const usedIds = new Set();
@@ -17305,6 +18571,7 @@ window.addEventListener("keydown", (e) => {
 					// survives a round trip instead of silently losing work.
 					const hidden = layer.visible ? "" : ` display="none"`;
 					parts.push(`<g id="${svgIdFor(layer.name, usedIds)}" data-name="${escapeXML(layer.name)}"${hidden}>`);
+					if (shadow) emitShadow(members);
 					members.forEach(emitChain);
 					parts.push(`</g>`);
 				});
@@ -17357,10 +18624,12 @@ window.addEventListener("keydown", (e) => {
 			}
 
 			// Our own exported backdrop carries data-hansketch="background" and is excluded, so
-			// a round trip does not accumulate a canvas-sized rectangle on every pass.
+			// a round trip does not accumulate a canvas-sized rectangle on every pass. Relief
+			// shadows (data-hansketch="shadow") are excluded the same way: they are redrawn
+			// from the setting, not imported as shapes.
 			const SVG_GEOMETRY_SELECTOR =
 				"path,polygon,polyline,rect,circle,ellipse,line";
-			const SVG_GEOMETRY_EXCLUDE = '[data-hansketch="background"]';
+			const SVG_GEOMETRY_EXCLUDE = '[data-hansketch="background"], [data-hansketch="shadow"] *';
 
 			function svgGeometryIn(root) {
 				return [...root.querySelectorAll(SVG_GEOMETRY_SELECTOR)]
@@ -17375,11 +18644,20 @@ window.addEventListener("keydown", (e) => {
 				return true; // polygon, rect, circle, ellipse
 			}
 
-			function importSVGText(svgText, fileName) {
+			// options.arrival: called from the composition arrival dialog, which has
+			//   already asked how to place it (otherwise a composition opens that dialog).
+			// options.applyGround: use a composition's ground as the canvas background.
+			// options.quiet: the caller reports the result itself.
+			// Returns { added, newLayers } on success, otherwise null.
+			function importSVGText(svgText, fileName, options = {}) {
 				const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
 				if (doc.querySelector("parsererror") || doc.documentElement.tagName.toLowerCase() !== "svg") {
 					toast("That file could not be read as SVG.", 2500);
-					return;
+					return null;
+				}
+				if (!options.arrival && doc.documentElement.hasAttribute("data-hansketch-composition")) {
+					openCompositionArrival(svgText, fileName);
+					return null;
 				}
 
 				// Mount offscreen: the geometry and style APIs only work on a live element.
@@ -17453,6 +18731,7 @@ window.addEventListener("keydown", (e) => {
 					// Top-level <g> elements become layers; loose geometry goes to one layer
 					// named after the file, mirroring how Illustrator presents a flat document.
 					const added = [];
+					const layersBefore = new Set(layers);
 					const groups = [...svgEl.children].filter(el => el.tagName.toLowerCase() === "g");
 					const claimed = new Set();
 
@@ -17492,22 +18771,220 @@ window.addEventListener("keydown", (e) => {
 					if (!added.length) {
 						toast("No importable shapes found in that SVG.", 2500);
 						renderLayerPanel();
-						return;
+						return null;
 					}
 
 					stampUnassignedChains(); // anything drawn before the import keeps its layer
 					added.forEach(c => chains.push(c));
 					reorderChainsByLayer();
 					activeLayerId = layers[layers.length - 1].id;
-					history.push({ type: "chain" });
+					// One undo step takes back the whole import, layers included; a single
+					// {type:"chain"} used to remove just one of the imported shapes.
+					const newLayers = layers.filter(l => !layersBefore.has(l));
+					recordAddition({ chains: added, layers: newLayers });
 					renderLayerPanel();
-					toast(`Imported ${added.length} shape${added.length === 1 ? "" : "s"} from SVG.`, 2200);
+					// A composition digitised by Shape Extractor carries the artwork's ground
+					// as its tagged background rect: use it for the canvas, so the forms sit on
+					// their own colour. Ordinary SVGs (our own exports included) leave the
+					// background alone.
+					let groundNote = "";
+					if (svgEl.hasAttribute("data-hansketch-composition") && options.applyGround !== false) {
+						const ground = svgEl.querySelector('[data-hansketch="background"]');
+						const rgba = ground && cssColorToRGBA(ground.getAttribute("fill"));
+						if (rgba) {
+							canvasBackgroundColor = [rgba[0], rgba[1], rgba[2], 1.0];
+							gl.clearColor(canvasBackgroundColor[0], canvasBackgroundColor[1], canvasBackgroundColor[2], 1.0);
+							updateTextColorsForBackground();
+							groundNote = " Background set to the artwork's ground.";
+						}
+					}
+					if (!options.quiet) toast(`Imported ${added.length} shape${added.length === 1 ? "" : "s"} from SVG.${groundNote}`, 2600);
+					return { added, newLayers };
 				} catch (err) {
 					console.warn("SVG import failed", err);
 					toast("That SVG could not be imported.", 2500);
+					return null;
 				} finally {
 					host.remove();
 				}
+			}
+
+			/* -----------------------------------
+			   COMPOSITION ARRIVAL (from Shape Extractor)
+			-----------------------------------
+			   A composition — an artwork digitised by Shape Extractor's Composition mode
+			   (contracts/composition-svg.md) — can arrive three ways: handed over through
+			   the browser (Open in HanSketch), dropped on the canvas, or through File ▸
+			   Import SVG. All three land here: one dialog with a preview asks how to place
+			   it, so outlines, shadows, physics and the canvas need no fiddling afterwards.
+			   The choices are remembered for the next arrival. */
+			const ARRIVAL_PREFS_KEY = "hansketch.arrival";
+			const ARRIVAL_DEFAULTS = { ground: true, fit: true, flat: true, shadow: false, physics: false };
+			let pendingArrival = null; // { svgText, name }
+			let titleBeforeArrival = null;
+
+			function arrivalPrefs() {
+				try { return { ...ARRIVAL_DEFAULTS, ...(JSON.parse(localStorage.getItem(ARRIVAL_PREFS_KEY) || "{}") || {}) }; }
+				catch (e) { return { ...ARRIVAL_DEFAULTS }; }
+			}
+
+			function sketchIsEmpty() {
+				return !chains.length && !circles.length && !rigidPolygons.length && !attractorsRepulsors.length;
+			}
+
+			function syncArrivalOptions() {
+				const fresh = $("arrivalPlaceNew").checked;
+				$("arrivalFitRow").classList.toggle("is-disabled", !fresh);
+				$("arrivalFit").disabled = !fresh;
+				$("arrivalNote").textContent = fresh && !sketchIsEmpty()
+					? "Starting anew clears what is on the canvas now and cannot be undone — save it first (File ▸ Save) to keep it."
+					: "";
+			}
+
+			function openCompositionArrival(svgText, name) {
+				const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
+				const root = doc.documentElement;
+				const planes = [...root.children].filter(el => el.tagName.toLowerCase() === "g").length;
+				const forms = root.querySelectorAll("path").length;
+				pendingArrival = { svgText, name: (name || "Composition").replace(/(\.composition)?\.svg$/i, "") };
+				$("arrivalSummary").textContent = `“${pendingArrival.name}”: ${forms} form${forms === 1 ? "" : "s"} on ${planes} plane${planes === 1 ? "" : "s"}.`;
+				$("arrivalPreview").src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgText);
+				const prefs = arrivalPrefs();
+				const empty = sketchIsEmpty();
+				$("arrivalPlaceNew").checked = empty;
+				$("arrivalPlaceAdd").checked = !empty;
+				$("arrivalGround").checked = prefs.ground;
+				$("arrivalFit").checked = prefs.fit;
+				$("arrivalFlat").checked = prefs.flat;
+				$("arrivalShadow").checked = prefs.shadow;
+				$("arrivalPhysics").checked = prefs.physics;
+				syncArrivalOptions();
+				// A tab opened just for this arrival would otherwise greet with the splash.
+				$("splashOverlay").style.display = "none";
+				$("arrivalBackdrop").style.display = "flex";
+				// Arriving in a background tab: say so in the tab title until it is seen.
+				if (document.hidden && titleBeforeArrival === null) {
+					titleBeforeArrival = document.title;
+					document.title = "● Composition arrived — " + titleBeforeArrival;
+				}
+			}
+
+			function closeCompositionArrival() {
+				$("arrivalBackdrop").style.display = "none";
+				pendingArrival = null;
+				if (titleBeforeArrival !== null) { document.title = titleBeforeArrival; titleBeforeArrival = null; }
+			}
+
+			// Like Reset, but the canvas starts over with no layers of its own: the
+			// composition's planes become the layers.
+			function clearSketchForArrival() {
+				chains.length = 0;
+				circles.length = 0;
+				rigidPolygons.length = 0;
+				attractorsRepulsors.length = 0;
+				history.length = 0;
+				movementBindingClearAll();
+				layers.length = 0;
+				createLayer("Layer 1");
+				activeLayerId = layers[0].id;
+				selectedChain = null;
+				refreshSelectionPanel();
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+			}
+
+			// Give the canvas the artwork's proportions, keeping its long edge (and its
+			// physical size's long edge, when one is set) so nothing else changes scale.
+			function matchCanvasToArtwork(svgText) {
+				const vb = (new DOMParser().parseFromString(svgText, "image/svg+xml").documentElement.getAttribute("viewBox") || "")
+					.trim().split(/[\s,]+/).map(parseFloat);
+				if (vb.length !== 4 || !(vb[2] > 0 && vb[3] > 0)) return;
+				const aspect = vb[2] / vb[3];
+				const long = Math.max(canvas.width, canvas.height);
+				if (canvasPhysicalWidthMm != null && canvasPhysicalHeightMm != null) {
+					const longMm = Math.max(canvasPhysicalWidthMm, canvasPhysicalHeightMm);
+					canvasPhysicalWidthMm = Math.round((aspect >= 1 ? longMm : longMm * aspect) * 10) / 10;
+					canvasPhysicalHeightMm = Math.round((aspect >= 1 ? longMm / aspect : longMm) * 10) / 10;
+				}
+				setCanvasSize(aspect >= 1 ? long : long * aspect, aspect >= 1 ? long / aspect : long);
+			}
+
+			function placeCompositionArrival() {
+				if (!pendingArrival) return;
+				const { svgText, name } = pendingArrival;
+				const choice = {
+					fresh: $("arrivalPlaceNew").checked,
+					ground: $("arrivalGround").checked,
+					fit: $("arrivalFit").checked,
+					flat: $("arrivalFlat").checked,
+					shadow: $("arrivalShadow").checked,
+					physics: $("arrivalPhysics").checked
+				};
+				try {
+					const { fresh, ...prefs } = choice;
+					localStorage.setItem(ARRIVAL_PREFS_KEY, JSON.stringify(prefs));
+				} catch (e) { /* preferences are a convenience */ }
+				closeCompositionArrival();
+
+				if (choice.fresh) {
+					stampUnassignedChains();
+					clearSketchForArrival();
+					if (choice.fit) matchCanvasToArtwork(svgText);
+				}
+				const result = importSVGText(svgText, `${name}.svg`, { arrival: true, applyGround: choice.ground, quiet: true });
+				if (!result) return;
+				// A fresh sketch keeps only the composition's planes as layers.
+				if (choice.fresh && layers.length > 1 && !chains.some(c => c.layerId === layers[0].id)) {
+					layers.shift();
+					refreshLayerIndex();
+				}
+				result.newLayers.forEach(layer => { layer.physicsEnabled = choice.physics; });
+				if (choice.flat) { showOutline = false; showFilled = true; }
+				if (choice.shadow) { reliefShadow.enabled = true; syncReliefShadowUI(); }
+				activeLayerId = layers[layers.length - 1].id;
+				renderLayerPanel();
+				splineCache.clear();
+				spatialHashCache.needsRebuild = true;
+				_gpuTexturesDirty = true;
+				SFX.blobComplete?.(colorInput.value);
+				toast(`Placed “${name}”: ${result.added.length} form${result.added.length === 1 ? "" : "s"} on ${result.newLayers.length} layer${result.newLayers.length === 1 ? "" : "s"}.`, 2600);
+			}
+
+			$("arrivalPlaceNew").addEventListener("change", syncArrivalOptions);
+			$("arrivalPlaceAdd").addEventListener("change", syncArrivalOptions);
+			$("arrivalImportBtn").onclick = placeCompositionArrival;
+			$("arrivalCancelBtn").onclick = closeCompositionArrival;
+			document.addEventListener("visibilitychange", () => {
+				if (!document.hidden && titleBeforeArrival !== null) {
+					document.title = titleBeforeArrival;
+					titleBeforeArrival = null;
+				}
+			});
+
+			// Drop an SVG on the canvas: same as File ▸ Import SVG.
+			{
+				const stage = $("canvasStage");
+				const hasFile = e => [...(e.dataTransfer?.types || [])].includes("Files");
+				["dragenter", "dragover"].forEach(type => stage.addEventListener(type, e => {
+					if (!hasFile(e)) return;
+					e.preventDefault();
+					stage.classList.add("drop-target");
+				}));
+				["dragleave", "drop"].forEach(type => stage.addEventListener(type, e => {
+					if (!hasFile(e)) return;
+					e.preventDefault();
+					stage.classList.remove("drop-target");
+				}));
+				stage.addEventListener("drop", e => {
+					const file = e.dataTransfer?.files?.[0];
+					if (!file) return;
+					if (!/\.svg$/i.test(file.name) && file.type !== "image/svg+xml") {
+						toast("Drop an SVG here (for scenes use File ▸ Load).", 2400);
+						return;
+					}
+					file.text().then(text => importSVGText(text, file.name)).catch(() => toast("Could not read that file.", 2400));
+				});
 			}
 
 			function exportJPG() {
@@ -17548,7 +19025,60 @@ window.addEventListener("keydown", (e) => {
 				ctx.fillStyle = getExportBackgroundCSS();
 				ctx.fillRect(0, 0, exportWidth, exportHeight);
 
-				chains.forEach(obj => {
+				// Trace one chain's outline (holes included) into a 2D context.
+				const traceChain = (context, obj) => {
+					const ch = obj.chain;
+					if (ch.length < 2) return false;
+					const spline = obj.isClosed ? getClosedSmoothCurve(ch, 10) :
+						getOpenSmoothCurve(ch, 10);
+					if (spline.length < 4) return false;
+					context.beginPath();
+					// Scale coordinates from canvas internal resolution to high-res export dimensions
+					context.moveTo(spline[0] * scaleX, spline[1] * scaleY);
+					for (let i = 2; i < spline.length; i += 2) {
+						context.lineTo(spline[i] * scaleX, spline[i + 1] * scaleY);
+					}
+					if (obj.isClosed) context.closePath();
+					if (obj.isClosed && obj.holes?.length) {
+						obj.holes.forEach(hole => {
+							const holeSpline = getClosedSmoothCurve(hole.chain, 10);
+							if (holeSpline.length < 6) return;
+							context.moveTo(holeSpline[0] * scaleX, holeSpline[1] * scaleY);
+							for (let i = 2; i < holeSpline.length; i += 2) context.lineTo(holeSpline[i] * scaleX, holeSpline[i + 1] * scaleY);
+							context.closePath();
+						});
+					}
+					return true;
+				};
+
+				// Relief shadow for one layer: its silhouettes are drawn opaque on a
+				// scratch canvas, then laid down once — blurred, offset and at the chosen
+				// opacity — so overlapping shapes cast one shadow, as on screen.
+				const shadow = reliefShadow.enabled ? shadowGeometry() : null;
+				const drawShadow = members => {
+					const sc = document.createElement("canvas");
+					sc.width = exportWidth;
+					sc.height = exportHeight;
+					const sctx = sc.getContext("2d");
+					sctx.fillStyle = sctx.strokeStyle = reliefShadow.color;
+					sctx.lineWidth = Math.max(outlineWidth, 1) * Math.min(scaleX, scaleY);
+					sctx.lineCap = "round";
+					sctx.lineJoin = "miter";
+					sctx.miterLimit = MITER_LIMIT;
+					members.forEach(obj => {
+						if (obj.isParticle || obj.chain.length === 1) return;
+						if (!traceChain(sctx, obj)) return;
+						if (obj.isClosed && showFilled) sctx.fill(obj.holes?.length ? "evenodd" : "nonzero");
+						else sctx.stroke();
+					});
+					ctx.save();
+					ctx.globalAlpha = reliefShadow.opacity;
+					if (shadow.soft >= 0.5) ctx.filter = `blur(${shadow.soft * Math.min(scaleX, scaleY) / 2}px)`;
+					ctx.drawImage(sc, shadow.ox * scaleX, shadow.oy * scaleY);
+					ctx.restore();
+				};
+
+				const drawChainJPG = obj => {
 					// Handle particle chains (single-vertex, rendered as circles)
 					if (obj.isParticle && obj.chain.length === 1) {
 						const dot = obj.chain[0];
@@ -17561,30 +19091,11 @@ window.addEventListener("keydown", (e) => {
 						return;
 					}
 
-					const ch = obj.chain;
-					if (ch.length < 2) return;
-					const spline = obj.isClosed ? getClosedSmoothCurve(ch, 10) :
-						getOpenSmoothCurve(ch, 10);
-					if (spline.length < 4) return;
 					const [rr, gg, bb] = obj.color.map(c => Math.floor(c * 255));
 					ctx.lineCap = "round";
-					ctx.lineJoin = "round";
-					ctx.beginPath();
-					// Scale coordinates from canvas internal resolution to high-res export dimensions
-					ctx.moveTo(spline[0] * scaleX, spline[1] * scaleY);
-					for (let i = 2; i < spline.length; i += 2) {
-						ctx.lineTo(spline[i] * scaleX, spline[i + 1] * scaleY);
-					}
-					if (obj.isClosed) ctx.closePath();
-					if (obj.isClosed && obj.holes?.length) {
-						obj.holes.forEach(hole => {
-							const holeSpline = getClosedSmoothCurve(hole.chain, 10);
-							if (holeSpline.length < 6) return;
-							ctx.moveTo(holeSpline[0] * scaleX, holeSpline[1] * scaleY);
-							for (let i = 2; i < holeSpline.length; i += 2) ctx.lineTo(holeSpline[i] * scaleX, holeSpline[i + 1] * scaleY);
-							ctx.closePath();
-						});
-					}
+					ctx.lineJoin = "miter";
+					ctx.miterLimit = MITER_LIMIT;
+					if (!traceChain(ctx, obj)) return;
 
 					// Use current appearance settings
 					const shouldFill = (showFilled && obj.isClosed);
@@ -17608,6 +19119,17 @@ window.addEventListener("keydown", (e) => {
 						ctx.lineWidth = strokeWidth;
 						ctx.stroke();
 					}
+				};
+
+				// Layer by layer, bottom first, so each layer's shadow falls on the ones
+				// below. Hidden layers are left out, as on screen (they used to be exported).
+				stampUnassignedChains();
+				layers.forEach(layer => {
+					if (!layer.visible) return;
+					const members = chains.filter(c => layerOf(c) === layer);
+					if (!members.length) return;
+					if (shadow) drawShadow(members);
+					members.forEach(drawChainJPG);
 				});
 
 				const url = offscreen.toDataURL("image/jpeg", 1.0);
@@ -17862,21 +19384,105 @@ window.addEventListener("keydown", (e) => {
 					case "c":
 						setEditTool("recolor");
 						break; // Recolor
+					case "v":
+						setEditTool("select");
+						break; // Select
+					case "p":
+						setEditTool("push");
+						break; // Push
 				}
 			});
 
+			// Undo, selection and brush keys. Separate from the tool shortcuts above,
+			// which deliberately ignore every modifier combination.
 			window.addEventListener("keydown", e => {
-				if (e.code === "Space" && !e.repeat) { // Space toggles
-					if (simSpeed > 0.001) { // turn OFF
-						prevSpeed = simSpeed; // remember
-						setPhysicsPercent("simSpeed", 0);
-					} else { // turn ON
-						setPhysicsPercent("simSpeed", (prevSpeed || 1) * 50);
-					}
+				const tgt = e.target;
+				if (tgt && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || tgt.isContentEditable)) return;
+				const mod = e.metaKey || e.ctrlKey;
+				const key = e.key.toLowerCase();
 
-					e.preventDefault(); // stop the page from scrolling
+				if (mod && !e.shiftKey && key === "z") { e.preventDefault(); undoLast(); return; }
+
+				if (pushMode && !mod && (e.key === "[" || e.key === "]")) {
+					pushRadiusCss = Math.max(8, Math.min(240, pushRadiusCss * (e.key === "]" ? 1.2 : 1 / 1.2)));
+					toast(`Push brush: ${Math.round(pushRadiusCss)} px`, 900);
+					return;
+				}
+
+				if (!selectMode || !selectionIsLive()) return;
+				if (e.key === "Escape") { setSelection(null); return; }
+				if (!mod && (e.key === "Delete" || e.key === "Backspace")) { e.preventDefault(); deleteSelected(); return; }
+				if (mod && key === "d") { e.preventDefault(); duplicateSelected(); return; }
+				if (mod && (e.code === "BracketRight" || e.code === "BracketLeft")) {
+					e.preventDefault();
+					arrangeSelected(e.code === "BracketRight" ? 1 : -1, e.shiftKey);
+					return;
+				}
+				if (!mod && e.key.startsWith("Arrow")) {
+					e.preventDefault();
+					const step = (e.shiftKey ? 10 : 1) * cssToCanvasScale();
+					const dx = e.key === "ArrowLeft" ? -step : e.key === "ArrowRight" ? step : 0;
+					const dy = e.key === "ArrowUp" ? -step : e.key === "ArrowDown" ? step : 0;
+					translateSelected(dx, dy);
 				}
 			});
+
+			// The badge on the canvas is the feedback (toasts are off unless tips are
+			// enabled): "paused" while physics is off; "still" for a few seconds when
+			// physics comes back on but every visible layer is set to stay still — a
+			// placed artwork or an imported SVG — so Space would otherwise look broken.
+			let physicsBadgeTimer = 0;
+			function showPhysicsBadge(mode) {
+				const badge = $("physicsPausedBadge");
+				clearTimeout(physicsBadgeTimer);
+				badge.dataset.mode = mode || "";
+				badge.hidden = !mode;
+				if (mode === "paused") {
+					badge.innerHTML = '<span aria-hidden="true">⏸</span> Physics off · <kbd>Space</kbd> to resume';
+					badge.title = "Turn physics back on (Space)";
+				} else if (mode === "still") {
+					badge.innerHTML = 'These layers are set to stay still · <u>let them move</u>';
+					badge.title = "Switch physics on for the visible layers (◇ → ◈ in Layers)";
+					physicsBadgeTimer = setTimeout(() => showPhysicsBadge(null), 6000);
+				}
+			}
+
+			function setPhysicsPaused(paused) {
+				physicsPaused = paused;
+				if (paused) { showPhysicsBadge("paused"); return; }
+				// A sketch saved while the old Space pause had zeroed Speed would
+				// otherwise stay frozen with physics nominally on.
+				if (simSpeed < 0.001) setPhysicsPercent("simSpeed", 50);
+				const visible = chains.filter(isChainVisible);
+				const allStill = visible.length && visible.every(c => !c.frozen && isChainStatic(c));
+				showPhysicsBadge(allStill ? "still" : null);
+			}
+
+			// Space toggles physics on and off, from anywhere except while typing or
+			// inside an open dialog (where Space presses the focused button).
+			window.addEventListener("keydown", e => {
+				if (e.code !== "Space" || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+				const tgt = e.target;
+				if (tgt instanceof Element) {
+					if (tgt.isContentEditable || tgt.closest("textarea, select")) return;
+					if (tgt.tagName === "INPUT" && !/^(checkbox|radio|range|button|submit|color)$/i.test(tgt.type)) return;
+					if (tgt.closest(".dialog-backdrop")) return;
+				}
+				e.preventDefault(); // no page scroll, and no click on a focused panel button
+				if (tgt instanceof HTMLElement && tgt !== document.body) tgt.blur();
+				setPhysicsPaused(!physicsPaused);
+			});
+			$("physicsPausedBadge").onclick = () => {
+				const badge = $("physicsPausedBadge");
+				if (badge.dataset.mode === "still") {
+					const ids = new Set(chains.filter(isChainVisible).map(c => layerOf(c)?.id));
+					layers.forEach(layer => { if (ids.has(layer.id)) layer.physicsEnabled = true; });
+					renderLayerPanel();
+					showPhysicsBadge(null);
+				} else {
+					setPhysicsPaused(false);
+				}
+			};
 			// 6) Gap & ΔSize
 			const radiusAvgInput = $("radiusAvgInput");
 			const radiusVarInput = $("radiusVarInput");
@@ -17886,6 +19492,290 @@ window.addEventListener("keydown", (e) => {
 					globalRadiusAvg = parseFloat(e.target.value);
 				};
 			}
+
+			function syncPenSmoothingUI() {
+				const input = $("penSmoothingInput");
+				if (input) input.value = Math.round(penSmoothing * 100);
+				const label = $("penSmoothingValue");
+				if (label) label.textContent = `${Math.round(penSmoothing * 100)}%`;
+			}
+			$("penSmoothingInput").oninput = e => {
+				penSmoothing = Math.max(0, Math.min(1, parseFloat(e.target.value) / 100));
+				syncPenSmoothingUI();
+			};
+
+			/* -----------------------------------
+			   LAWS OF CHANCE
+			-----------------------------------
+			   Arp made collages by letting torn paper fall onto a sheet and gluing the
+			   pieces where they landed. This drops a set of pieces, one after another,
+			   at random positions, turns and sizes onto a new layer of their own. The
+			   layer's physics is off unless "settle" is ticked, so by default the pieces
+			   stay exactly where chance put them. One undo takes the whole drop back. */
+			const CHANCE_COLORS = ["#1c1813", "#c0533b", "#3d63ae", "#d6a13a", "#efe9dc"];
+			let lastChanceEntry = null;
+
+			// A rectangle whose edges wander like torn paper: the offset from the
+			// straight edge drifts rather than jumping, the way a tear follows fibres.
+			function tornSquarePoints(size) {
+				const ps = getPhysicsScale();
+				const step = 5 * ps;
+				const w = size * (0.7 + Math.random() * 0.6);
+				const h = size * (0.7 + Math.random() * 0.6);
+				const corners = [[-w / 2, -h / 2], [w / 2, -h / 2], [w / 2, h / 2], [-w / 2, h / 2]];
+				const pts = [];
+				for (let e = 0; e < 4; e++) {
+					const [ax, ay] = corners[e], [bx, by] = corners[(e + 1) % 4];
+					const len = Math.hypot(bx - ax, by - ay);
+					const nx = (by - ay) / len, ny = -(bx - ax) / len;
+					const steps = Math.max(2, Math.round(len / step));
+					let drift = 0;
+					for (let k = 0; k < steps; k++) {
+						const t = k / steps;
+						drift = drift * 0.65 + (Math.random() - 0.5) * 2.4 * ps;
+						const off = k === 0 ? 0 : drift;
+						pts.push({ x: ax + (bx - ax) * t + nx * off, y: ay + (by - ay) * t + ny * off, corner: k === 0 });
+					}
+				}
+				// Start mid-edge: closed chains repeat their first point, and a corner
+				// there would turn into two corners once physics pulls the pair apart.
+				const shift = Math.max(1, Math.floor(pts.length / 8));
+				return { outer: [...pts.slice(shift), ...pts.slice(0, shift)], holes: [] };
+			}
+
+			// A library form centred on the origin, its longer side `size` long.
+			function libraryFormPoints(doc, size) {
+				const outer = shapeLibraryPoints(doc.points);
+				const b = bindingBounds(outer);
+				const k = size / Math.max(b.width, b.height, 1e-6);
+				const cx = (b.minX + b.maxX) / 2, cy = (b.minY + b.maxY) / 2;
+				const fit = ring => ring.map(pt => ({ x: (pt.x - cx) * k, y: (pt.y - cy) * k }));
+				return {
+					outer: fit(outer),
+					holes: (doc.holes || []).map(shapeLibraryPoints).filter(r => r.length >= 3).map(fit)
+				};
+			}
+
+			function chancePiece(form, x, y, angle, color) {
+				const cos = Math.cos(angle), sin = Math.sin(angle);
+				const place = ring => {
+					const pts = ring.map(pt => ({ x: x + pt.x * cos - pt.y * sin, y: y + pt.x * sin + pt.y * cos,
+						pinned: false, corner: !!pt.corner }));
+					// Even spacing gives every piece the same physical "grain".
+					return respacePoints(pts, true, 5 * getPhysicsScale());
+				};
+				const chain = makeChainFromPoints(place(form.outer), { closed: true, color });
+				const holes = form.holes.map(r => {
+					const hole = makeChainFromPoints(place(r), { closed: true, color: chain.color });
+					hole.isHole = true;
+					hole.ignoreTurgor = true;
+					return hole;
+				});
+				if (holes.length) chain.holes = holes;
+				return chain;
+			}
+
+			async function dropChancePieces() {
+				const count = Math.max(1, Math.min(60, parseInt($("chanceCount").value, 10) || 9));
+				const kind = $("chanceForms").value;
+				const sizeFrac = (parseFloat($("chanceSize").value) || 16) / 100;
+				const settle = $("chanceSettle").checked;
+				const colors = palette.length ? palette : CHANCE_COLORS;
+
+				let docs = [];
+				if (kind !== "torn") {
+					const manifest = await ensureShapeLibrary();
+					const organic = manifest.filter(e => e.category === "organic");
+					docs = (await Promise.all(organic.map(e => loadShapeDocument(e).catch(() => null)))).filter(Boolean);
+					if (!docs.length && kind === "library") {
+						toast("The shape library could not be loaded; dropping torn squares instead.", 2600);
+					}
+				}
+
+				stampUnassignedChains(); // what is already drawn keeps its layer
+				const layer = createLayer(`Chance ${layers.filter(l => /^Chance \d+$/.test(l.name)).length + 1}`);
+				layer.physicsEnabled = settle;
+				activeLayerId = layer.id;
+
+				const base = Math.min(canvas.width, canvas.height) * sizeFrac;
+				const pieces = [];
+				for (let i = 0; i < count; i++) {
+					const size = base * (0.6 + Math.random() * 0.8);
+					const useLibrary = docs.length && (kind === "library" || (kind === "mixed" && Math.random() < 0.5));
+					const form = useLibrary ? libraryFormPoints(docs[Math.floor(Math.random() * docs.length)], size)
+						: tornSquarePoints(size);
+					const margin = size * 0.4;
+					const x = margin + Math.random() * Math.max(1, canvas.width - 2 * margin);
+					const y = margin + Math.random() * Math.max(1, canvas.height - 2 * margin);
+					const color = hexToRGBA(colors[Math.floor(Math.random() * colors.length)]);
+					const piece = chancePiece(form, x, y, Math.random() * Math.PI * 2, color);
+					piece.layerId = layer.id;
+					pieces.push(piece);
+				}
+
+				lastChanceEntry = additionEntry({ chains: pieces, layers: [layer] });
+				history.push(lastChanceEntry);
+				renderLayerPanel();
+
+				// One at a time, like paper falling. An undo mid-drop removes the layer,
+				// which stops the rest from landing.
+				pieces.forEach((piece, i) => setTimeout(() => {
+					if (!layers.includes(layer)) return;
+					chains.push(piece);
+					spatialHashCache.needsRebuild = true;
+					_gpuTexturesDirty = true;
+				}, i * 90));
+				toast(`Dropped ${count} piece${count === 1 ? "" : "s"} on ${layer.name}`, 1800);
+			}
+
+			function refreshChanceDialog() {
+				$("chanceSizeValue").textContent = `${$("chanceSize").value}%`;
+				$("chanceColorsNote").textContent = palette.length
+					? `Colours: your palette${paletteLabel ? ` “${paletteLabel}”` : ""} (${palette.length}).`
+					: "Colours: ink, terracotta, blue, ochre and paper. Load a palette to use your own.";
+				$("chanceAgainBtn").disabled = !(lastChanceEntry && history[history.length - 1] === lastChanceEntry);
+			}
+
+			$("menuChance").onclick = () => {
+				refreshChanceDialog();
+				$("chanceBackdrop").style.display = "flex";
+			};
+			$("chanceSize").oninput = refreshChanceDialog;
+			$("chanceCloseBtn").onclick = () => { $("chanceBackdrop").style.display = "none"; };
+			$("chanceDropBtn").onclick = () => {
+				$("chanceBackdrop").style.display = "none";
+				dropChancePieces();
+			};
+			$("chanceAgainBtn").onclick = () => {
+				if (lastChanceEntry && history[history.length - 1] === lastChanceEntry) {
+					undoEntry(history.pop());
+				}
+				$("chanceBackdrop").style.display = "none";
+				dropChancePieces();
+			};
+
+			/* -----------------------------------
+			   AUTOSAVE
+			-----------------------------------
+			   The sketch — forms, guides, force paths and every setting, background
+			   colour included — is kept in this browser's storage and reopened on the
+			   next visit. Before this, closing the tab lost everything that had not been
+			   saved as a file. It is a safety net, not a file: File ▸ Save is still how
+			   a sketch travels. */
+			const AUTOSAVE_KEY = "hansketch.autosave.v1";
+			const AUTOSAVE_INTERVAL_MS = 4000;
+			let autosaveDisabled = false;
+
+			function autosavePayload(includeBinding) {
+				stampUnassignedChains();
+				const settings = getCurrentSettings();
+				if (!includeBinding) delete settings.movementBinding;
+				// Three decimals is well below a pixel and below one colour step (1/255).
+				const compact = (key, value) => {
+					if (key === "_forces" || key === "_held") return undefined;
+					return typeof value === "number" ? Math.round(value * 1000) / 1000 : value;
+				};
+				return JSON.stringify({ savedAt: Date.now(), chains, circles, rigidPolygons,
+					attractorsRepulsors, settings }, compact);
+			}
+
+			function writeAutosave() {
+				if (autosaveDisabled) return;
+				try {
+					localStorage.setItem(AUTOSAVE_KEY, autosavePayload(true));
+				} catch (e) {
+					// Most likely the storage quota. Imported motion clips are the bulky
+					// part, so try once more without them before giving up.
+					try {
+						localStorage.setItem(AUTOSAVE_KEY, autosavePayload(false));
+					} catch (e2) {
+						autosaveDisabled = true;
+						toast("Autosave paused: this sketch is too large for browser storage. Use File ▸ Save.", 4500);
+					}
+				}
+			}
+
+			function restoreAutosave() {
+				let raw = null;
+				try { raw = localStorage.getItem(AUTOSAVE_KEY); } catch (e) { return; }
+				if (!raw) return;
+				try {
+					const data = JSON.parse(raw);
+					(data.chains || []).forEach(c => chains.push(c));
+					(data.circles || []).forEach(c => circles.push(c));
+					(data.rigidPolygons || []).forEach(p => rigidPolygons.push(p));
+					(data.attractorsRepulsors || []).forEach(a => attractorsRepulsors.push(a));
+					if (data.settings) applySettings(data.settings);
+					splineCache.clear();
+					spatialHashCache.needsRebuild = true;
+					_gpuTexturesDirty = true;
+					renderLayerPanel();
+					if (chains.length || circles.length || rigidPolygons.length) {
+						toast("Reopened your last sketch", 2200);
+					}
+				} catch (e) {
+					console.warn("Autosave could not be restored", e);
+				}
+			}
+
+			$("newSketchOption").onclick = e => {
+				e.stopPropagation();
+				$("fileSubmenu").style.display = "none";
+				if (!confirm("Start a new sketch? The current one is cleared from this browser; save it first with File ▸ Save if you want to keep it.")) return;
+				autosaveDisabled = true; // so leaving the page does not write it straight back
+				try { localStorage.removeItem(AUTOSAVE_KEY); } catch (err) { /* nothing to clear */ }
+				location.reload();
+			};
+
+			restoreAutosave();
+			setInterval(writeAutosave, AUTOSAVE_INTERVAL_MS);
+
+			/* Inbox: compositions handed over by Shape Extractor's "Open in HanSketch"
+			   (contracts/composition-svg.md, "Hand-off"). The extractor leaves the
+			   document in localStorage and announces it on a BroadcastChannel; whichever
+			   HanSketch tab claims it first opens the arrival dialog. Checked at start-up
+			   (a tab opened for the purpose), on announcement (a tab already open), and
+			   when a tab comes back into view (in case it missed the announcement). */
+			const INBOX_KEY = "hansketch.inbox";
+			const INBOX_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+			const hansketchChannel = "BroadcastChannel" in window ? new BroadcastChannel("hansketch") : null;
+
+			function takeInbox() {
+				let raw = null;
+				try { raw = localStorage.getItem(INBOX_KEY); } catch (e) { return null; }
+				if (!raw) return null;
+				try { localStorage.removeItem(INBOX_KEY); } catch (e) { /* still use it once */ }
+				let item = null;
+				try { item = JSON.parse(raw); } catch (e) { return null; }
+				if (!item || item.schema !== "hansketch.inbox" || item.kind !== "composition-svg" || typeof item.svg !== "string") return null;
+				if (!(Date.now() - Date.parse(item.sentAt) < INBOX_MAX_AGE_MS)) return null;
+				return item;
+			}
+
+			function checkInbox() {
+				const claim = () => {
+					const item = takeInbox();
+					if (!item) return;
+					hansketchChannel?.postMessage({ type: "inbox-taken", id: item.id });
+					openCompositionArrival(item.svg, item.name);
+				};
+				// The lock makes the claim atomic when several HanSketch tabs are open.
+				if (navigator.locks?.request) navigator.locks.request("hansketch-inbox", claim);
+				else claim();
+			}
+
+			hansketchChannel?.addEventListener("message", e => {
+				const message = e.data || {};
+				if (message.type === "who-is-hansketch") hansketchChannel.postMessage({ type: "hansketch-here" });
+				if (message.type === "inbox") checkInbox();
+			});
+			hansketchChannel?.postMessage({ type: "hansketch-here" });
+			document.addEventListener("visibilitychange", () => { if (!document.hidden) checkInbox(); });
+			checkInbox();
+			document.addEventListener("visibilitychange", () => {
+				if (document.visibilityState === "hidden") writeAutosave();
+			});
+			window.addEventListener("pagehide", writeAutosave);
 
 			if (radiusVarInput) {
 				radiusVarInput.oninput = e => {
