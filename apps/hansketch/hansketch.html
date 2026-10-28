@@ -248,7 +248,7 @@ body::before {
 }
 
 #exportSubmenu {
-  width: 190px;
+  width: 250px;
 }
 
 /* Menu rows that toggle a setting rather than firing an action. Separated from the
@@ -1299,12 +1299,26 @@ body.presentation-mode .paused-badge { display: none; }
 .appearance-dialog {
   min-width: 500px;
   max-width: 600px;
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .appearance-dialog-content {
   display: flex;
   gap: 24px;
   margin: 16px 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.appearance-dialog .paper-preset,
+.appearance-dialog .aspect-preset {
+  margin: 0;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
 }
 
 .appearance-controls {
@@ -3197,7 +3211,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					display: block;
 				}
 
-				/* Canvas - full screen, fills entire iPad width */
+				.window.ipad #canvasStage { position: absolute; inset: 0; padding: 0; }
+
+				/* Canvas - fitted paper artboard; CSS sizing never changes print dimensions. */
 				.window.ipad #glCanvas {
 					position: absolute;
 					top: 0;
@@ -3673,10 +3689,20 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						<span id="presentationModeOption">Presentation Mode</span>
 					</div>
 				</span>
+				<span id="menuEdit">Edit
+					<div class="submenu" id="editSubmenu">
+						<span id="selectAllOption">Select All · Cmd/Ctrl+A</span>
+						<span id="deselectAllOption">Deselect All · Esc</span>
+						<span id="resetSettingsOption" title="Restore physics, drawing and appearance defaults; keep artwork, layers, palette and paper size">Reset Settings</span>
+					</div>
+				</span>
 				<span id="menuExport">Export
 					<div class="submenu" id="exportSubmenu">
 						<span id="exportSVGOption">SVG</span>
 						<span id="exportJPGOption">JPG</span>
+						<span id="exportTIFFOption">TIFF · print resolution</span>
+						<span id="exportPDFOption">PDF · artwork</span>
+						<span id="exportLayersPDFOption" title="One black-on-white page per layer, including hidden layers; same paper size and alignment, without background colour or relief shadows">PDF · all layers for screen printing</span>
 						<span id="exportBackgroundToggle" class="submenu-toggle">Background Color ✓</span>
 					</div>
 				</span>
@@ -3798,7 +3824,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				     shortcuts: Cmd+[ / Cmd+] are the browser's own back/forward keys. -->
 				<div class="toolbar-section" id="selectionSection" style="display:none;">
 					<h4>Selection</h4>
+					<p class="layer-note" id="selectionCount" aria-live="polite">No forms selected.</p>
 					<div class="selection-actions">
+						<button id="selAllBtn" title="Select all visible, unlocked forms (Cmd/Ctrl+A)">Select all</button>
+						<button id="selNoneBtn" title="Deselect all (Escape)">Deselect</button>
 						<button id="selDuplicateBtn" title="Duplicate (Cmd/Ctrl+D)">Duplicate</button>
 						<button id="selDeleteBtn" title="Delete (Backspace)">Delete</button>
 						<button id="selFrontBtn" title="Bring to front of its layer">To front</button>
@@ -3806,7 +3835,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						<button id="selBackwardBtn" title="Send backward">Backward</button>
 						<button id="selBackBtn" title="Send to back of its layer">To back</button>
 					</div>
-					<p class="layer-note">Drag to move · corners scale (Alt: from centre) · round handle rotates (Shift: 15°) · arrows nudge · double-click a point on the outline: corner ↔ smooth.</p>
+					<p class="layer-note">Shift-click to add or remove forms · drag to move the selection · corners scale (Alt: from centre) · round handle rotates (Shift: 15°) · arrows nudge · double-click an outline point: corner ↔ smooth.</p>
 				</div>
 
 				<div class="toolbar-section" id="shapeSettingsSection">
@@ -3867,8 +3896,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 							<input type="range" id="shadowOpacity" min="0" max="100" step="5"></label>
 						<label class="shadow-color-row">Colour
 							<input type="color" id="shadowColor"></label>
+						<div class="palette-swatches" id="shadowPaletteSwatches" aria-label="Shadow palette"></div>
+						<p class="palette-note" id="shadowPaletteNote"></p>
 					</div>
-					<p class="topology-note">Like the cut planes of a painted wood relief. Shadows are exported to SVG and JPG.</p>
+					<p class="topology-note">Like the cut planes of a painted wood relief. Shadows are exported to SVG, JPG, TIFF and artwork PDF.</p>
 				</div>
 
 				<!-- CANVAS TOOLS -->
@@ -4424,14 +4455,14 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 									<label style="font-size: 11px; color: #888;">H</label>
 									<input type="number" id="appearanceCanvasHeight" min="1" max="4096" step="1" value="500" style="width: 80px; padding: 4px 6px; font-family: var(--font-ui);">
 									<select id="appearanceCanvasUnit" style="padding: 4px 6px; font-family: var(--font-ui);">
-										<option value="px" selected>px</option>
-										<option value="mm">mm</option>
+										<option value="px">px</option>
+										<option value="mm" selected>mm</option>
 									</select>
 								</div>
 								<div id="appearanceDpiRow" style="display: none; margin-top: 8px; gap: 8px; align-items: center; flex-wrap: wrap;">
 									<label style="font-size: 11px; color: #888;">DPI</label>
-									<input type="number" id="appearanceCanvasDpi" min="36" max="1200" step="1" value="96" style="width: 70px; padding: 4px 6px; font-family: var(--font-ui);">
-									<span id="appearanceDpiHint" style="font-size: 11px; color: #888;">used for internal resolution &amp; JPG export</span>
+									<input type="number" id="appearanceCanvasDpi" min="36" max="1200" step="1" value="300" style="width: 70px; padding: 4px 6px; font-family: var(--font-ui);">
+									<span id="appearanceDpiHint" style="font-size: 11px; color: #888;">print resolution for JPG / TIFF; PDF keeps the paper size</span>
 								</div>
 								<div id="appearanceSizeReadout" style="margin-top: 6px; font-size: 11px; color: #888; font-family: var(--font-ui);"></div>
 								<div style="margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px;">
@@ -4442,6 +4473,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 									<button type="button" class="aspect-preset" data-ratio="9:16" style="padding: 2px 6px; cursor: pointer;">9:16</button>
 									<button type="button" class="paper-preset" data-paper="a4p" style="padding: 2px 6px; cursor: pointer;" title="A4 portrait 210 × 297 mm">A4 ↕</button>
 									<button type="button" class="paper-preset" data-paper="a4l" style="padding: 2px 6px; cursor: pointer;" title="A4 landscape 297 × 210 mm">A4 ↔</button>
+									<button type="button" class="paper-preset" data-paper="a3p" title="A3 portrait 297 × 420 mm at 300 dpi">A3 ↕</button>
+									<button type="button" class="paper-preset" data-paper="a3l" title="A3 landscape 420 × 297 mm at 300 dpi">A3 ↔</button>
+									<button type="button" class="paper-preset" data-paper="a2p" title="A2 portrait 420 × 594 mm at 300 dpi">A2 ↕</button>
+									<button type="button" class="paper-preset" data-paper="a2l" title="A2 landscape 594 × 420 mm at 300 dpi">A2 ↔</button>
 									<button type="button" class="paper-preset" data-paper="letter" style="padding: 2px 6px; cursor: pointer;" title="US Letter 215.9 × 279.4 mm">Letter</button>
 									<label class="appearance-checkbox-label" style="margin-left: auto; font-size: 11px;">
 										<input type="checkbox" id="appearanceLockAspect">
@@ -4461,6 +4496,14 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					<button id="appearanceApplyBtn">Apply</button>
 					<button id="appearanceCancelBtn">Cancel</button>
 				</div>
+			</div>
+		</div>
+
+		<div class="dialog-backdrop" id="printExportBackdrop" style="z-index:20000;" role="dialog" aria-modal="true" aria-labelledby="printExportStatus">
+			<div class="dialog-content">
+				<h3 id="printExportStatus" role="status" aria-live="polite">Preparing print export…</h3>
+				<p id="printExportDetail">Please keep this tab open while the file is prepared.</p>
+				<button id="printExportClose" style="display:none;">Close</button>
 			</div>
 		</div>
 
@@ -4566,6 +4609,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
      padding:5px 8px; background:var(--ink); color:var(--paper);
      border:none; border-radius:6px; box-shadow:0 8px 24px rgba(28,24,19,.10);">
 	</div>
+	<script src="print-export.js"></script>
 	<script>
 		 (function () {
     var ua = navigator.userAgent || "";
@@ -5989,23 +6033,21 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			   FILE & EXPORT MENU
 			----------------------------------- */
 			function setupSubmenu(menuId, submenuId) {
-				const menu = $(menuId),
-					submenu = $(submenuId);
-				let visible = false;
-				menu.addEventListener("click", (e) => {
+				const menu = $(menuId), submenu = $(submenuId);
+				menu.addEventListener("click", e => {
 					e.stopPropagation();
-					visible = !visible;
-					submenu.style.display = visible ? "flex" : "none";
+					const open = submenu.style.display !== "flex";
+					document.querySelectorAll(".submenu").forEach(el => { el.style.display = "none"; });
+					submenu.style.display = open ? "flex" : "none";
 				});
-				document.addEventListener("click", (e) => {
-					if (!menu.contains(e.target) && visible) {
-						visible = false;
-						submenu.style.display = "none";
-					}
+				document.addEventListener("click", e => {
+					if (!menu.contains(e.target)) submenu.style.display = "none";
 				});
 			}
+
 			setupSubmenu("menuFile", "fileSubmenu");
 			setupSubmenu("menuExport", "exportSubmenu");
+			setupSubmenu("menuEdit", "editSubmenu");
 
 
 			/* ---------- PRESETS ---------- */
@@ -8083,7 +8125,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					if (!_layerById.has(activeLayerId)) activeLayerId = layers[layers.length - 1].id;
 					renderLayerPanel();
 				}
-				if (selectedChain && !chains.includes(selectedChain)) selectedChain = null;
+				selectionIsLive();
 			}
 
 			// Geometry undo. Transforms and the push brush can change how many points a
@@ -8544,33 +8586,51 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			const SELECT_HANDLE_CSS_PX = 5;
 			const SELECT_ROTATE_OFFSET_CSS_PX = 24;
 
-			function selectionFrame(chainObj) {
-				const b = chainBounds(chainObj);
+			function selectionFrame() {
+				let b = null;
+				for (const obj of selectedChains) {
+					const next = chainBounds(obj);
+					if (!b) b = next;
+					else {
+						b.minX = Math.min(b.minX, next.minX); b.minY = Math.min(b.minY, next.minY);
+						b.maxX = Math.max(b.maxX, next.maxX); b.maxY = Math.max(b.maxY, next.maxY);
+					}
+				}
+				b.cx = (b.minX + b.maxX) / 2; b.cy = (b.minY + b.maxY) / 2;
 				const k = cssToCanvasScale();
-				return {
-					...b,
+				return { ...b,
 					corners: [[b.minX, b.minY], [b.maxX, b.minY], [b.maxX, b.maxY], [b.minX, b.maxY]],
 					rotate: { x: b.cx, y: b.minY - SELECT_ROTATE_OFFSET_CSS_PX * k },
-					handle: SELECT_HANDLE_CSS_PX * k
-				};
+					handle: SELECT_HANDLE_CSS_PX * k };
 			}
 
 			function selectionIsLive() {
-				if (selectedChain && (!chains.includes(selectedChain) || !isChainPickable(selectedChain))) {
-					selectedChain = null;
-					refreshSelectionPanel();
+				let changed = false;
+				for (const obj of selectedChains) {
+					if (!chains.includes(obj) || !isChainPickable(obj)) { selectedChains.delete(obj); changed = true; }
 				}
-				return !!selectedChain;
+				if (!selectedChains.has(selectedChain)) selectedChain = selectedChains.values().next().value || null;
+				if (changed) refreshSelectionPanel();
+				return selectedChains.size > 0;
 			}
 
-			function setSelection(chainObj) {
-				selectedChain = chainObj;
+			function setSelection(value) {
+				selectedChains.clear();
+				for (const obj of (Array.isArray(value) ? value : value ? [value] : [])) {
+					if (isChainPickable(obj)) selectedChains.add(obj);
+				}
+				selectedChain = [...selectedChains].pop() || null;
 				refreshSelectionPanel();
 			}
 
+			function selectAllForms() {
+				setEditTool("select", true);
+				setSelection(chains.filter(isChainPickable));
+			}
+
 			function selectPointerDown(x, y, e) {
-				if (selectionIsLive() && !isSinglePoint(selectedChain)) {
-					const f = selectionFrame(selectedChain);
+				if (selectionIsLive() && (selectedChains.size > 1 || !isSinglePoint(selectedChain))) {
+					const f = selectionFrame();
 					const grab = f.handle * 2.2;
 					if (Math.hypot(x - f.rotate.x, y - f.rotate.y) <= grab) {
 						beginSelectDrag("rotate", x, y, { cx: f.cx, cy: f.cy });
@@ -8586,13 +8646,23 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					}
 				}
 				const hit = pickChainAt(x, y);
+				if (e.shiftKey) {
+					if (hit !== -1) {
+						const obj = chains[hit];
+						const next = [...selectedChains];
+						if (selectedChains.has(obj)) next.splice(next.indexOf(obj), 1);
+						else next.push(obj);
+						setSelection(next);
+					}
+					return;
+				}
 				if (hit !== -1) {
-					setSelection(chains[hit]);
+					if (!selectedChains.has(chains[hit])) setSelection(chains[hit]);
 					beginSelectDrag("move", x, y, {});
 					return;
 				}
 				if (selectedChain) {
-					const f = selectionFrame(selectedChain);
+					const f = selectionFrame();
 					if (x >= f.minX && x <= f.maxX && y >= f.minY && y <= f.maxY) {
 						beginSelectDrag("move", x, y, {});
 						return;
@@ -8603,8 +8673,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			function beginSelectDrag(kind, x, y, frame) {
 				selectDrag = { kind, startX: x, startY: y, ...frame, moved: false,
-					before: snapshotGeometry(selectedChain) };
-				selectedChain._held = true;
+					before: [...selectedChains].map(snapshotGeometry) };
+				selectDrag.before.forEach(s => { s.chain._held = true; });
 			}
 
 			function selectPointerMove(x, y, e) {
@@ -8641,9 +8711,11 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						target[i].vx = 0; target[i].vy = 0;
 					}
 				};
-				apply(selectedChain.chain, d.before.points);
-				(selectedChain.holes || []).forEach((hole, i) => {
-					if (d.before.holes[i]) apply(hole.chain, d.before.holes[i].points);
+				d.before.forEach(before => {
+					apply(before.chain.chain, before.points);
+					(before.chain.holes || []).forEach((hole, i) => {
+						if (before.holes[i]) apply(hole.chain, before.holes[i].points);
+					});
 				});
 				splineCache.clear();
 				spatialHashCache.needsRebuild = true;
@@ -8653,89 +8725,99 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			function selectPointerUp() {
 				const d = selectDrag;
 				selectDrag = null;
-				if (!selectedChain) return;
-				selectedChain._held = false;
-				if (!d.moved) return;
-				if (d.kind === "scale" && d.scale && Math.abs(d.scale - 1) > 1e-3) {
-					// Respace to the spacing the form had before, so the springs keep the
-					// new size instead of pulling it back to the old one.
-					const obj = selectedChain;
-					obj.chain = respacePoints(obj.chain, obj.isClosed, averageSpacing(d.before.points, obj.isClosed));
-					(obj.holes || []).forEach((hole, i) => {
-						if (d.before.holes[i]) hole.chain = respacePoints(hole.chain, true, averageSpacing(d.before.holes[i].points, true));
-					});
-					settleEditedChain(obj, true);
-				} else {
-					settleEditedChain(selectedChain, false);
-				}
-				history.push({ type: "geometry", snapshots: [d.before] });
+				if (!d) return;
+				d.before.forEach(before => {
+					const obj = before.chain;
+					obj._held = false;
+					if (!d.moved) return;
+					if (d.kind === "scale" && d.scale && Math.abs(d.scale - 1) > 1e-3) {
+						obj.chain = respacePoints(obj.chain, obj.isClosed, averageSpacing(before.points, obj.isClosed));
+						(obj.holes || []).forEach((hole, i) => {
+							if (before.holes[i]) hole.chain = respacePoints(hole.chain, true, averageSpacing(before.holes[i].points, true));
+						});
+						settleEditedChain(obj, true);
+					} else settleEditedChain(obj, false);
+				});
+				if (d.moved) history.push({ type: "geometry", snapshots: d.before });
 			}
 
 			function translateSelected(dx, dy) {
 				if (!selectionIsLive()) return;
-				const before = snapshotGeometry(selectedChain);
-				forEachRing(selectedChain, ring => {
-					for (const p of ring.chain) { p.x += dx; p.y += dy; }
+				const snapshots = [...selectedChains].map(snapshotGeometry);
+				selectedChains.forEach(obj => {
+					forEachRing(obj, ring => {
+						for (const p of ring.chain) { p.x += dx; p.y += dy; }
+					});
+					settleEditedChain(obj, false);
 				});
-				settleEditedChain(selectedChain, false);
-				history.push({ type: "geometry", snapshots: [before] });
+				history.push({ type: "geometry", snapshots });
 			}
 
 			function deleteSelected() {
 				if (!selectionIsLive()) return;
-				const i = chains.indexOf(selectedChain);
-				recordDeletion({ chains: [[i, selectedChain]] });
-				chains.splice(i, 1);
+				const removed = [];
+				chains.forEach((obj, i) => { if (selectedChains.has(obj)) removed.push([i, obj]); });
+				recordDeletion({ chains: removed });
+				for (let i = removed.length - 1; i >= 0; i--) chains.splice(removed[i][0], 1);
 				setSelection(null);
 				SFX.deleteSound();
-				splineCache.clear();
-				spatialHashCache.needsRebuild = true;
-				_gpuTexturesDirty = true;
+				splineCache.clear(); spatialHashCache.needsRebuild = true; _gpuTexturesDirty = true;
 			}
 
-			// The copy lands just above the original on the same layer, nudged so it is
-			// visibly a second form.
+			// Copies stay on their originals' layers, in the same relative order.
 			function duplicateSelected() {
 				if (!selectionIsLive()) return;
-				const src = selectedChain;
-				const copy = JSON.parse(JSON.stringify(src, (key, value) =>
-					(key === "_forces" || key === "_held") ? undefined : value));
-				const off = 16 * cssToCanvasScale();
-				forEachRing(copy, ring => {
-					for (const p of ring.chain) { p.x += off; p.y += off; p.vx = 0; p.vy = 0; }
-				});
-				chains.splice(chains.indexOf(src) + 1, 0, copy);
-				recordAddition({ chains: [copy] });
-				setSelection(copy);
-				splineCache.clear();
-				spatialHashCache.needsRebuild = true;
-				_gpuTexturesDirty = true;
-				toast("Duplicated", 1000);
+				const copies = [], off = 16 * cssToCanvasScale();
+				for (const src of chains.slice()) {
+					if (!selectedChains.has(src)) continue;
+					const copy = JSON.parse(JSON.stringify(src, (key, value) =>
+						(key === "_forces" || key === "_held") ? undefined : value));
+					forEachRing(copy, ring => {
+						for (const p of ring.chain) { p.x += off; p.y += off; p.vx = 0; p.vy = 0; }
+					});
+					chains.splice(chains.indexOf(src) + 1, 0, copy);
+					copies.push(copy);
+				}
+				recordAddition({ chains: copies });
+				setSelection(copies);
+				splineCache.clear(); spatialHashCache.needsRebuild = true; _gpuTexturesDirty = true;
 			}
 
-			// Stacking order within the selection's own layer; layers keep their order.
-			// Particles are always drawn above other forms, so this only affects lines
-			// and blobs.
+			// Move the selection within each of its layers; never cross layer boundaries.
 			function arrangeSelected(direction, toEnd) {
 				if (!selectionIsLive()) return;
-				const obj = selectedChain;
-				const from = chains.indexOf(obj);
-				const layer = layerOf(obj);
-				const same = [];
-				chains.forEach((c, i) => { if (layerOf(c) === layer) same.push(i); });
-				const pos = same.indexOf(from);
-				let target = toEnd ? (direction > 0 ? same.length - 1 : 0) : pos + direction;
-				target = Math.max(0, Math.min(same.length - 1, target));
-				if (target === pos) {
-					toast(direction > 0 ? "Already at the front of its layer" : "Already at the back of its layer", 1200);
-					return;
-				}
-				chains.splice(from, 1);
-				chains.splice(same[target], 0, obj);
-				history.push({ type: "order", chain: obj, from });
-				splineCache.clear();
-				spatialHashCache.needsRebuild = true;
-				_gpuTexturesDirty = true;
+				stampUnassignedChains();
+				const target = chains.slice();
+				layers.forEach(layer => {
+					const indices = [], members = [];
+					chains.forEach((obj, i) => { if (layerOf(obj) === layer) { indices.push(i); members.push(obj); } });
+					let ordered = members.slice();
+					if (toEnd) {
+						const chosen = members.filter(obj => selectedChains.has(obj));
+						const others = members.filter(obj => !selectedChains.has(obj));
+						ordered = direction > 0 ? others.concat(chosen) : chosen.concat(others);
+					} else if (direction > 0) {
+						for (let i = ordered.length - 2; i >= 0; i--) {
+							if (selectedChains.has(ordered[i]) && !selectedChains.has(ordered[i + 1]))
+								[ordered[i], ordered[i + 1]] = [ordered[i + 1], ordered[i]];
+						}
+					} else {
+						for (let i = 1; i < ordered.length; i++) {
+							if (selectedChains.has(ordered[i]) && !selectedChains.has(ordered[i - 1]))
+								[ordered[i - 1], ordered[i]] = [ordered[i], ordered[i - 1]];
+						}
+					}
+					indices.forEach((index, i) => { target[index] = ordered[i]; });
+				});
+				const entries = [];
+				target.forEach((obj, i) => {
+					if (chains[i] === obj) return;
+					const from = chains.indexOf(obj);
+					chains.splice(from, 1); chains.splice(i, 0, obj);
+					entries.push({ type: "order", chain: obj, from });
+				});
+				if (entries.length) history.push({ type: "compound", entries });
+				splineCache.clear(); spatialHashCache.needsRebuild = true; _gpuTexturesDirty = true;
 			}
 
 			// Nearest point of any pickable chain within `radius` (canvas px), for Pin
@@ -8782,7 +8864,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					});
 				};
 				// The selected form wins when its outline is in reach.
-				if (selectionIsLive()) consider(selectedChain);
+				if (selectionIsLive()) selectedChains.forEach(consider);
 				if (!best && !corner) chains.forEach(consider);
 				return corner || best;
 			}
@@ -8813,7 +8895,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			function refreshSelectionPanel() {
 				const panel = $("selectionSection");
 				if (!panel) return;
-				panel.style.display = selectedChain ? "" : "none";
+				panel.style.display = selectMode ? "" : "none";
+				const count = selectedChains.size;
+				$("selectionCount").textContent = count ? `${count} form${count === 1 ? "" : "s"} selected` : "No forms selected.";
+				for (const id of ["selDuplicateBtn", "selDeleteBtn", "selFrontBtn", "selForwardBtn", "selBackwardBtn", "selBackBtn", "selNoneBtn"]) $(id).disabled = !count;
 			}
 
 			/* ── Push brush (P): liquify edges ────────────────────────────────
@@ -9000,9 +9085,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				}
 				beginOverlayDraw();
 				drawCornerMarkers();
-				const f = selectionFrame(selectedChain);
+				const f = selectionFrame();
 				drawOverlayVerts(new Float32Array(f.corners.flat()), gl.LINE_LOOP, _accentRGBA);
-				if (isSinglePoint(selectedChain)) return; // a dot can only be moved
+				if (selectedChains.size === 1 && isSinglePoint(selectedChain)) return; // a dot can only be moved
 				const h = f.handle;
 				f.corners.forEach(([hx, hy]) => {
 					const sq = new Float32Array([hx - h, hy - h, hx + h, hy - h, hx + h, hy + h, hx - h, hy + h]);
@@ -9195,36 +9280,14 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			/* Full-screen canvas for iPad - fills entire screen, panel overlays */
 			function fitCanvasForIPad() {
-				const titleBarHeight = 44;
-				// Canvas fills entire screen width and height (panel overlays on top)
-				const fullWidth = window.innerWidth;
-				const fullHeight = window.innerHeight - titleBarHeight;
-
-			// Fill entire screen
-			// PERFORMANCE: Force devicePixelRatio to 1 on iPad to avoid retina resolution overhead
-			// On retina displays, devicePixelRatio is 2 or 3, which means the browser renders
-			// the canvas at 2x/3x resolution internally. By dividing canvas dimensions by
-			// devicePixelRatio, we force it to render at 1x resolution (native logical pixels).
-			const isIPadDevice = /iPad/i.test(navigator.userAgent) ||
-				(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-			// Force device pixel ratio to 1 for iPad (ignore retina scaling)
-			// Divide canvas dimensions by devicePixelRatio to get 1x rendering resolution
-			const actualDPR = window.devicePixelRatio || 1.0;
-			const dpr = isIPadDevice ? 1.0 : actualDPR;
-			const resolutionScale = 1.0; // No additional downscaling - devicePixelRatio handling is enough
-
-			// Set CSS size to full screen (visual size)
-			canvas.style.width = fullWidth + "px";
-			canvas.style.height = fullHeight + "px";
-
-			// Set internal canvas resolution: divide by devicePixelRatio to force 1x rendering
-			// This prevents the browser from rendering at 2x/3x resolution on retina displays
-			// The CSS size stays the same, so it displays correctly, but renders at lower resolution
-			canvas.width = Math.floor(fullWidth * resolutionScale / dpr);
-			canvas.height = Math.floor(fullHeight * resolutionScale / dpr);
-
-			if (gl) gl.viewport(0, 0, canvas.width, canvas.height);
+				const availableW = Math.max(80, window.innerWidth - 24);
+				const availableH = Math.max(80, window.innerHeight - 44 - 24);
+				const fit = Math.min(availableW / canvas.width, availableH / canvas.height);
+				canvas.style.width = Math.round(canvas.width * fit) + "px";
+				canvas.style.height = Math.round(canvas.height * fit) + "px";
+				canvas.style.position = "absolute";
+				canvas.style.left = Math.round((window.innerWidth - canvas.width * fit) / 2) + "px";
+				canvas.style.top = Math.round((window.innerHeight - 44 - canvas.height * fit) / 2) + "px";
 			}
 
 			/* master switch */
@@ -9610,7 +9673,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			// Select tool: the chain object itself, so the selection survives the array
 			// being regrouped by layer. selectDrag is the gesture in progress, if any.
-			let selectedChain = null;
+			let selectedChain = null; // primary form, used by corner editing
+			const selectedChains = new Set();
 			let selectDrag = null;
 			// Outline point under the cursor in Select mode: what a double-click would
 			// turn into a corner (or back). { chain, ring, index } or null.
@@ -10146,6 +10210,28 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				note.textContent = palette.length
 					? `${palette.length} color${palette.length === 1 ? "" : "s"} — click to draw with one.`
 					: "Load a palette from Color Extractor.";
+				renderShadowPalette();
+			}
+
+			function renderShadowPalette() {
+				const strip = $("shadowPaletteSwatches");
+				strip.textContent = "";
+				palette.forEach(hex => {
+					const button = document.createElement("button");
+					button.type = "button";
+					button.className = "palette-swatch" + (hex === reliefShadow.color ? " is-active" : "");
+					button.style.background = hex;
+					button.title = `Shadow colour ${hex}`;
+					button.setAttribute("aria-label", button.title);
+					button.onclick = () => {
+						reliefShadow.color = hex;
+						syncReliefShadowUI();
+					};
+					strip.appendChild(button);
+				});
+				$("shadowPaletteNote").textContent = palette.length
+					? "Pick a palette colour for the shadow. Opacity blends it with the paper."
+					: "Load a palette in Shape Settings to use its colours here.";
 			}
 
 			// The palette used to feed only the draw colour, so the canvas background
@@ -10280,7 +10366,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			    if (toolName === "select") selectMode = true;
 			    if (toolName === "push")   pushMode = true;
 			  }
-			  if (!selectMode) { selectedChain = null; refreshSelectionPanel(); }
+			  if (!selectMode) setSelection(null);
+			  refreshSelectionPanel();
 
 			  // ✅ If no draw mode is active, we ALWAYS fall back to drag
 			  const anyEditOn = slicingMode || dragMode || pinMode || freezeMode || deleteMode || recolorMode || selectMode || pushMode;
@@ -10330,7 +10417,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			  setIconActive($("iconRecolor"), false, "Disable Recolor Mode","Enable Recolor Mode");
 			  setIconActive($("iconSelect"), false, "Disable Select","Enable Select");
 			  setIconActive($("iconPush"),   false, "Disable Push","Enable Push");
-			  selectedChain = null;
+			  setSelection(null);
 			  refreshSelectionPanel();
 			}
 
@@ -10410,6 +10497,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			$("iconSelect").onclick = function() {
 				setEditTool("select");
 			};
+			$("selAllBtn").onclick = selectAllForms;
+			$("selNoneBtn").onclick = () => setSelection(null);
+			$("selectAllOption").onclick = e => { e.stopPropagation(); $("editSubmenu").style.display = "none"; selectAllForms(); };
+			$("deselectAllOption").onclick = e => { e.stopPropagation(); $("editSubmenu").style.display = "none"; setSelection(null); };
 			$("selDuplicateBtn").onclick = duplicateSelected;
 			$("selDeleteBtn").onclick = deleteSelected;
 			$("selFrontBtn").onclick = () => arrangeSelected(1, true);
@@ -10496,11 +10587,11 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				if (unit === "mm") {
 					const pxW = Math.round(mmToPx(w, dpi));
 					const pxH = Math.round(mmToPx(h, dpi));
-					readout.textContent = `= ${pxW} × ${pxH} px @ ${dpi} DPI  (SVG / JPG exports use ${w.toFixed(2)} × ${h.toFixed(2)} mm)`;
+					readout.textContent = `= ${pxW} × ${pxH} px @ ${dpi} DPI  (paper: ${w.toFixed(2)} × ${h.toFixed(2)} mm; live canvas uses a smaller preview)`;
 				} else {
 					const mmW = pxToMm(w, dpi).toFixed(2);
 					const mmH = pxToMm(h, dpi).toFixed(2);
-					readout.textContent = `≈ ${mmW} × ${mmH} mm @ ${dpi} DPI  (SVG / JPG exports use raw pixels)`;
+					readout.textContent = `≈ ${mmW} × ${mmH} mm @ ${dpi} DPI  (pixel-sized artwork)`;
 				}
 			}
 
@@ -10563,15 +10654,13 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						pxW = Math.round(reqW);
 						pxH = Math.round(reqH);
 					}
+					if (unit === "mm") {
+						const fit = Math.min(1, 2048 / Math.max(pxW, pxH));
+						pxW = Math.round(pxW * fit); pxH = Math.round(pxH * fit);
+					}
 					if (pxW !== canvas.width || pxH !== canvas.height) {
-						const applied = setCanvasSize(pxW, pxH);
-						// If setCanvasSize clamped, rescale the stored physical size so the
-						// DPI relationship stays consistent with what actually landed.
-						if (canvasPhysicalWidthMm != null &&
-						    (applied.w !== pxW || applied.h !== pxH)) {
-							canvasPhysicalWidthMm = pxToMm(applied.w, dpi);
-							canvasPhysicalHeightMm = pxToMm(applied.h, dpi);
-						}
+						setCanvasSize(pxW, pxH);
+
 					}
 				}
 
@@ -10698,6 +10787,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				const papers = {
 					a4p:    { w: 210,   h: 297   },
 					a4l:    { w: 297,   h: 210   },
+					a3p: { w: 297, h: 420 }, a3l: { w: 420, h: 297 },
+					a2p: { w: 420, h: 594 }, a2l: { w: 594, h: 420 },
 					letter: { w: 215.9, h: 279.4 }
 				};
 				document.querySelectorAll(".paper-preset").forEach(btn => {
@@ -10710,6 +10801,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 						unitSel.value = "mm";
 						wInput.step = "0.1"; hInput.step = "0.1";
 						dpiRow.style.display = "flex";
+						dpiInput.value = 300;
 						wInput.value = p.w;
 						hInput.value = p.h;
 						lockedRatio = p.w / p.h;
@@ -10854,6 +10946,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			----------------------------------- */
 
 			/* Entry types:
+               settings — resettable document controls (no geometry, layers or paper size).
 			   chain / circle / rigidPolygon — one item appended at the end; undo pops it.
 			   added    — items appended anywhere (and possibly new layers); removed by identity.
 			   delete   — items removed with their indices; see restoreDeletion().
@@ -10870,6 +10963,11 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				if (last.type === "added") undoAddition(last);
 				if (last.type === "edit") Object.assign(last.target, last.prev);
 				if (last.type === "geometry") last.snapshots.forEach(restoreGeometry);
+				if (last.type === "settings") {
+                    applySettings(last.settings);
+                    setPhysicsPaused(last.physicsPaused);
+                    colorInput.dispatchEvent(new Event("input", { bubbles: true }));
+                }
 				if (last.type === "order") {
 					const i = chains.indexOf(last.chain);
 					if (i !== -1) {
@@ -10923,11 +11021,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			// ratio. The internal resolution (canvas.width/height) is untouched — that is
 			// the artwork size, and physics, exports and saved scenes all depend on it.
 			function fitCanvasToWorkspace() {
-				// iPad drives canvas sizing from fitCanvasForIPad(), which fills the
-				// screen rather than fitting a stage. Defer to it there, but keep the
-				// aspect ratio honest: setCanvasSize() delegates display sizing here, so
-				// returning outright used to leave an explicitly sized artboard stretched
-				// to the old full-screen box.
+                // iPad fits the same artboard between its floating panels and title bar.
+                // Its physical size, internal resolution and proportions stay unchanged.
 				if (_isIPad) { fitCanvasForIPad(); return; }
 				const stage = $("canvasStage");
 				if (!stage) return;
@@ -10951,16 +11046,16 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			const CANVAS_MAX = 4096;
 
 			/* ---------- Physical size (millimetres) ----------
-			   When the user enters the canvas size in mm, we keep the internal WebGL resolution
-			   in pixels (derived via DPI) but also remember the mm dimensions so that exports
-			   reflect real-world size:
+			   Paper size and DPI are authoritative for exports. The working WebGL canvas is
+               capped separately, preserving its aspect ratio, so drawing stays responsive
+               without shrinking the declared physical size:
 			     - SVG gets width="Xmm" height="Ymm" attrs + a viewBox in internal px.
 			     - JPG is rasterised at mm * canvasDpi / 25.4 pixels.
 			   When null, the app is in "pixel-native" mode and exports behave as before.
 			*/
-			let canvasPhysicalWidthMm = null;
-			let canvasPhysicalHeightMm = null;
-			let canvasDpi = 96; // CSS default; also used as export DPI when physical size is set
+			let canvasPhysicalWidthMm = 297;
+			let canvasPhysicalHeightMm = 420;
+			let canvasDpi = 300; // A3 portrait is the default paper; live resolution is separate.
 			const MM_PER_INCH = 25.4;
 			const pxToMm = (px, dpi) => (px * MM_PER_INCH) / dpi;
 			const mmToPx = (mm, dpi) => (mm * dpi) / MM_PER_INCH;
@@ -10988,8 +11083,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			}
 
 			function setCanvasSize(w, h) {
-				w = Math.max(CANVAS_MIN, Math.min(CANVAS_MAX, Math.round(w)));
-				h = Math.max(CANVAS_MIN, Math.min(CANVAS_MAX, Math.round(h)));
+				const fit = Math.min(1, CANVAS_MAX / Math.max(w, h));
+				w = Math.max(CANVAS_MIN, Math.round(w * fit));
+				h = Math.max(CANVAS_MIN, Math.round(h * fit));
 
 				// Internal drawing resolution — this is what physics clamps against.
 				canvas.width = w;
@@ -11005,6 +11101,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				spatialHashCache.needsRebuild = true;
 				splineCache.clear();
 
+				_gpuTexturesDirty = true;
 				return { w, h };
 			}
 
@@ -12825,6 +12922,7 @@ window.addEventListener("keydown", (e) => {
 				text("shadowAngleValue", `${reliefShadow.angle}°`);
 				text("shadowSoftnessValue", `${reliefShadow.softness} px`);
 				text("shadowOpacityValue", `${Math.round(reliefShadow.opacity * 100)}%`);
+				renderShadowPalette();
 			}
 
 			// Accepts a saved scene's values, ignoring anything malformed.
@@ -12852,6 +12950,7 @@ window.addEventListener("keydown", (e) => {
 			});
 			$("shadowColor").oninput = e => {
 				reliefShadow.color = e.target.value;
+				renderShadowPalette();
 			};
 			syncReliefShadowUI();
 
@@ -13050,6 +13149,7 @@ window.addEventListener("keydown", (e) => {
 			        currentLineThickness,
 			        globalRadiusAvg,
 			        globalRadiusVar,
+				particleEmitRate, particleRenderSize,
 			        colorValue: colorInput.value,
 			        // Imported palette travels with the scene so a saved sketch reopens
 			        // with the same swatches to hand.
@@ -13069,6 +13169,7 @@ window.addEventListener("keydown", (e) => {
 				selfPerforationEnabled,
 				shapeMemoryEnabled,
 				penSmoothing,
+				gravityEnabled, gravityAccel,
 				reliefShadow: { ...reliefShadow },
 				travelingSegmentEnabled,
 			        travelingSegmentLength,
@@ -13145,6 +13246,9 @@ window.addEventListener("keydown", (e) => {
 					const el = $("radiusVarInput");
 					if (el) el.value = obj.globalRadiusVar;
 				}
+				if (typeof obj.particleEmitRate === "number" && isFinite(obj.particleEmitRate)) particleEmitRate = Math.max(1, Math.min(100, obj.particleEmitRate));
+				if (typeof obj.particleRenderSize === "number" && isFinite(obj.particleRenderSize)) particleRenderSize = Math.max(1, Math.min(30, obj.particleRenderSize));
+
 				if (typeof obj.colorValue === "string") {
 					colorInput.value = obj.colorValue;
 				}
@@ -13153,6 +13257,11 @@ window.addEventListener("keydown", (e) => {
 					paletteLabel = typeof obj.paletteLabel === "string" ? obj.paletteLabel : "";
 					renderPalette();
 				}
+				if (typeof obj.gravityEnabled === "boolean") {
+					gravityEnabled = obj.gravityEnabled;
+					toggleActiveIcon($("iconGravity"), gravityEnabled);
+				}
+				if (typeof obj.gravityAccel === "number" && isFinite(obj.gravityAccel)) gravityAccel = obj.gravityAccel;
 				// turgorPressure is restored by the PHYSICS_PARAMS loop above.
 
 			// Appearance settings
@@ -13246,6 +13355,25 @@ window.addEventListener("keydown", (e) => {
 			}
 
 			}
+
+			function resettableSettings() {
+				const settings = getCurrentSettings();
+				for (const key of ["layers", "activeLayerId", "palette", "paletteLabel", "movementBinding",
+					"canvasWidth", "canvasHeight", "canvasPhysicalWidthMm", "canvasPhysicalHeightMm", "canvasDpi"]) delete settings[key];
+				return settings;
+			}
+
+			$("resetSettingsOption").onclick = e => {
+				e.stopPropagation();
+				$("editSubmenu").style.display = "none";
+				if (selectDrag) selectPointerUp();
+				if (pushStroke) pushPointerUp();
+				history.push({ type: "settings", settings: resettableSettings(), physicsPaused });
+				applySettings(defaultResettableSettings);
+				colorInput.dispatchEvent(new Event("input", { bubbles: true }));
+				setPhysicsPaused(false);
+				writeAutosave();
+			};
 
 			function downloadJSON(filename, dataObj) {
 				const dataStr = JSON.stringify(dataObj, null, 2);
@@ -18284,7 +18412,7 @@ window.addEventListener("keydown", (e) => {
 				/* 0 ─ Title-bar */
 				{
 					el: ".title-bar",
-					text: "Title bar: File (save/load), Export (SVG/JPG), About, Help."
+					text: "Title bar: File (save/load), Edit (select/reset settings), Export (SVG/JPG/TIFF/PDF), About, Help."
 				},
 
 				/* 1 ─ Soft Forms */
@@ -18887,7 +19015,7 @@ window.addEventListener("keydown", (e) => {
 				layers.length = 0;
 				createLayer("Layer 1");
 				activeLayerId = layers[0].id;
-				selectedChain = null;
+				setSelection(null);
 				refreshSelectionPanel();
 				splineCache.clear();
 				spatialHashCache.needsRebuild = true;
@@ -18987,29 +19115,17 @@ window.addEventListener("keydown", (e) => {
 				});
 			}
 
-			function exportJPG() {
-				// If a physical canvas size is set, rasterise at exactly mm × DPI / 25.4 pixels so
-				// the file is print-ready at the chosen DPI. Otherwise keep the legacy behaviour
-				// (scale longest side to 2000 px based on the on-screen canvas aspect).
-				const hasPhys = canvasPhysicalWidthMm != null && canvasPhysicalHeightMm != null;
-				let exportWidth, exportHeight;
-				if (hasPhys) {
-					exportWidth  = Math.max(1, Math.round(mmToPx(canvasPhysicalWidthMm,  canvasDpi)));
-					exportHeight = Math.max(1, Math.round(mmToPx(canvasPhysicalHeightMm, canvasDpi)));
-				} else {
-					const rect = canvas.getBoundingClientRect();
-					const visualWidth  = rect.width  || parseInt(canvas.style.width)  || canvas.width;
-					const visualHeight = rect.height || parseInt(canvas.style.height) || canvas.height;
-					const targetResolution = 2000;
-					const aspectRatio = visualWidth / visualHeight;
-					if (visualWidth >= visualHeight) {
-						exportWidth  = targetResolution;
-						exportHeight = Math.round(targetResolution / aspectRatio);
-					} else {
-						exportHeight = targetResolution;
-						exportWidth  = Math.round(targetResolution * aspectRatio);
-					}
-				}
+			function rasterExportSize() {
+				const hasPhysical = canvasPhysicalWidthMm != null && canvasPhysicalHeightMm != null;
+				const width = hasPhysical ? Math.round(mmToPx(canvasPhysicalWidthMm, canvasDpi)) : canvas.width;
+				const height = hasPhysical ? Math.round(mmToPx(canvasPhysicalHeightMm, canvasDpi)) : canvas.height;
+				if (width < 1 || height < 1 || width > 16384 || height > 16384 || width * height > 70000000)
+					throw new Error("This raster is too large for the browser. Choose a lower DPI in Appearance, or export vector PDF / SVG.");
+				return { width, height };
+			}
+
+			function renderArtworkCanvas({ layerId = null, shadowOnly = false, transparent = false, size = null } = {}) {
+				const { width: exportWidth, height: exportHeight } = size || rasterExportSize();
 
 				// Calculate scale factors from canvas internal resolution to export resolution
 				const scaleX = exportWidth / canvas.width;
@@ -19022,8 +19138,11 @@ window.addEventListener("keydown", (e) => {
 
 				// Paint the canvas background colour (or white when the user has switched the
 				// background off). The grid is still never exported.
-				ctx.fillStyle = getExportBackgroundCSS();
-				ctx.fillRect(0, 0, exportWidth, exportHeight);
+				if (!ctx) throw new Error("The browser could not create the print canvas. Try a lower DPI.");
+				if (!transparent) {
+					ctx.fillStyle = getExportBackgroundCSS();
+					ctx.fillRect(0, 0, exportWidth, exportHeight);
+				}
 
 				// Trace one chain's outline (holes included) into a 2D context.
 				const traceChain = (context, obj) => {
@@ -19075,6 +19194,7 @@ window.addEventListener("keydown", (e) => {
 					ctx.globalAlpha = reliefShadow.opacity;
 					if (shadow.soft >= 0.5) ctx.filter = `blur(${shadow.soft * Math.min(scaleX, scaleY) / 2}px)`;
 					ctx.drawImage(sc, shadow.ox * scaleX, shadow.oy * scaleY);
+					sc.width = sc.height = 1;
 					ctx.restore();
 				};
 
@@ -19125,19 +19245,136 @@ window.addEventListener("keydown", (e) => {
 				// below. Hidden layers are left out, as on screen (they used to be exported).
 				stampUnassignedChains();
 				layers.forEach(layer => {
-					if (!layer.visible) return;
+					if (layerId == null ? !layer.visible : layer.id !== layerId) return;
 					const members = chains.filter(c => layerOf(c) === layer);
 					if (!members.length) return;
 					if (shadow) drawShadow(members);
-					members.forEach(drawChainJPG);
+					if (!shadowOnly) members.forEach(drawChainJPG);
 				});
 
-				const url = offscreen.toDataURL("image/jpeg", 1.0);
-				const link = document.createElement("a");
-				link.href = url;
-				link.download = "blobs.jpg";
-				link.click();
+				return offscreen;
 			}
+
+			function downloadArtwork(blob, filename) {
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				link.href = url; link.download = filename; link.click();
+				setTimeout(() => URL.revokeObjectURL(url), 30000);
+			}
+
+			async function exportJPG() {
+				// Preserve the existing 2000-pixel JPG behaviour for pixel-native sketches.
+				const scale = 2000 / Math.max(canvas.width, canvas.height);
+				const size = canvasPhysicalWidthMm == null ? { width: Math.round(canvas.width * scale), height: Math.round(canvas.height * scale) } : null;
+				const rendered = renderArtworkCanvas({ size });
+				const blob = await new Promise(resolve => rendered.toBlob(resolve, "image/jpeg", 1));
+				rendered.width = rendered.height = 1;
+				if (!blob) throw new Error("The browser could not encode this image. Try a lower DPI.");
+				downloadArtwork(blob, "blobs.jpg");
+			}
+
+			async function exportTIFF() {
+				const rendered = renderArtworkCanvas();
+				const image = rendered.getContext("2d").getImageData(0, 0, rendered.width, rendered.height);
+				rendered.width = rendered.height = 1;
+				downloadArtwork(HanSketchPrint.tiff(image, canvasDpi), "blobs.tiff");
+			}
+
+			// Paths stay vector in PDF. Only the soft layer shadows are rasterised,
+			// at the declared print resolution. Even-odd fills preserve living holes.
+			function pdfChainCommands(obj, black) {
+				const n = value => Number(value.toFixed(4));
+				const rgb = black ? "0 0 0" : obj.color.slice(0, 3).map(n).join(" ");
+				if (obj.isParticle && obj.chain.length === 1) {
+					const { x, y } = obj.chain[0];
+					const r = (obj.particleRenderSize || 4) * getDotScale(), k = r * 0.552284749831;
+					return `${black ? "0 g" : rgb + " rg"} ${n(x + r)} ${n(y)} m `
+						+ `${n(x + r)} ${n(y + k)} ${n(x + k)} ${n(y + r)} ${n(x)} ${n(y + r)} c `
+						+ `${n(x - k)} ${n(y + r)} ${n(x - r)} ${n(y + k)} ${n(x - r)} ${n(y)} c `
+						+ `${n(x - r)} ${n(y - k)} ${n(x - k)} ${n(y - r)} ${n(x)} ${n(y - r)} c `
+						+ `${n(x + k)} ${n(y - r)} ${n(x + r)} ${n(y - k)} ${n(x + r)} ${n(y)} c f\n`;
+				}
+				const ringPath = (points, closed) => {
+					if (points.length < 2) return "";
+					const curve = closed ? getClosedSmoothCurve(points, 10) : getOpenSmoothCurve(points, 10);
+					if (curve.length < 4) return "";
+					const commands = [`${n(curve[0])} ${n(curve[1])} m`];
+					for (let i = 2; i < curve.length; i += 2) commands.push(`${n(curve[i])} ${n(curve[i + 1])} l`);
+					if (closed) commands.push("h");
+					return commands.join(" ") + "\n";
+				};
+				let path = ringPath(obj.chain, obj.isClosed);
+				if (!path) return "";
+				if (obj.isClosed) for (const hole of obj.holes || []) path += ringPath(hole.chain, true);
+				const fill = showFilled && obj.isClosed;
+				const stroke = showOutline;
+				if (!fill && !stroke) return "";
+				const strokeColor = black || fill ? "0 0 0" : rgb;
+				const paint = fill ? (stroke ? "B*" : "f*") : "S";
+				const colors = black ? "0 g 0 G" : `${rgb} rg ${strokeColor} RG`;
+				return `${colors} ${outlineWidth} w 1 J 0 j 3 M\n${path}${paint}\n`;
+			}
+
+			async function exportPDF(allLayers = false) {
+				stampUnassignedChains();
+				const widthMm = canvasPhysicalWidthMm || pxToMm(canvas.width, canvasDpi);
+				const heightMm = canvasPhysicalHeightMm || pxToMm(canvas.height, canvasDpi);
+				const sx = widthMm * 72 / 25.4 / canvas.width, sy = heightMm * 72 / 25.4 / canvas.height;
+				const start = `q ${sx} 0 0 ${-sy} 0 ${heightMm * 72 / 25.4} cm\n0 0 ${canvas.width} ${canvas.height} re W n\n`;
+				const background = allLayers || !exportWithBackground ? [1, 1, 1] : canvasBackgroundColor.slice(0, 3);
+				const paper = `${allLayers ? "1 g" : background.join(" ") + " rg"} 0 0 ${canvas.width} ${canvas.height} re f\n`;
+				const pageLayers = allLayers ? layers.map(layer => [layer]) : [layers.filter(layer => layer.visible)];
+				const pages = pageLayers.map(group => {
+					let commands = start + paper;
+					const images = [];
+					for (const layer of group) {
+						const members = chains.filter(obj => layerOf(obj) === layer);
+						if (!allLayers && reliefShadow.enabled && members.some(obj => !isSinglePoint(obj))) {
+							const imageIndex = images.length;
+							images.push(() => {
+								const rendered = renderArtworkCanvas({ layerId: layer.id, shadowOnly: true, transparent: true });
+								const image = rendered.getContext("2d").getImageData(0, 0, rendered.width, rendered.height);
+								rendered.width = rendered.height = 1;
+								return image;
+							});
+							commands += `q ${canvas.width} 0 0 ${-canvas.height} 0 ${canvas.height} cm /Im${imageIndex} Do Q\n`;
+						}
+						for (const obj of members) commands += pdfChainCommands(obj, allLayers);
+					}
+					return { name: allLayers ? group[0].name : "Artwork", commands: commands + "Q\n", images };
+				});
+				downloadArtwork(await HanSketchPrint.pdf(pages, widthMm, heightMm), allLayers ? "blobs-screen-print-layers.pdf" : "blobs.pdf");
+			}
+
+			let printExportBusy = false;
+            window.addEventListener("keydown", e => {
+                if (printExportBusy) { e.preventDefault(); e.stopImmediatePropagation(); }
+            }, true);
+			async function runPrintExport(label, action) {
+				if (printExportBusy) return;
+				printExportBusy = true;
+				const wasPaused = physicsPaused;
+				physicsPaused = true; // one moment across all pages; no dial or badge changes
+				const backdrop = $("printExportBackdrop");
+				$("printExportStatus").textContent = `Preparing ${label}…`;
+				$("printExportDetail").textContent = "Please keep this tab open while the file is prepared.";
+				$("printExportClose").style.display = "none";
+				backdrop.style.display = "flex";
+				try {
+					await new Promise(resolve => setTimeout(resolve, 0));
+					await action();
+					backdrop.style.display = "none";
+				} catch (error) {
+					console.error("Print export failed", error);
+					$("printExportStatus").textContent = "Export could not be completed";
+					$("printExportDetail").textContent = error.message || "Try a lower DPI in Appearance.";
+					$("printExportClose").style.display = "inline-block";
+				} finally {
+					physicsPaused = wasPaused;
+					printExportBusy = false;
+				}
+			}
+			$("printExportClose").onclick = () => { $("printExportBackdrop").style.display = "none"; };
 
 			$("exportSVGOption").onclick = e => {
 				e.stopPropagation();
@@ -19146,9 +19383,18 @@ window.addEventListener("keydown", (e) => {
 			};
 			$("exportJPGOption").onclick = e => {
 				e.stopPropagation();
-				exportJPG();
+				runPrintExport("JPG", exportJPG);
 				$("exportSubmenu").style.display = "none";
 			};
+
+			[["exportTIFFOption", "TIFF", exportTIFF], ["exportPDFOption", "PDF", () => exportPDF(false)],
+			 ["exportLayersPDFOption", "screen-print layers", () => exportPDF(true)]].forEach(([id, label, action]) => {
+				$(id).onclick = e => {
+					e.stopPropagation();
+					$("exportSubmenu").style.display = "none";
+					runPrintExport(label, action);
+				};
+			});
 
 			// Background toggle stays open on click so the user can see the state flip.
 			function refreshExportBackgroundToggle() {
@@ -19398,8 +19644,10 @@ window.addEventListener("keydown", (e) => {
 			window.addEventListener("keydown", e => {
 				const tgt = e.target;
 				if (tgt && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || tgt.isContentEditable)) return;
+				if ([...document.querySelectorAll(".dialog-backdrop")].some(el => getComputedStyle(el).display !== "none")) return;
 				const mod = e.metaKey || e.ctrlKey;
 				const key = e.key.toLowerCase();
+				if (mod && key === "a") { e.preventDefault(); selectAllForms(); return; }
 
 				if (mod && !e.shiftKey && key === "z") { e.preventDefault(); undoLast(); return; }
 
@@ -19727,6 +19975,8 @@ window.addEventListener("keydown", (e) => {
 				location.reload();
 			};
 
+			setCanvasSize(Math.round(2048 * 297 / 420), 2048);
+			const defaultResettableSettings = resettableSettings();
 			restoreAutosave();
 			setInterval(writeAutosave, AUTOSAVE_INTERVAL_MS);
 

@@ -218,7 +218,7 @@
   <main>
     <section id="intro">
       <h2>Overview</h2>
-      <p>HanSketch is a WebGL-based canvas for creating physics-driven paths, circles, particles, and extracted-shape bindings. Draw forms, tune the motion, then export to SVG, JPG, or animation.</p>
+      <p>HanSketch is a WebGL-based canvas for creating physics-driven paths, circles, particles, and extracted-shape bindings. Draw forms, tune the motion, then export to SVG, JPG, TIFF, PDF, or animation.</p>
     </section>
 
     <section id="interface">
@@ -245,7 +245,7 @@
     <section id="edit">
       <h2>Edit Tools</h2>
       <ul>
-        <li><strong>Select (V)</strong> – click a form to select it. Drag it to move; drag a corner to scale from the opposite corner (hold <kbd>Alt</kbd> to scale from the centre); drag the round handle to rotate (hold <kbd>Shift</kbd> for 15° steps). Arrow keys nudge. The Selection panel in the inspector duplicates, deletes, and moves the form forward or back within its layer. A scaled form keeps its new size; the physics treats it as the form's natural shape. <strong>Corners:</strong> as with Illustrator's Curvature tool, double-click a point on an outline to make it a sharp corner, and double-click it again to make it smooth (the point under the cursor is ringed). Every corner keeps a small diamond marker on the canvas, so it can always be found again; Pin, Drag and this double-click snap to a corner when you click near its diamond. The Pen always draws smooth; corners are added afterwards. A corner stays sharp while the form moves, and Push or Drag can pull it into a point. Markers are hidden in Presentation Mode and never exported.</li>
+        <li><strong>Select (V)</strong> – click a form to select it. Hold <kbd>Shift</kbd> while clicking to add or remove forms, or use <kbd>Cmd/Ctrl</kbd>+<kbd>A</kbd> to select all visible, unlocked forms. Drag the selection to move; drag a corner to scale from the opposite corner (hold <kbd>Alt</kbd> to scale from the centre); drag the round handle to rotate (hold <kbd>Shift</kbd> for 15° steps). Arrow keys nudge. The Selection panel in the inspector duplicates, deletes, and moves the selected forms forward or back within their own layers. Each group transform, duplicate or delete is one undo step. A scaled form keeps its new size; the physics treats it as the form's natural shape. <strong>Corners:</strong> as with Illustrator's Curvature tool, double-click a point on an outline to make it a sharp corner, and double-click it again to make it smooth (the point under the cursor is ringed). Every corner keeps a small diamond marker on the canvas, so it can always be found again; Pin, Drag and this double-click snap to a corner when you click near its diamond. The Pen always draws smooth; corners are added afterwards. A corner stays sharp while the form moves, and Push or Drag can pull it into a point. Markers are hidden in Presentation Mode and never exported.</li>
         <li><strong>Drag</strong> – pull a single point of a form; the rest follows through the physics. Also moves circles and other geometry.</li>
         <li><strong>Push (P)</strong> – a liquify brush: drag across an edge to push it in or out, strongest at the centre of the circle. <kbd>[</kbd> and <kbd>]</kbd> change the brush size. The pushed outline becomes the form's remembered shape.</li>
         <li><strong>Freeze</strong> – lock physics in a shape (dashed rendering). Click inside a closed form, or on an open path.</li>
@@ -297,7 +297,8 @@
         <li><strong>Spacing</strong> – choose no, normal, or high repulsion between forms.</li>
         <li><strong>Undo (⎌)</strong> – reverses the last edit (<kbd>Cmd/Ctrl</kbd>+<kbd>Z</kbd>).</li>
         <li><strong>Topology</strong> – enable Self-intersection → hole for nested inner rings.</li>
-        <li><strong>Reset (🗑️)</strong> – clears the scene after confirmation.</li>
+        <li><strong>Edit → Reset Settings</strong> – restores physics, drawing and appearance defaults while keeping artwork, layers, palette and paper size. Undo restores the previous settings.</li>
+        <li><strong>Clear Canvas (🗑️)</strong> – clears the scene after confirmation.</li>
         <li><strong>Shape + Motion</strong> – open Binding Studio to map an extracted shape to a continuous motion clip.</li>
       </ul>
     </section>
@@ -306,7 +307,7 @@
       <ul>
         <li><kbd>Q</kbd> Pen · <kbd>E</kbd> Circle · <kbd>T</kbd> Rectangle · <kbd>Y</kbd> Triangle · <kbd>R</kbd> Particles</li>
         <li><kbd>V</kbd> Select · <kbd>A</kbd> Drag · <kbd>P</kbd> Push · <kbd>S</kbd> Freeze · <kbd>D</kbd> Pin · <kbd>C</kbd> Recolor · <kbd>Z</kbd> Slice · <kbd>X</kbd> Delete</li>
-        <li><kbd>Cmd/Ctrl</kbd>+<kbd>Z</kbd> Undo</li>
+        <li><kbd>Cmd/Ctrl</kbd>+<kbd>Z</kbd> Undo · <kbd>Cmd/Ctrl</kbd>+<kbd>A</kbd> Select all visible, unlocked forms · <kbd>Shift</kbd>-click add/remove a form</li>
         <li>With a selection: <kbd>Cmd/Ctrl</kbd>+<kbd>D</kbd> duplicate · <kbd>Backspace</kbd> delete · arrows nudge (<kbd>Shift</kbd> ×10) · <kbd>Esc</kbd> deselect</li>
         <li>Push brush: <kbd>[</kbd> smaller · <kbd>]</kbd> larger</li>
         <li><kbd>Mouse‑Wheel</kbd> over canvas / slider – adjust Blob Size smoothly.</li>
@@ -327,15 +328,17 @@
             source file; switch a layer's physics on when you want it to move. You can also drop an SVG straight onto the canvas.</li>
         <li><strong>Digitise an Artwork…</strong> – opens Shape Extractor in Composition mode. Its <em>Open in HanSketch</em> button sends the digitised artwork back here without a file; a dialog with a preview then asks how to place it (a new sketch in the artwork's proportions or added to this one, the artwork's ground as background, flat colour, Relief Shadow, physics). Each plane becomes a layer. A composition SVG imported or dropped here opens the same dialog.</li>
       </ul>
+      <h3>Paper size</h3>
+      <p>New sketches start at <strong>A3 portrait (297 × 420 mm), 300 dpi</strong>: TIFF and JPG exports are 3508 × 4961 pixels. In <strong>Appearance → Canvas Size</strong>, choose A3 or A2 in either orientation, or enter a custom size. A2 portrait (420 × 594 mm) exports at 4961 × 7016 pixels at 300 dpi. The live canvas uses a smaller working resolution; export size and paper proportions are preserved. Existing saved sketches keep their own size.</p>
       <h3>Export Menu</h3>
       <ul>
-        <li>Lines → SVG/JPG – strokes only.</li>
-        <li>Fill → SVG/JPG – fills closed shapes.</li>
-        <li>Background Color – when on, exports paint the canvas background colour
-            instead of white. Toggle it from the Export menu.</li>
-        <li>Relief shadows are exported to both. In SVG each layer gets a shadow
-            group (an ordinary group in Illustrator); re-importing the SVG skips it.</li>
-        <li>Hidden layers are left out of JPG exports, as on screen.</li>
+        <li><strong>SVG</strong> – editable vector groups for every layer; hidden layers retain their hidden state.</li>
+        <li><strong>JPG</strong> – full-colour raster at the chosen paper size and DPI. Pixel-native sketches keep the existing 2000-pixel long-edge export.</li>
+        <li><strong>TIFF</strong> – lossless, uncompressed 8-bit RGB, with the chosen DPI stored in the file. A3 and A2 at 300 dpi work without reducing the paper size.</li>
+        <li><strong>PDF · artwork</strong> – one page at the exact paper size. Contours, holes, outlines and particles remain vector; soft relief shadows use lossless images at the chosen print resolution.</li>
+        <li><strong>PDF · all layers for screen printing</strong> – one named, black-on-white vector page per layer, bottom first, including hidden and locked layers. Every page has the same paper size and alignment; background colour and relief shadows are omitted. The current fill/outline style is kept. Arrange one printing ink per layer when preparing separations; this exports layers, not automatic colour separations or halftones. Print at 100% / Actual Size.</li>
+        <li><strong>Background Color</strong> – artwork exports use the canvas background when on, or white when off (SVG omits its backdrop).</li>
+        <li>JPG, TIFF and artwork PDF include visible layers only. SVG and the screen-print PDF retain every layer.</li>
       </ul>
       <p>Exported SVGs write one group per layer, named the way Illustrator names
          its own, so opening the file in Illustrator reconstructs the layers.</p>
@@ -355,7 +358,7 @@
     </section>
     <section id="shadow">
       <h2>Relief Shadow</h2>
-      <p>Tick <strong>Layers cast shadows</strong> in the inspector and every layer casts one soft shadow onto the layers below it, like the cut planes of a painted wood relief. Forms on the same layer are one plane, so their shadows merge rather than darken where they overlap. Distance, Angle, Softness, Opacity and Colour update live and are saved with the sketch. Put forms on separate layers to lift them off one another. Particles cast no shadow.</p>
+      <p>Tick <strong>Layers cast shadows</strong> in the inspector and every layer casts one soft shadow onto the layers below it, like the cut planes of a painted wood relief. Forms on the same layer are one plane, so their shadows merge rather than darken where they overlap. Distance, Angle, Softness, Opacity and Colour update live and are saved with the sketch. Put forms on separate layers to lift them off one another. Particles cast no shadow. Load a palette from Color Extractor in Shape Settings, then choose one of its swatches under Relief Shadow → Colour. The colour picker and palette stay in sync; Opacity controls how it blends with the paper.</p>
     </section>
 
     <section id="chance">
