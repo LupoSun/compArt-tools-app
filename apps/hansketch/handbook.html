@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HanSketch · Handbuch</title>
+<style>
+:root { color-scheme: light; font-family: system-ui, sans-serif; color:#1c1813; background:#f4f1ea; }
+* { box-sizing:border-box; } body { margin:0; } a { color:#973c29; text-underline-offset:3px; }
+header, main, footer { max-width:960px; margin:auto; padding:24px; }
+header { border-bottom:1px solid #c7c0b5; } header a { font-size:14px; } h1 { font-size:2rem; } h2 { font-size:1.5rem; margin-top:48px; } h3 { font-size:1.1rem; }
+p, li { line-height:1.65; max-width:72ch; } h1,h2,h3 { text-wrap:balance; }
+nav { display:flex; gap:12px 22px; flex-wrap:wrap; } section { scroll-margin-top:24px; }
+.table-wrap { overflow:auto; } table { border-collapse:collapse; width:100%; font-size:14px; }
+th,td { text-align:left; padding:12px 8px; border-bottom:1px solid #c7c0b5; vertical-align:top; line-height:1.5; }
+th { background:#e9e4da; } kbd,code { background:#e9e4da; padding:2px 5px; border-radius:3px; }
+details { padding:12px 0; border-bottom:1px solid #c7c0b5; } summary { cursor:pointer; font-weight:600; }
+:focus-visible { outline:3px solid #973c29; outline-offset:4px; } footer { border-top:1px solid #c7c0b5; margin-top:48px; font-size:14px; }
+@media print { :root { background:white; } header a, nav { display:none; } section { break-inside:avoid; } header,main,footer { max-width:none; padding:0; } h2 { margin-top:24px; } }
+</style>
+</head>
+<body>
+<header>
+<a href="index.html">← Zum Studio</a>
+<h1>HanSketch · Kleines Handbuch</h1>
+<p>Formen zeichnen, Kräfte beobachten und aus Bewegung ein Bild entwickeln. Die englischen Namen entsprechen den Beschriftungen im Studio. Dieses Handbuch lässt sich mit der Druckfunktion des Browsers als PDF speichern.</p>
+<nav aria-label="Inhalt"><a href="#start">Start</a><a href="#tools">Werkzeuge</a><a href="#material">Farbe &amp; Material</a><a href="#physics">Physik</a><a href="#view">Ansicht &amp; Schatten</a><a href="#export">Speichern &amp; Film</a><a href="#nature">Naturstudien</a><a href="#questions">Hilfe</a></nav>
+</header>
+<main>
+<section id="start"><h2>Ein erstes Bild</h2>
+<ol><li>Mit <strong>Pen (Q)</strong> zeichnen. Ein einzelner Klick erzeugt ein Partikel. Eine Geste, die nahe am Anfang endet, wird zur geschlossenen Form; sonst bleibt sie eine offene Linie.</li><li>Mit <kbd>Space</kbd> die Physik pausieren. Erneutes Drücken setzt sie fort, ohne die Regler zu verändern.</li><li>Mit <strong>Select (V)</strong> eine Form auswählen. Ziehen verschiebt sie, die Eckgriffe skalieren, der runde Griff dreht.</li><li>Unter <strong>File → Save Blobs (JSON)</strong> eine bearbeitbare Szene speichern. Unter <strong>Export</strong> ein Bild oder einen Film ausgeben.</li></ol>
+<p>Links stehen die Werkzeuge, rechts die Eigenschaften und Ebenen, unten die Physikregler. Prozentwerte und Masse sind relative Studiowerte, keine geeichten Messungen.</p></section>
+<section id="tools"><h2>Werkzeuge und Ebenen</h2>
+<div class="table-wrap"><table><thead><tr><th>Funktion</th><th>Wirkung</th></tr></thead><tbody>
+<tr><td>Soft Forms</td><td>Bewegliche Kreise, Rechtecke, Dreiecke, Linien und Partikel gehören zum Kunstwerk.</td></tr>
+<tr><td>Hard Geometry</td><td>Feste Hindernisse stossen Formen ab. Sie werden nicht als Kunstwerk exportiert.</td></tr>
+<tr><td>Select</td><td>Shift-Klick ergänzt oder entfernt Formen. Cmd/Ctrl+A wählt sichtbare, nicht gesperrte Formen; Escape hebt die Auswahl auf. Verschieben, Skalieren, Drehen, Duplizieren und Anordnen gelten für die ganze Auswahl.</td></tr>
+<tr><td>Drag / Push</td><td>Drag zieht an einzelnen Punkten. Push verschiebt die Kontur mit einem weichen Pinsel.</td></tr>
+<tr><td>Pin / Freeze</td><td>Pin hält Punkte fest, Freeze eine ganze Form. Einfrieren verändert die Materialdeckkraft nicht.</td></tr>
+<tr><td>Recolor (C)</td><td>Farbe oder Palettenton wählen, dann eine bestehende Form anklicken.</td></tr>
+<tr><td>Ecken</td><td>Mit Select einen Konturpunkt doppelt anklicken, um Ecke und glatte Kurve umzuschalten. Eine Spitze ist kein starrer Winkel.</td></tr>
+<tr><td>Undo</td><td>Cmd/Ctrl+Z macht Bearbeitungsschritte rückgängig. Eine Naturstudie samt ihren globalen Einstellungsänderungen ist ein Undo-Schritt.</td></tr>
+</tbody></table></div>
+<p>Neue Formen liegen auf der aktiven Ebene. Sichtbarkeit, Sperre und Physik sind getrennt einstellbar. Importierte SVG-Ebenen starten mit ausgeschalteter Physik, damit die Komposition erhalten bleibt.</p></section>
+<section id="material"><h2>Farbe, Deckkraft und individuelles Fallen</h2>
+<p><strong>Form properties</strong> zeigt an, ob die Einstellungen für neue Formen oder die aktuelle Auswahl gelten. Unterschiedliche Werte einer Mehrfachauswahl erscheinen leer mit dem Hinweis „Mixed“. Ein eingegebener Wert gilt dann für alle ausgewählten Formen.</p>
+<ul><li><strong>Opacity:</strong> 100 % deckt vollständig, 50 % lässt darunterliegende Farben durchscheinen, 0 % macht die Form unsichtbar. Sie bleibt auswählbar und nimmt an der Physik teil. Deckkraft und Freeze sind unabhängig.</li><li><strong>Mass:</strong> relative Trägheit gegenüber Konturkräften. Unter gleichem Luftwiderstand verlieren leichte Formen ihre Bewegung schneller als schwere.</li><li><strong>Air resistance:</strong> 0 bedeutet kein zusätzliches Luftmodell. Höhere Werte bremsen die Bewegung relativ zum Wind. HanSketch verwendet linearen Widerstand, eine vereinfachte Annäherung.</li><li><strong>Gravity influence:</strong> 1 folgt der globalen Schwerkraft. 0 blendet sie für diese Form aus, negative Werte lassen die Form entgegen der Fallrichtung steigen. Dies ist eine freie künstlerische Einstellung, kein unterschiedlicher Naturwert von g.</li></ul>
+<p><strong>Pigment stains</strong> in Nature Lab fügt zwölf unregelmässige, halbtransparente Formen hinzu. Der gleiche Seed erzeugt dieselbe Ausgangsverteilung. Die Flecken beginnen eingefroren; mit Select und Opacity lassen sie sich komponieren.</p>
+<p>Die Deckkraft reist in JSON, SVG und den Bild-/Filmexporten mit. Siebdruck-PDF zeigt ebenfalls die Tonwerte; es erzeugt keine Rasterpunkte oder automatischen Farbseparationen. Schatten bleiben eine eigene Darstellung der Ebenen; vollständig transparente Formen werfen keinen Schatten.</p></section>
+<section id="physics"><h2>Kräfte verstehen</h2>
+<div class="table-wrap"><table><thead><tr><th>Regler</th><th>Was lässt sich beobachten?</th></tr></thead><tbody>
+<tr><td>Inflation</td><td>Ein Druckmodell bläht geschlossene Formen auf. Offene Linien erhalten keinen Flächendruck.</td></tr>
+<tr><td>Stiffness</td><td>Konturfedern ziehen Punkte zu ihrem Ruheabstand zurück. Höhere Werte wirken straffer.</td></tr>
+<tr><td>Shape Memory</td><td>Eine sanfte Rückstellkraft erinnert an die Ausgangskontur, ohne die gesamte Form am Ort festzuhalten. Ausschalten löscht die Erinnerung nicht.</td></tr>
+<tr><td>Chaos</td><td>Ein Rauschfeld regt Bewegung an. 0 schaltet es aus. Dies ist kein exaktes Modell thermischer Bewegung.</td></tr>
+<tr><td>Speed</td><td>Ändert die Anzahl fester Simulationsschritte pro Bildschirmbild. 50 % ist das Basistempo; Gerätebildrate und Rechenleistung beeinflussen die tatsächliche Zeit.</td></tr>
+<tr><td>Environment → Gravity strength</td><td>Globale Beschleunigungsstärke. Im rechten Environment-Bereich Gravity einschalten oder G drücken. 90° fällt nach unten, 0° nach rechts. Wind wirkt horizontal durch den Luftwiderstand der Form.</td></tr>
+<tr><td>Advanced → Blob Size</td><td>Verändert Punktgrösse, Ruheabstände und dadurch auch bestehende Formen. Es ist kein Zoom.</td></tr>
+<tr><td>Advanced → Spacing</td><td>Stärke der Abstossung innerhalb und zwischen Formen. Höhere Werte können Formen auseinanderdrücken.</td></tr>
+<tr><td>Advanced → Bounce</td><td>Bewegungserhaltung: hoch lässt Bewegung länger bestehen, niedrig beruhigt sie. Das ist kein berechneter Rückprallkoeffizient und kein eigener Luftwiderstand.</td></tr>
+<tr><td>Attractor / Repulsor</td><td>Gezeichnete Pfade ziehen an oder stossen ab. Sie sind gestalterische Kraftfelder, keine vollständige Simulation von Magnetismus oder Gravitation.</td></tr>
+</tbody></table></div>
+<p>Eine Form reagiert gleichzeitig auf mehrere Kräfte und Beschränkungen. Für einen Vergleich möglichst nur eine Einstellung ändern und mit demselben Anfangszustand beginnen.</p></section>
+<section id="view"><h2>Zoomen und Schatten vergrössern</h2>
+<p><strong>+</strong>, <strong>−</strong> oder das Mausrad zoomen die Ansicht. <strong>Fit</strong> stellt die ganze Arbeitsfläche wieder her. <strong>Pan</strong> schaltet auf Verschieben um; auf dem iPad lässt sich in diesem Modus mit zwei Fingern zoomen. Die mittlere Maustaste verschiebt ebenfalls. Alt-Mausrad behält den bisherigen Blob-Size-Kurzbefehl.</p>
+<p>Der Zoom verändert weder das Papierformat noch die gespeicherte Geometrie, die Physik oder die Exportauflösung.</p>
+<p><strong>Relief Shadow</strong> erzeugt einen Schatten pro Ebene. Distance verschiebt ihn, Angle bestimmt die Richtung, Softness macht seine Kante weich, <strong>Spread</strong> vergrössert seine Silhouette. Opacity und Colour bestimmen Deckkraft und Farbe. So lässt sich „grösser“ getrennt von „weicher“ einstellen. Partikel werfen keinen Reliefschatten.</p></section>
+<section id="export"><h2>Speichern, Drucken und Film</h2>
+<p><strong>JSON</strong> ist das Format zum Weiterarbeiten. Zusätzlich gibt es eine lokale automatische Speicherung im Browser; eine heruntergeladene Szene ist die bewusste Sicherung. Neue Szenen beginnen mit A3 hochkant und 300 dpi. Canvas Size bietet auch A2 und andere Formate.</p>
+<ul><li><strong>SVG:</strong> bearbeitbare Vektoren und benannte Ebenengruppen. Versteckte Ebenen bleiben als versteckte Gruppen erhalten.</li><li><strong>JPG / TIFF:</strong> flache Rasterbilder. TIFF ist verlustfrei mit Druckauflösung und DPI-Angabe.</li><li><strong>PDF · artwork:</strong> Seite im Papierformat mit Vektorkonturen und gerasterten weichen Schatten.</li><li><strong>PDF · all layers for screen printing:</strong> eine schwarzweisse Seite pro Ebene, auch für versteckte Ebenen, ohne Hintergrund und Schatten. Eine Druckfarbe je Ebene vorbereiten; bei 100 % / Actual Size drucken.</li></ul>
+<h3>Eine laufende Animation aufnehmen</h3>
+<ol><li><strong>Export → Record animation…</strong> öffnet den Animation-Bereich im rechten Inspector.</li><li>Ein unterstütztes <strong>MP4</strong>- oder <strong>WebM</strong>-Format, Dauer (1–120 Sekunden), Zielbildrate und lange Bildkante wählen.</li><li><strong>Record film</strong> startet. Die Aufnahme zeigt das Kunstwerk ohne Auswahlrahmen, Raster und Werkzeuge. Space pausiert die Physik; die Filmaufnahme läuft dabei weiter.</li><li>Die Dauer endet automatisch. <strong>Stop &amp; save</strong> speichert früher, <strong>Cancel</strong> verwirft. Den Tab sichtbar lassen; beim Verbergen wird die Aufnahme mit einer Meldung abgebrochen.</li></ol>
+<p>Die tatsächliche Bildrate hängt von Gerät, Schatten und Szenenkomplexität ab. Bei ruckelnder Aufnahme Auflösung und Zielbildrate reduzieren. Das Druckformat bleibt unverändert.</p>
+<p>MOV wird nicht direkt vom Studio kodiert. Für ein Schnittprogramm, das MOV verlangt, den MP4-/WebM-Film dort oder mit einem Konverter importieren und als MOV ausgeben. Eine andere Dateiendung allein konvertiert keinen Film.</p>
+<details><summary>Optional: lokale Konvertierung mit FFmpeg</summary><p>Wenn FFmpeg installiert ist, erzeugt beispielsweise <code>ffmpeg -i hansketch-animation.webm -c:v libx264 -pix_fmt yuv420p hansketch-animation.mov</code> eine neue MOV-Datei. Ein vom Schnittprogramm verlangter Codec wie ProRes muss gesondert gewählt werden. <a href="https://ffmpeg.org/ffmpeg.html">FFmpeg-Dokumentation</a>.</p></details>
+<h3>Einzelbilder und Zeitraffer</h3>
+<p><strong>Export → Filmstrip / time-lapse…</strong> öffnet die bisher versteckte Filmleiste. Capture Frame nimmt ein Einzelbild auf. Record Animation sammelt in einem gewählten Intervall. Export Animation bietet WebM und animiertes SVG. Ein Aufnahmeintervall von einer Sekunde und 24 Bilder/s komprimieren etwa 24 Sekunden in eine Sekunde Film. Dies unterscheidet sich von der flüssigen Live-Aufnahme.</p></section>
+<section id="nature"><h2>Naturphänomene ausprobieren</h2>
+<p><strong>Nature Lab</strong> verbindet Erklärung und Versuch. Add study layer legt eine neue Ebene an und passt globale Physikregler an; andere vorhandene Formen können deshalb ebenfalls reagieren. Ein Undo entfernt die Studie und stellt die vorherigen Einstellungen wieder her.</p>
+<h3>Fallen mit und ohne Luft</h3>
+<p>In „Falling · without air“ beginnen eine leichte blaue und eine schwere rote Form auf gleicher Höhe. Beide erhalten dieselbe Fallbeschleunigung. In „Falling · with air“ haben sie denselben Widerstandswert; die leichtere Form wird stärker gebremst. Bounce steht für diese Versuche auf 100 %, damit die allgemeine Dämpfung den Vergleich nicht überlagert.</p>
+<p>Die Gewichtskraft ist <code>F = m · g</code>, deshalb ist ohne Luft <code>a = F/m = g</code>. HanSketch ergänzt einen einfachen linearen Widerstand relativ zum Wind; reale Luftkräfte können quadratisch von Geschwindigkeit und zusätzlich von Form und Querschnitt abhängen. <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/falling-object-with-air-resistance/">NASA: Fallen und Luftwiderstand</a>.</p>
+<h3>Elastizität und Druck</h3>
+<p>„Elasticity &amp; pressure“ fügt eine Kontur zum Ziehen und Loslassen ein. Zunächst nur Stiffness ändern. Danach Inflation an einer offenen Linie und einer geschlossenen Form vergleichen. Shape Memory ist ein Rückstellmodell, kein biologisches Gedächtnis.</p>
+<h3>Differenzielles Konturwachstum</h3>
+<p>„Differential contour growth“ beginnt mit einer wachsenden geschlossenen Kontur. Die Grenze bewegt sich lokal unterschiedlich schnell nach aussen. Unter Grow selected forms lassen sich Growth rate und Local variation für ausgewählte bewegliche Formen setzen. 0 Variation ist gleichmässig, hohe Variation bildet Ausbuchtungen. Start growth beginnt mit den eingegebenen Werten neu; Stop growth stoppt die Auswahl. Space pausiert die Physik und das Wachstum.</p>
+<p>Das Modell arbeitet in 2D und erzeugt keine echten Blattfalten oder chemischen Reaktionen. Es hält die Punktdichte nach und begrenzt das Wachstum auf den Leinwandrand, weniger als 600 Punkte, ungefähr das Dreifache des Anfangsumfangs und 7.200 Schritte. Formen mit Löchern sind für diesen Versuch ausgeschlossen. Wachstum und Parameter werden mit der Szene gespeichert.</p>
+<p>Dass räumlich unterschiedliches Wachstum die Form von Pflanzenorganen beeinflusst, wurde mit Messungen und Finite-Elemente-Modellen untersucht. Das bestätigt nicht automatisch dieses vereinfachte Konturmodell. <a href="https://pubmed.ncbi.nlm.nih.gov/30455311/">Huang et al., PNAS 2018: Differential growth and shape formation in plant organs</a>.</p>
+<h3>Verzweigung und Flecken</h3>
+<p>„Branching rules“ wiederholt eine einfache Verzweigungsregel. Mit dem Winkel und Seed lassen sich begrenzte Varianten erzeugen. Die Zweige sind getrennte offene Pfade und beginnen eingefroren. „Pigment stains“ erzeugt überlagerbare, unregelmässige Farbflecken.</p>
+<p>Weitere umsetzbare Forschungsrichtungen sind Space Colonization für von Zielpunkten gelenkte Äste und Gray–Scott-Reaktions–Diffusion für lebendige Flecken und Streifen. Sie sind noch keine aktiven Simulationsmodi. Space Colonization benötigt eine Netzstruktur; Reaktions–Diffusion ein zusätzliches Konzentrationsraster und einen eigenen Weg zum Vektorexport.</p>
+<ul><li><a href="https://algorithmicbotany.org/papers/#abop">Prusinkiewicz &amp; Lindenmayer: The Algorithmic Beauty of Plants</a>, regelbasiertes Pflanzenmodellieren.</li><li><a href="https://algorithmicbotany.org/papers/colonization.egwnp2007.html">Runions et al.: Modeling Trees with a Space Colonization Algorithm</a>, zielpunktgesteuerte Verzweigung.</li><li><a href="https://www.karlsims.com/rd.html">Karl Sims: Reaction–Diffusion Tutorial</a>, zwei gekoppelte Konzentrationsfelder, Feed und Kill.</li></ul></section>
+<section id="questions"><h2>Wenn etwas unerwartet ist</h2>
+<details><summary>Eine Form bewegt sich nicht.</summary><p>Space-Pause, Speed, Bounce, Freeze, Pins und den Physikschalter der Ebene prüfen. Importierte SVG-Ebenen stehen anfangs still.</p></details>
+<details><summary>Die Form ist unsichtbar, aber noch da.</summary><p>Mit Select All auswählen und Opacity erhöhen. 0 % Deckkraft löscht keine Geometrie. Auch die Sichtbarkeit der Ebene prüfen.</p></details>
+<details><summary>Die Regler sollen zurückgesetzt werden.</summary><p>Edit → Reset Settings stellt die Standardwerte wieder her und behält Kunstwerk, Ebenen, Palette und Papierformat. Undo stellt die vorherigen Einstellungen wieder her. Das Papierkorb-Symbol leert dagegen die Arbeitsfläche.</p></details>
+<details><summary>Das iPad zeigt nur wenige Regler.</summary><p>Die Panel-Schalter öffnen Werkzeuge, Physik und Inspector. Für Zoomgesten Pan einschalten. In der Physikleiste sind Environment und Advanced aufklappbar.</p></details>
+</section>
+</main><footer>HanSketch · Stand 7. November 2026 · <a href="help.html">Weitere Hilfe</a></footer>
+</body></html>

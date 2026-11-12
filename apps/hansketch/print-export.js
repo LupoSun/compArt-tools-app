@@ -62,6 +62,8 @@
     };
     const pageIds = [], labels = [];
     const widthPt = widthMm * 72 / 25.4, heightPt = heightMm * 72 / 25.4;
+    const opacityStates = [];
+    for (let i = 0; i <= 100; i++) opacityStates.push(`/O${i} ${add(`<< /Type /ExtGState /ca ${i/100} /CA ${i/100} >>`)} 0 R`);
     for (const page of pages) {
       const images = [];
       for (const getImage of (page.images || [])) {
@@ -81,7 +83,7 @@
       const content = await stream(encoder.encode(page.commands));
       const resources = images.map((id, i) => `/Im${i} ${id} 0 R`).join(" ");
       pageIds.push(add(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${widthPt} ${heightPt}] `
-        + `/Resources << /XObject << ${resources} >> >> /Contents ${content} 0 R >>`));
+        + `/Resources << /XObject << ${resources} >> /ExtGState << ${opacityStates.join(" ")} >> >> /Contents ${content} 0 R >>`));
       labels.push(`${pageIds.length - 1} << /P ${utf16(page.name || "Artwork")} >>`);
     }
     objects[1] = `<< /Type /Catalog /Pages 2 0 R /PageLabels << /Nums [${labels.join(" ")}] >> >>`;

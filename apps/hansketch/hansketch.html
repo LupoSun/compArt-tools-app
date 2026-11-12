@@ -2431,7 +2431,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 }
 
 		/* ---------- iPad overrides (full ipad.css wrapped; no transformation) ---------- */
-		@supports (-webkit-touch-callout: none) {
+		@supports (display: block) {
 			@media (hover: none) and (pointer: coarse) {
 
 				/* =========================================================
@@ -3643,7 +3643,23 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			}
 		}
-	</style>
+
+        .property-fields { display: grid; grid-template-columns: minmax(0, 1fr) 76px; gap: 8px; align-items: center; margin: 10px 0; }
+        .property-fields label { font-size: 12px; }
+        .property-fields input { min-width: 0; width: 100%; padding: 5px; color: var(--ink); background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 4px; }
+        .view-tools { position: absolute; top: 8px; left: 8px; z-index: 5; display: flex; gap: 4px; align-items: center; background: var(--panel, #fbf9f4); padding: 4px; border-radius: 6px; border: 1px solid var(--hairline-strong); }
+        .view-tools button { min-width: 32px; min-height: 32px; }
+        .window.ipad .view-tools { top: 70px; left: calc(var(--panel-left-width) + var(--gap-2)); }
+        .view-tools output { min-width: 46px; text-align: center; font-size: 12px; }
+        .view-tools [aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
+        #canvasStage { overflow: hidden; }
+        body.presentation-mode .view-tools { display: none; }
+        #materialSection summary { cursor: pointer; font-size: 12px; }
+        #materialSection .layer-note, #environmentSection .layer-note, #animationSection .layer-note, #natureSection .layer-note { font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+        #materialSection button, #animationSection button, #natureSection button { font-size: 12px; min-height: 34px; }
+        .property-fields input, .property-fields select, #natureStudy { font: inherit; font-size: 13px; min-height: 32px; }
+        #natureSection a { color: var(--accent-press); font-size: 12px; }
+    </style>
 
 	<!-- Show content once page is loaded -->
 	<script>
@@ -3698,7 +3714,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				</span>
 				<span id="menuExport">Export
 					<div class="submenu" id="exportSubmenu">
-						<span id="exportSVGOption">SVG</span>
+						<span id="recordAnimationOption">Record animation…</span>
+                        <span id="openFilmstripOption">Filmstrip / time-lapse…</span>
+                        <span id="exportSVGOption">SVG</span>
 						<span id="exportJPGOption">JPG</span>
 						<span id="exportTIFFOption">TIFF · print resolution</span>
 						<span id="exportPDFOption">PDF · artwork</span>
@@ -3710,6 +3728,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				<span id="menuChance" title="Laws of Chance: drop pieces onto the sheet">Chance</span>
 				<span id="menuAbout">About</span>
 				<span id="menuHelp">Help</span>
+                <a href="handbook.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">Handbook</a>
+                <a href="updates/2026-11-release.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">Updates</a>
 			</div>
 			<div class="title-actions">
 				<span id="resetIcon" class="reset-icon" title="Reset Canvas">🗑️</span>
@@ -3867,7 +3887,69 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					</div>
 				</div>
 
-				<!-- LAYERS -->
+				<div class="toolbar-section" id="materialSection">
+                    <h4>Form properties</h4>
+                    <p class="layer-note" id="materialScope" aria-live="polite">New forms</p>
+                    <div class="property-fields">
+                        <label for="formOpacity">Opacity (%)</label><input id="formOpacity" type="number" min="0" max="100" step="5" value="100">
+                        <label for="formMass">Mass (relative)</label><input id="formMass" type="number" min="0.1" max="10" step="0.1" value="1">
+                        <label for="formAirDrag">Air resistance</label><input id="formAirDrag" type="number" min="0" max="5" step="0.1" value="0">
+                        <label for="formGravityFactor">Gravity influence</label><input id="formGravityFactor" type="number" min="-2" max="3" step="0.1" value="1">
+                    </div>
+                    <div class="selection-actions" aria-label="Opacity presets">
+                        <button type="button" data-opacity="100">Opaque</button><button type="button" data-opacity="50">Semi</button><button type="button" data-opacity="0">Transparent</button>
+                    </div>
+                    <p class="layer-note">Select forms to edit them together. With no selection, these are drawing defaults. Mixed values are blank.</p>
+                    <details><summary>Why do forms fall differently?</summary><p class="layer-note">Without air, mass does not change gravitational acceleration. Air resistance slows light forms more. Mass also changes the response to contour forces. Gravity influence is a free artistic multiplier, including rising forms below zero.</p></details>
+                </div>
+                <div class="toolbar-section" id="animationSection">
+                    <h4>Animation</h4>
+                    <div class="property-fields">
+                        <label for="videoFormat">Format</label><select id="videoFormat"></select>
+                        <label for="videoDuration">Duration (s)</label><input id="videoDuration" type="number" min="1" max="120" value="10">
+                        <label for="videoFps">Frames / s</label><select id="videoFps"><option>24</option><option selected>30</option><option>60</option></select>
+                        <label for="videoSize">Long edge (px)</label><select id="videoSize"><option>720</option><option selected>1280</option><option>1920</option></select>
+                    </div>
+                    <div class="selection-actions"><button id="videoStart">Record film</button><button id="videoStop" disabled>Stop &amp; save</button><button id="videoCancel" disabled>Cancel</button></div>
+                    <p id="videoStatus" class="layer-note" role="status">Records the artwork without editor guides. Keep this tab visible.</p>
+                    <p class="layer-note">MP4 / WebM availability depends on your browser. For MOV, convert the downloaded film in your video editor. Use Filmstrip for sampled frames and animated SVG.</p>
+                </div>
+                <div class="toolbar-section" id="environmentSection">
+                    <h4>Environment · all forms</h4>
+                    <label><input type="checkbox" id="environmentGravity"> Gravity on</label>
+                    <div class="property-fields">
+                        <label for="gravityDirection">Fall direction (°)</label><input id="gravityDirection" type="number" min="0" max="360" step="5" value="90">
+                        <label for="windStrength">Wind (horizontal)</label><input id="windStrength" type="number" min="-10" max="10" step="0.5" value="0">
+                    </div>
+                    <p class="layer-note">90° falls down, 0° right. Strength is under Environment in the physics bar. Wind acts through each form’s air resistance. These are relative studio units.</p>
+                </div>
+                <div class="toolbar-section" id="natureSection">
+                    <h4>Nature Lab</h4>
+                    <label for="natureStudy">Explore a phenomenon</label>
+                    <select id="natureStudy" style="width:100%;margin:8px 0">
+                        <option value="vacuum">Falling · without air</option><option value="air">Falling · with air</option>
+                        <option value="elastic">Elasticity &amp; pressure</option><option value="growth">Differential contour growth</option>
+                        <option value="branches">Branching rules</option><option value="stains">Pigment stains</option>
+                    </select>
+                    <p id="natureExplanation" class="layer-note"></p>
+                    <div class="property-fields">
+                        <label for="natureSeed">Random seed</label><input id="natureSeed" type="number" min="1" max="99999" value="42">
+                        <label for="branchAngle">Branch angle (°)</label><input id="branchAngle" type="number" min="10" max="45" value="25">
+                    </div>
+                    <button id="natureAdd">Add study layer</button>
+                    <p class="layer-note">Adds a new layer and adjusts the global physics for the chosen study. Undo restores the previous settings and removes the study.</p>
+                    <details><summary>Grow selected forms</summary>
+                        <div class="property-fields">
+                            <label for="growthRate">Growth rate</label><input id="growthRate" type="number" min="0" max="1" step="0.1" value="0.5">
+                            <label for="growthVariation">Local variation</label><input id="growthVariation" type="number" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+                        <div class="selection-actions"><button id="growthStart">Start growth</button><button id="growthStop">Stop growth</button></div>
+                        <p class="layer-note">Select closed forms without holes. Growth stops at the canvas edge, 600 points, three times the initial perimeter, or 7,200 steps. Space pauses it with physics.</p>
+                    </details>
+                    <p id="natureStatus" class="layer-note" role="status"></p>
+                    <a href="handbook.html#nature" target="_blank" rel="noopener">Models, learning exercises &amp; sources ↗</a>
+                </div>
+                <!-- LAYERS -->
 
 				<div class="toolbar-section" id="layersSection">
 					<h4>Layers</h4>
@@ -3887,12 +3969,14 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					</label>
 					<div class="shadow-controls" id="shadowControls">
 						<label>Distance <span id="shadowDistanceValue"></span>
-							<input type="range" id="shadowDistance" min="0" max="40" step="1"></label>
+							<input type="range" id="shadowDistance" min="0" max="100" step="1"></label>
 						<label>Angle <span id="shadowAngleValue"></span>
 							<input type="range" id="shadowAngle" min="0" max="355" step="5"></label>
 						<label>Softness <span id="shadowSoftnessValue"></span>
-							<input type="range" id="shadowSoftness" min="0" max="30" step="1"></label>
-						<label>Opacity <span id="shadowOpacityValue"></span>
+							<input type="range" id="shadowSoftness" min="0" max="80" step="1"></label>
+						<label title="Expands the shadow silhouette before softening it.">Spread <span id="shadowSpreadValue"></span>
+                            <input type="range" id="shadowSpread" min="0" max="40" step="1"></label>
+                        <label>Opacity <span id="shadowOpacityValue"></span>
 							<input type="range" id="shadowOpacity" min="0" max="100" step="5"></label>
 						<label class="shadow-color-row">Colour
 							<input type="color" id="shadowColor"></label>
@@ -4609,7 +4693,9 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
      padding:5px 8px; background:var(--ink); color:var(--paper);
      border:none; border-radius:6px; box-shadow:0 8px 24px rgba(28,24,19,.10);">
 	</div>
-	<script src="print-export.js"></script>
+	<script src="print-export.js?v=2026-11-11"></script>
+    <script src="animation-export.js?v=2026-11-11"></script>
+    <script src="nature-models.js?v=2026-11-11"></script>
 	<script>
 		 (function () {
     var ua = navigator.userAgent || "";
@@ -8624,7 +8710,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			}
 
 			function selectAllForms() {
-				setEditTool("select", true);
+				setEditTool("select", { forceOn: true });
 				setSelection(chains.filter(isChainPickable));
 			}
 
@@ -8771,7 +8857,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				for (const src of chains.slice()) {
 					if (!selectedChains.has(src)) continue;
 					const copy = JSON.parse(JSON.stringify(src, (key, value) =>
-						(key === "_forces" || key === "_held") ? undefined : value));
+						(key === "_forces" || key === "_held" || key === "_growthScratch") ? undefined : value));
 					forEachRing(copy, ring => {
 						for (const p of ring.chain) { p.x += off; p.y += off; p.vx = 0; p.vy = 0; }
 					});
@@ -8897,6 +8983,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				if (!panel) return;
 				panel.style.display = selectMode ? "" : "none";
 				const count = selectedChains.size;
+                syncMaterialUI();
 				$("selectionCount").textContent = count ? `${count} form${count === 1 ? "" : "s"} selected` : "No forms selected.";
 				for (const id of ["selDuplicateBtn", "selDeleteBtn", "selFrontBtn", "selForwardBtn", "selBackwardBtn", "selBackBtn", "selNoneBtn"]) $(id).disabled = !count;
 			}
@@ -8967,7 +9054,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				if (bestIndex !== -1) {
 					const obj = chains[bestIndex];
 					obj.frozen = !obj.frozen;
-					obj.alpha = obj.frozen ? 0.3 : 1.0;
+					// Freeze is a simulation state; material opacity is independent.
 					SFX.freeze();
 				}
 			}
@@ -8993,7 +9080,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					}
 					if (inside) {
 						obj.frozen = !obj.frozen;
-						obj.alpha = obj.frozen ? 0.3 : 1.0;
+						// Freeze is a simulation state; material opacity is independent.
 						count++;
 					}
 				}
@@ -9118,7 +9205,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 				gl.enableVertexAttribArray(linePosLoc);
 				gl.uniform2f(lineResLoc, canvas.width, canvas.height);
 				gl.enable(gl.BLEND);
-				gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 				// Delete lasso
 				if (deleteMode && deleteLassoActive && deleteLassoPath.length >= 2) {
@@ -9495,6 +9582,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			// Assign one freshly created chain to the active layer.
 			function assignChainToActiveLayer(chainObj) {
+                adoptMaterial(chainObj);
 				// Capture closed geometry before it has a chance to deform. This also runs
 				// while physics is paused and immediately before saving via
 				// stampUnassignedChains(), so the remembered contour is genuinely the
@@ -9705,6 +9793,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			const reliefShadow = {
 				enabled: false,
 				distance: 8,
+                spread: 0,
 				angle: 45,
 				softness: 6,
 				opacity: 0.35,
@@ -9838,6 +9927,32 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			let gravityEnabled = false;
 			// Pixels per second^2; feels good across your current timestep range
 			let gravityAccel = 15;
+            let gravityDirection = 90, windStrength = 0;
+            let videoArtworkPreview = null;
+            const materialDefaults = { opacity: 1, mass: 1, airDrag: 0, gravityFactor: 1 };
+            const materialLimits = { opacity: [0, 1], mass: [0.1, 10], airDrag: [0, 5], gravityFactor: [-2, 3] };
+            function materialValue(obj, key) {
+                const value = Number(obj?.[key]);
+                const [lo, hi] = materialLimits[key];
+                return Number.isFinite(value) ? Math.max(lo, Math.min(hi, value)) : (key === "opacity" || key === "mass" || key === "gravityFactor" ? 1 : 0);
+            }
+            function formOpacity(obj) { return materialValue(obj, "opacity"); }
+            function adoptMaterial(obj, defaults = materialDefaults) {
+                for (const key of Object.keys(materialLimits)) obj[key] = materialValue(obj[key] === undefined ? defaults : obj, key);
+                return obj;
+            }
+            function applyEnvironment(point, obj, ps) {
+                const a = gravityDirection * Math.PI / 180;
+                const g = gravityEnabled ? gravityAccel * ps / 60 * materialValue(obj, "gravityFactor") : 0;
+                point.vx += Math.cos(a) * g;
+                point.vy += Math.sin(a) * g;
+                const drag = materialValue(obj, "airDrag") / materialValue(obj, "mass");
+                if (drag > 0) {
+                    const retention = Math.exp(-drag / 60);
+                    point.vx = windStrength * ps + (point.vx - windStrength * ps) * retention;
+                    point.vy *= retention;
+                }
+            }
 
 			/* -----------------------------------
 			   PHYSICS PARAMETER TABLE
@@ -9854,6 +9969,10 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			   allowed to differ from the variable name so a variable can be renamed
 			   without invalidating every scene file already on disk. */
 			const PHYSICS_PARAMS = [
+                { id: "gravityStrength", settingKey: "gravityAccel", label: "Gravity strength", group: "environment", groupOrder: 0,
+                  tooltip: "Global acceleration, active when Gravity is on. Relative studio units, not calibrated metres per second squared.",
+                  min: 0, max: 100, step: 1, get: () => gravityAccel, set: v => { gravityAccel = v; },
+                  toValue: p => p * 0.6, toPercent: v => v / 0.6 },
 				{
 					id: "dotScale",
 					settingKey: "dotScaleFactor",
@@ -9980,6 +10099,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			const PHYSICS_DIAL_GROUPS = [
 				{ id: "material", label: "Material" },
 				{ id: "motion", label: "Motion" },
+				{ id: "environment", label: "Environment", collapsed: true },
 				{ id: "advanced", label: "Advanced", collapsed: true }
 			];
 
@@ -10339,6 +10459,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 
 			// Ensure only one edit tool is active at a time
 			function setEditTool(toolName, opts = {}) {
+              if ($("viewHand")) { viewHand = false; updateView(); }
 			  const forceOn = !!opts.forceOn;
 
 			  const isAlreadyActive = !forceOn && (
@@ -10443,6 +10564,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			}
 
 			function setDrawMode(mode) {
+              if ($("viewHand")) { viewHand = false; updateView(); }
 			  // Toggle: clicking the same draw mode turns drawing OFF
 			  drawMode = (drawMode === mode) ? "none" : mode;
 
@@ -10992,7 +11114,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					undoEntry(history.pop());
 					SFX.undo();
 				}
-				toast("Undo", 1200);
+				syncMaterialUI();
+                toast("Undo", 1200);
 			}
 			$("iconUndo").onclick = undoLast;
 
@@ -11162,43 +11285,17 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 					tempCanvas.height = captureHeight;
 					const tempCtx = tempCanvas.getContext("2d");
 
-					// Read pixels from WebGL context (only the capture area)
-					const pixels = new Uint8Array(captureWidth * captureHeight * 4);
-					// WebGL coordinates: y=0 is bottom, so we need to convert
-					const glY = canvas.height - captureY - captureHeight;
-					gl.readPixels(captureX, glY, captureWidth, captureHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-
-					// WebGL reads pixels from bottom-left, but canvas expects top-left
-					// PERFORMANCE: Optimized vertical flip using direct array manipulation
-					const imageData = tempCtx.createImageData(captureWidth, captureHeight);
-					const data = imageData.data;
-					const rowSize = captureWidth * 4;
-
-					// Flip rows by swapping top and bottom rows
-					for (let y = 0; y < captureHeight / 2; y++) {
-						const topRow = y * rowSize;
-						const bottomRow = (captureHeight - 1 - y) * rowSize;
-
-						// Swap entire rows at once (faster than pixel-by-pixel)
-						for (let x = 0; x < rowSize; x++) {
-							const temp = pixels[topRow + x];
-							pixels[topRow + x] = pixels[bottomRow + x];
-							pixels[bottomRow + x] = temp;
-						}
-					}
-
-					// Copy flipped pixels to imageData
-					data.set(pixels);
-
-					// Draw the flipped image to the 2D canvas
-					tempCtx.putImageData(imageData, 0, 0);
+                    // Reuse the artwork renderer: no synchronous GPU readback or editor overlays.
+                    const artwork = renderArtworkCanvas({ size: { width: canvas.width, height: canvas.height } });
+                    tempCtx.drawImage(artwork, captureX, captureY, captureWidth, captureHeight, 0, 0, captureWidth, captureHeight);
+                    artwork.width = artwork.height = 1;
 
 					// Convert to data URL
 					const dataURL = tempCanvas.toDataURL("image/png");
 
 					// Deep clone chains data for vector export
 					const vectorData = {
-						chains: chains.map(chainObj => ({
+						chains: chains.filter(isChainVisible).map(chainObj => ({
 							chain: chainObj.chain.map(dot => ({
 								x: dot.x,
 								y: dot.y,
@@ -11208,7 +11305,8 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 							})),
 							isClosed: chainObj.isClosed,
 							color: chainObj.color ? [...chainObj.color] : [0, 0, 0, 1],
-							alpha: chainObj.alpha ?? 1.0,
+							opacity: formOpacity(chainObj),
+                            holes: chainObj.holes ? JSON.parse(JSON.stringify(chainObj.holes)) : undefined,
 							baseDotRadius: chainObj.baseDotRadius,
 							frozen: chainObj.frozen || false,
 							isParticle: chainObj.isParticle || false,
@@ -11636,145 +11734,34 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 			}
 
 			// Export filmstrip animation as video (WebM) using native MediaRecorder API
-			async function exportFilmstripAnimation() {
-				if (filmstripData.frames.length === 0) {
-					toast("No frames to export", 1500);
-					return;
-				}
-
-				// Check if MediaRecorder is supported
-				if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) {
-					toast("Video export not supported in this browser", 3000);
-					return;
-				}
-
-				toast("Creating video...", 2000);
-
-				// Set exporting flag to hide bounding box
-				filmstripData.isExporting = true;
-
-				// Get frame dimensions from first frame
-				const firstFrame = new Image();
-				firstFrame.src = filmstripData.frames[0].imageData;
-
-				await new Promise((resolve, reject) => {
-					firstFrame.onload = async () => {
-						const width = firstFrame.width;
-						const height = firstFrame.height;
-
-						// Create a temporary canvas for recording
-						const recordCanvas = document.createElement("canvas");
-						recordCanvas.width = width;
-						recordCanvas.height = height;
-						const recordCtx = recordCanvas.getContext("2d");
-
-						// Create a stream from the canvas
-						const stream = recordCanvas.captureStream(filmstripData.fps);
-
-						// Set up MediaRecorder
-						const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-							? 'video/webm;codecs=vp9'
-							: MediaRecorder.isTypeSupported('video/webm')
-							? 'video/webm'
-							: 'video/webm';
-
-						const mediaRecorder = new MediaRecorder(stream, {
-							mimeType: mimeType,
-							videoBitsPerSecond: 2500000 // 2.5 Mbps
-						});
-
-						const chunks = [];
-
-						mediaRecorder.ondataavailable = (event) => {
-							if (event.data && event.data.size > 0) {
-								chunks.push(event.data);
-							}
-						};
-
-						mediaRecorder.onstop = () => {
-							filmstripData.isExporting = false; // Reset flag
-							const blob = new Blob(chunks, { type: mimeType });
-							const url = URL.createObjectURL(blob);
-							const link = document.createElement("a");
-							link.href = url;
-							link.download = `hansketch-animation-${Date.now()}.webm`;
-							link.click();
-							URL.revokeObjectURL(url);
-							toast(`Animation exported! ${filmstripData.frames.length} frames`, 2000);
-							resolve();
-						};
-
-						mediaRecorder.onerror = (event) => {
-							toast("Error recording video", 2000);
-							reject(event.error);
-						};
-
-						// Start recording
-						mediaRecorder.start();
-
-						// Load all frame images
-						const frameImages = [];
-						let imagesLoaded = 0;
-
-						filmstripData.frames.forEach((frame, index) => {
-							const img = new Image();
-							img.src = frame.imageData;
-
-							img.onload = () => {
-								frameImages[index] = img;
-								imagesLoaded++;
-
-								// When all images are loaded, start playing through frames
-								if (imagesLoaded === filmstripData.frames.length) {
-									let currentFrameIndex = 0;
-									const frameDelay = 1000 / filmstripData.fps;
-									const startTime = performance.now();
-
-									function drawNextFrame() {
-										if (currentFrameIndex >= frameImages.length) {
-											// All frames drawn, stop recording
-											setTimeout(() => {
-												mediaRecorder.stop();
-												stream.getTracks().forEach(track => track.stop());
-											}, frameDelay);
-											return;
-										}
-
-										// Draw current frame
-										recordCtx.clearRect(0, 0, width, height);
-										recordCtx.drawImage(frameImages[currentFrameIndex], 0, 0);
-
-										currentFrameIndex++;
-
-										// Schedule next frame
-										setTimeout(drawNextFrame, frameDelay);
-									}
-
-									// Start drawing frames
-									drawNextFrame();
-								}
-							};
-
-							img.onerror = () => {
-								imagesLoaded++;
-								if (imagesLoaded === filmstripData.frames.length) {
-									filmstripData.isExporting = false; // Reset flag on error
-									toast("Error loading some frames", 2000);
-									mediaRecorder.stop();
-									stream.getTracks().forEach(track => track.stop());
-									reject(new Error("Failed to load frames"));
-								}
-							};
-						});
-					};
-
-					firstFrame.onerror = () => {
-						filmstripData.isExporting = false; // Reset flag on error
-						toast("Error loading first frame", 2000);
-						reject(new Error("Failed to load first frame"));
-					};
-				});
-			}
+            async function exportFilmstripAnimation() {
+                if (!filmstripData.frames.length || videoRecording) return;
+                const format = HanSketchAnimation.formats().find(item => item.label === "WebM");
+                $("animationSection").scrollIntoView({block:"center"});
+                if (!format) { $("videoStatus").textContent = "WebM encoding is unavailable here. Use live MP4 recording or SVG animation."; return; }
+                videoBusy(true); $("videoStatus").textContent = "Loading filmstrip frames…";
+                try {
+                    const images = await Promise.all(filmstripData.frames.map(frame => new Promise((resolve,reject) => {
+                        const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error("A filmstrip frame could not be loaded.")); image.src = frame.imageData;
+                    })));
+                    const started = performance.now();
+                    const render = () => {
+                        const index = Math.min(images.length-1, Math.floor((performance.now()-started)*filmstripData.fps/1000));
+                        const image = images[index], result = document.createElement("canvas");
+                        result.width=image.width; result.height=image.height; result.getContext("2d").drawImage(image,0,0); return result;
+                    };
+                    filmstripData.isExporting = true;
+                    videoRecording = HanSketchAnimation.record({render, format, fps:filmstripData.fps, seconds:images.length/filmstripData.fps,
+                        onProgress: elapsed => { $("videoStatus").textContent = `Encoding filmstrip · ${elapsed.toFixed(1)} s`; },
+                        onComplete: (blob,ext) => {
+                            filmstripData.isExporting=false; videoRecording=null; videoBusy(false);
+                            if(blob) downloadArtwork(blob,`hansketch-filmstrip.${ext}`);
+                            $("videoStatus").textContent = blob ? "Saved filmstrip video." : "Filmstrip export cancelled.";
+                        },
+                        onError: error => { filmstripData.isExporting=false;videoRecording=null;endVideoPreview();videoBusy(false);$("videoStatus").textContent=error.message; }
+                    });
+                } catch(error) { filmstripData.isExporting=false;videoRecording=null;endVideoPreview();videoBusy(false);$("videoStatus").textContent=error.message; }
+            }
 
 			// Export SVG animation
 			function exportFilmstripSVG() {
@@ -11856,7 +11843,7 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 							const cx = (dot.x - exportX) * scaleX;
 							const cy = (dot.y - exportY) * scaleY;
 							const sr = r * Math.min(scaleX, scaleY);
-							svgParts.push(`<circle cx="${cx}" cy="${cy}" r="${sr}" fill="rgb(${rr},${gg},${bb})" />`);
+							svgParts.push(`<circle opacity="${formOpacity(chainObj)}" cx="${cx}" cy="${cy}" r="${sr}" fill="rgb(${rr},${gg},${bb})" />`);
 							return;
 						}
 
@@ -11876,20 +11863,27 @@ body.filmstrip-unlocked .filmstrip-panel.panel-hidden::before {
 							pathData += ` L ${(spline[i] - exportX) * scaleX} ${(spline[i + 1] - exportY) * scaleY}`;
 						}
 						if (chainObj.isClosed) pathData += " Z";
+                        for (const hole of chainObj.holes || []) {
+                            const ring = getClosedSmoothCurve(hole.chain, 10);
+                            if (ring.length < 6) continue;
+                            pathData += ` M ${(ring[0]-exportX)*scaleX} ${(ring[1]-exportY)*scaleY}`;
+                            for(let i=2;i<ring.length;i+=2) pathData += ` L ${(ring[i]-exportX)*scaleX} ${(ring[i+1]-exportY)*scaleY}`;
+                            pathData += " Z";
+                        }
 
 						const [rr, gg, bb] = chainObj.color.map(c => Math.floor(c * 255));
-						// Make frozen items appear unfrozen (always use alpha 1.0)
-						const alpha = 1.0;
+						// Freeze is editor state; exported opacity belongs to the material.
+						const alpha = formOpacity(chainObj);
 						const shouldFill = (vectorData.showFilled && chainObj.isClosed);
 						const shouldStroke = vectorData.showOutline;
 						const strokeWidth = vectorData.outlineWidth * Math.min(scaleX, scaleY);
 
 						if (shouldFill && shouldStroke) {
-							svgParts.push(`<path d="${pathData}" fill="rgb(${rr},${gg},${bb})" fill-opacity="${alpha}" stroke="rgb(0,0,0)" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
+							svgParts.push(`<path fill-rule="evenodd" d="${pathData}" fill="rgb(${rr},${gg},${bb})" fill-opacity="${alpha}" stroke-opacity="${alpha}" stroke="rgb(0,0,0)" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
 						} else if (shouldFill) {
-							svgParts.push(`<path d="${pathData}" fill="rgb(${rr},${gg},${bb})" fill-opacity="${alpha}" stroke="none" />`);
+							svgParts.push(`<path fill-rule="evenodd" d="${pathData}" fill="rgb(${rr},${gg},${bb})" fill-opacity="${alpha}" stroke="none" />`);
 						} else if (shouldStroke) {
-							svgParts.push(`<path d="${pathData}" stroke="rgb(${rr},${gg},${bb})" stroke-opacity="${alpha}" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
+							svgParts.push(`<path fill-rule="evenodd" d="${pathData}" stroke="rgb(${rr},${gg},${bb})" stroke-opacity="${alpha}" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
 						}
 					});
 
@@ -12914,11 +12908,13 @@ window.addEventListener("keydown", (e) => {
 				$("shadowToggle").checked = reliefShadow.enabled;
 				$("shadowControls").classList.toggle("is-on", reliefShadow.enabled);
 				set("shadowDistance", reliefShadow.distance);
+                set("shadowSpread", reliefShadow.spread);
 				set("shadowAngle", reliefShadow.angle);
 				set("shadowSoftness", reliefShadow.softness);
 				set("shadowOpacity", Math.round(reliefShadow.opacity * 100));
 				set("shadowColor", reliefShadow.color);
 				text("shadowDistanceValue", `${reliefShadow.distance} px`);
+                text("shadowSpreadValue", `${reliefShadow.spread} px`);
 				text("shadowAngleValue", `${reliefShadow.angle}°`);
 				text("shadowSoftnessValue", `${reliefShadow.softness} px`);
 				text("shadowOpacityValue", `${Math.round(reliefShadow.opacity * 100)}%`);
@@ -12929,11 +12925,12 @@ window.addEventListener("keydown", (e) => {
 			function applyReliefShadowSettings(saved) {
 				const num = (v, lo, hi) => (typeof v === "number" && isFinite(v)) ? Math.max(lo, Math.min(hi, v)) : null;
 				if (typeof saved.enabled === "boolean") reliefShadow.enabled = saved.enabled;
-				const d = num(saved.distance, 0, 40); if (d !== null) reliefShadow.distance = d;
+				const d = num(saved.distance, 0, 100); if (d !== null) reliefShadow.distance = d;
 				const a = num(saved.angle, 0, 360); if (a !== null) reliefShadow.angle = a;
-				const sf = num(saved.softness, 0, 30); if (sf !== null) reliefShadow.softness = sf;
+				const sf = num(saved.softness, 0, 80); if (sf !== null) reliefShadow.softness = sf;
 				const o = num(saved.opacity, 0, 1); if (o !== null) reliefShadow.opacity = o;
-				const c = normaliseHex(saved.color); if (c) reliefShadow.color = c;
+				const spread = num(saved.spread, 0, 40); reliefShadow.spread = spread ?? 0;
+                const c = normaliseHex(saved.color); if (c) reliefShadow.color = c;
 				syncReliefShadowUI();
 			}
 
@@ -12941,7 +12938,7 @@ window.addEventListener("keydown", (e) => {
 				reliefShadow.enabled = e.target.checked;
 				syncReliefShadowUI();
 			};
-			[["shadowDistance", "distance", 1], ["shadowAngle", "angle", 1],
+			[["shadowSpread", "spread", 1], ["shadowDistance", "distance", 1], ["shadowAngle", "angle", 1],
 			 ["shadowSoftness", "softness", 1], ["shadowOpacity", "opacity", 0.01]].forEach(([id, key, k]) => {
 				$(id).oninput = e => {
 					reliefShadow[key] = parseFloat(e.target.value) * k;
@@ -13169,7 +13166,8 @@ window.addEventListener("keydown", (e) => {
 				selfPerforationEnabled,
 				shapeMemoryEnabled,
 				penSmoothing,
-				gravityEnabled, gravityAccel,
+				gravityEnabled, gravityAccel, gravityDirection, windStrength,
+                materialDefaults: { ...materialDefaults },
 				reliefShadow: { ...reliefShadow },
 				travelingSegmentEnabled,
 			        travelingSegmentLength,
@@ -13261,7 +13259,13 @@ window.addEventListener("keydown", (e) => {
 					gravityEnabled = obj.gravityEnabled;
 					toggleActiveIcon($("iconGravity"), gravityEnabled);
 				}
-				if (typeof obj.gravityAccel === "number" && isFinite(obj.gravityAccel)) gravityAccel = obj.gravityAccel;
+				if (Number.isFinite(obj.gravityAccel)) gravityAccel = Math.max(0, Math.min(60, obj.gravityAccel));
+                if (Number.isFinite(obj.gravityDirection)) gravityDirection = Math.max(0, Math.min(360, obj.gravityDirection));
+                if (Number.isFinite(obj.windStrength)) windStrength = Math.max(-10, Math.min(10, obj.windStrength));
+
+                // Defaults are an explicit part of a scene, including after Reset Settings.
+                if (obj.materialDefaults) for (const key of Object.keys(materialLimits)) materialDefaults[key] = materialValue(obj.materialDefaults, key);
+                syncMaterialUI(); syncEnvironmentUI();
 				// turgorPressure is restored by the PHYSICS_PARAMS loop above.
 
 			// Appearance settings
@@ -13519,7 +13523,7 @@ window.addEventListener("keydown", (e) => {
 				setTimeout(() => {
 					try {
 						if ($("importIncludeChains")?.checked && pendingImport.chains)
-							pendingImport.chains.forEach(c => chains.push(c));
+							pendingImport.chains.forEach(c => chains.push(adoptMaterial(c, { opacity: 1, mass: 1, airDrag: 0, gravityFactor: 1 })));
 
 						if ($("importIncludeCircles")?.checked && pendingImport.circles)
 							pendingImport.circles.forEach(c => circles.push(c));
@@ -15072,7 +15076,7 @@ window.addEventListener("keydown", (e) => {
 					_particleInstData[base + 3] = c[0];
 					_particleInstData[base + 4] = c[1];
 					_particleInstData[base + 5] = c[2];
-					_particleInstData[base + 6] = ch.alpha ?? 1.0;
+					_particleInstData[base + 6] = formOpacity(ch);
 				}
 				gl.useProgram(particleProgram);
 				gl.uniform2f(_ppResLoc, canvas.width, canvas.height);
@@ -15092,7 +15096,7 @@ window.addEventListener("keydown", (e) => {
 				gl.vertexAttribDivisor(_ppInstColorLoc, 1);
 				// Single instanced draw call for ALL particles
 				gl.enable(gl.BLEND);
-				gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 				gl.drawArraysInstanced(gl.TRIANGLES, 0, PARTICLE_SEG * 3, count);
 				// Reset divisors
 				gl.vertexAttribDivisor(_ppInstPosLoc, 0);
@@ -16237,7 +16241,7 @@ window.addEventListener("keydown", (e) => {
 				}
 			}
 
-			function simulateChain(chainObj, cIndex) {
+			function simulateChain(chainObj, cIndex, material = chainObj) {
 				if (chainObj.frozen) return; // skip frozen
 
 				const arr = chainObj.chain;
@@ -16268,7 +16272,7 @@ window.addEventListener("keydown", (e) => {
 								}
 							}
 							
-							if (gravityEnabled) d.vy += gravityAccel * ps * (timeStep / 60);
+							applyEnvironment(d, material, ps);
 							d.vx *= velocityRetention;
 							d.vy *= velocityRetention;
 							d.x += d.vx * timeStep;
@@ -16599,11 +16603,9 @@ window.addEventListener("keydown", (e) => {
 						d.vy = 0;
 						continue;
 					}
-					if (gravityEnabled) {
-						d.vy += gravityAccel * ps * (timeStep / 60);
-					}
-					d.vx = (d.vx + forces[i].x * timeStep) * velocityRetention;
-					d.vy = (d.vy + forces[i].y * timeStep) * velocityRetention;
+					applyEnvironment(d, material, ps);
+					d.vx = (d.vx + forces[i].x * timeStep / materialValue(material, "mass")) * velocityRetention;
+					d.vy = (d.vy + forces[i].y * timeStep / materialValue(material, "mass")) * velocityRetention;
 
 					d.x += d.vx * timeStep;
 					d.y += d.vy * timeStep;
@@ -17102,7 +17104,7 @@ window.addEventListener("keydown", (e) => {
 				gl.enableVertexAttribArray(linePosLoc);
 				gl.uniform2f(lineResLoc, canvas.width, canvas.height);
 				gl.enable(gl.BLEND);
-				gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 				attractorsRepulsors.forEach(ar => {
 					if (ar.path.length < 2) return;
@@ -17570,7 +17572,7 @@ window.addEventListener("keydown", (e) => {
 
 					// Fill stencil area
 					const rgba = chainObj.color.slice();
-					rgba[3] = chainObj.alpha ?? 1.0;
+					rgba[3] = formOpacity(chainObj);
 					gl.uniform4fv(locs.u_color, rgba);
 					gl.colorMask(true, true, true, true);
 					gl.stencilFunc(gl.EQUAL, 1, 1);
@@ -17611,7 +17613,7 @@ window.addEventListener("keydown", (e) => {
 				// Draw outline
 				if (showOutline) {
 					const outlineColor = chainObj.color.slice();
-					outlineColor[3] = chainObj.alpha ?? 1.0;
+					outlineColor[3] = formOpacity(chainObj);
 					gl.uniform4fv(locs.u_color, outlineColor);
 
 					// For thin outlines, render directly
@@ -17660,7 +17662,8 @@ window.addEventListener("keydown", (e) => {
 				return {
 					ox: Math.cos(a) * reliefShadow.distance * ps,
 					oy: Math.sin(a) * reliefShadow.distance * ps,
-					soft: reliefShadow.softness * ps
+					soft: reliefShadow.softness * ps,
+                    spread: reliefShadow.spread * ps
 				};
 			}
 
@@ -17686,11 +17689,12 @@ window.addEventListener("keydown", (e) => {
 
 			function drawLayerShadow(start, layer) {
 				const items = [];
+                const spread = shadowGeometry().spread;
 				let ux0 = Infinity, uy0 = Infinity, ux1 = -Infinity, uy1 = -Infinity;
 				for (let ci = start; ci < chains.length; ci++) {
 					const obj = chains[ci];
 					if (layerOf(obj) !== layer) break;
-					if (obj.isParticle || obj.chain.length < 2) continue;
+					if (obj.isParticle || obj.chain.length < 2 || formOpacity(obj) === 0) continue;
 					const spline = getChainSpline(obj, ci);
 					if (!spline || spline.length < 4) continue;
 					let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -17700,7 +17704,7 @@ window.addEventListener("keydown", (e) => {
 						if (spline[i + 1] < y0) y0 = spline[i + 1];
 						if (spline[i + 1] > y1) y1 = spline[i + 1];
 					}
-					const pad = outlineWidth / 2 + 2;
+					const pad = outlineWidth / 2 + spread + 2;
 					x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
 					if (obj.isClosed && showFilled) {
 						const rings = [spline];
@@ -17708,9 +17712,10 @@ window.addEventListener("keydown", (e) => {
 							const hs = getClosedSmoothCurve(h.chain, 10);
 							if (hs.length >= 6) rings.push(hs);
 						});
-						items.push({ fill: true, tris: rings.map(r => buildStencilTris(r, x0, y0)), quad: quadVerts(x0, y0, x1, y1) });
+						items.push({ fill: true, tris: rings.map(r => buildStencilTris(r, x0, y0)), quad: quadVerts(x0, y0, x1, y1),
+                            spreadStrips: spread > 0 ? rings.map(r => getThickLineVertices(r, spread * 2).slice()) : [] });
 					} else {
-						const w = Math.max(outlineWidth, 1);
+						const w = Math.max(outlineWidth, 1) + spread * 2;
 						const strip = obj.isClosed ? getThickLineVertices(spline, w) : getThickLineVerticesOpen(spline, w);
 						items.push({ fill: false, strip: strip.slice() }); // the builder reuses its buffer
 					}
@@ -17753,7 +17758,11 @@ window.addEventListener("keydown", (e) => {
 							gl.stencilFunc(gl.NOTEQUAL, 0x02, 0x01);
 							gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
 							draw(item.quad, gl.TRIANGLES);
-						} else {
+                            gl.stencilMask(0x02);
+                            gl.stencilFunc(gl.ALWAYS, 0x02, 0xFF);
+                            gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
+                            item.spreadStrips.forEach(strip => draw(strip, gl.TRIANGLE_STRIP));
+                        } else {
 							gl.stencilMask(0x02);
 							gl.stencilFunc(gl.ALWAYS, 0x02, 0xFF);
 							gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
@@ -17810,7 +17819,7 @@ window.addEventListener("keydown", (e) => {
 
 					// PERFORMANCE: Reuse scratch array instead of .slice() per chain
 					_rgbaScratch[0] = chainObj.color[0]; _rgbaScratch[1] = chainObj.color[1];
-					_rgbaScratch[2] = chainObj.color[2]; _rgbaScratch[3] = chainObj.alpha ?? 1.0;
+					_rgbaScratch[2] = chainObj.color[2]; _rgbaScratch[3] = formOpacity(chainObj);
 					gl.uniform4fv(lineColorLoc, _rgbaScratch);
 
 					// Step 2: draw full-screen quad wherever stencil is non-zero (= inside the blob).
@@ -17879,7 +17888,7 @@ window.addEventListener("keydown", (e) => {
 				if (showOutline) {
 					// PERFORMANCE: Reuse scratch array instead of .slice() per chain
 					_rgbaScratch[0] = chainObj.color[0]; _rgbaScratch[1] = chainObj.color[1];
-					_rgbaScratch[2] = chainObj.color[2]; _rgbaScratch[3] = chainObj.alpha ?? 1.0;
+					_rgbaScratch[2] = chainObj.color[2]; _rgbaScratch[3] = formOpacity(chainObj);
 					gl.uniform4fv(lineColorLoc, _rgbaScratch);
 
 					if (chainObj.frozen) {
@@ -17971,7 +17980,7 @@ window.addEventListener("keydown", (e) => {
 				gl.uniform2f(lineResLoc, canvas.width, canvas.height);
 
 				const rgba = chainObj.color.slice();
-				rgba[3] = chainObj.alpha ?? 1.0;
+				rgba[3] = formOpacity(chainObj);
 				gl.uniform4fv(lineColorLoc, rgba);
 				gl.drawArrays(gl.TRIANGLE_FAN, 0, seg + 2);
 			}
@@ -18111,7 +18120,7 @@ window.addEventListener("keydown", (e) => {
 
 				// Ensure blending is enabled for transparency
 				gl.enable(gl.BLEND);
-				gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+				gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 				// Use gray color with low opacity for faint overlay
 				gl.uniform4fv(lineColorLoc, [0.3, 0.3, 0.3, overlayOpacity]);
@@ -18307,8 +18316,9 @@ window.addEventListener("keydown", (e) => {
 							// Guard here rather than inside simulateChain so a chain's holes, which
 							// carry no layerId of their own, follow their parent's layer.
 							if (isChainStatic(chainObj)) continue;
+							advanceNatureGrowth(chainObj);
 							simulateChain(chainObj, ci);
-							chainObj.holes?.forEach(hole => simulateChain(hole, -1));
+							chainObj.holes?.forEach(hole => simulateChain(hole, -1, chainObj));
 						}
 						updateSelfPerforations(++selfIntersectionCheckFrame % 6 === 0);
 						simulateInterChainRepulsion();
@@ -18332,7 +18342,11 @@ window.addEventListener("keydown", (e) => {
 					_simAccumulator = 0;
 				}
 
-				// Clear & draw
+				// The recorder presents the artwork renderer while recording. Avoid doing
+                // a second full WebGL/stencil render alongside the video frame.
+                if (videoArtworkPreview) { requestAnimationFrame(animate); return; }
+
+                // Clear & draw
 
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
@@ -18640,7 +18654,7 @@ window.addEventListener("keydown", (e) => {
 						const cx = dot.x * scaleX;
 						const cy = dot.y * scaleY;
 						const sr = r * Math.min(scaleX, scaleY);
-						parts.push(`<circle cx="${cx}" cy="${cy}" r="${sr}" fill="rgb(${rr},${gg},${bb})" />`);
+						parts.push(`<circle opacity="${formOpacity(obj)}" cx="${cx}" cy="${cy}" r="${sr}" fill="rgb(${rr},${gg},${bb})" />`);
 						return;
 					}
 
@@ -18655,13 +18669,13 @@ window.addEventListener("keydown", (e) => {
 
 					if (shouldFill && shouldStroke) {
 						// Both fill and outline - draw filled with black border
-						parts.push(`<path d="${d}" fill="rgb(${rr},${gg},${bb})" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="rgb(0,0,0)" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
+						parts.push(`<path opacity="${formOpacity(obj)}" d="${d}" fill="rgb(${rr},${gg},${bb})" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="rgb(0,0,0)" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
 					} else if (shouldFill) {
 						// Only fill
-						parts.push(`<path d="${d}" fill="rgb(${rr},${gg},${bb})" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="none" />`);
+						parts.push(`<path opacity="${formOpacity(obj)}" d="${d}" fill="rgb(${rr},${gg},${bb})" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="none" />`);
 					} else if (shouldStroke) {
 						// Only outline
-						parts.push(`<path d="${d}" stroke="rgb(${rr},${gg},${bb})" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
+						parts.push(`<path opacity="${formOpacity(obj)}" d="${d}" stroke="rgb(${rr},${gg},${bb})" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`);
 					}
 				};
 
@@ -18672,17 +18686,17 @@ window.addEventListener("keydown", (e) => {
 				const shadow = reliefShadow.enabled ? shadowGeometry() : null;
 				if (shadow && shadow.soft >= 0.5) {
 					const sd = shadow.soft * Math.min(scaleX, scaleY) / 2;
-					parts.push(`<defs><filter id="hansketch-shadow-soft" x="-25%" y="-25%" width="150%" height="150%">`
+					parts.push(`<defs><filter id="hansketch-shadow-soft" x="-100%" y="-100%" width="300%" height="300%">`
 						+ `<feGaussianBlur stdDeviation="${sd}"/></filter></defs>`);
 				}
 				const emitShadow = members => {
-					const strokeWidth = Math.max(outlineWidth, 1) * Math.min(scaleX, scaleY);
+					const strokeWidth = (Math.max(outlineWidth, 1) + shadow.spread * 2) * Math.min(scaleX, scaleY);
 					const body = members.map(obj => {
-						if (obj.isParticle || obj.chain.length === 1) return "";
+						if (obj.isParticle || obj.chain.length === 1 || formOpacity(obj) === 0) return "";
 						const d = chainPathData(obj);
 						if (!d) return "";
 						return (obj.isClosed && showFilled)
-							? `<path d="${d}" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="none" />`
+							? `<path d="${d}" fill-rule="${obj.holes?.length ? "evenodd" : "nonzero"}" stroke="${reliefShadow.color}" stroke-width="${shadow.spread * 2 * Math.min(scaleX, scaleY)}" stroke-linejoin="round" />`
 							: `<path d="${d}" fill="none" stroke="${reliefShadow.color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="miter" stroke-miterlimit="3" />`;
 					}).join("");
 					if (!body) return;
@@ -18845,9 +18859,16 @@ window.addEventListener("keydown", (e) => {
 						const style = getComputedStyle(el);
 						const color = cssColorToRGBA(style.fill) || cssColorToRGBA(style.stroke) || hexToRGBA(colorInput.value);
 						const isClosed = svgElementIsClosed(el);
+                        let opacity = 1;
+                        for (let node = el; node && node !== host; node = node.parentElement) {
+                            const alpha = Number.parseFloat(getComputedStyle(node).opacity);
+                            if (Number.isFinite(alpha)) opacity *= alpha;
+                        }
+                        opacity *= Number.parseFloat(style.fill !== "none" ? style.fillOpacity : style.strokeOpacity) || 0;
 						if (isClosed) pts.push({ ...pts[0] }); // closed chains repeat their first point
 						return {
 							chain: pts,
+                            opacity, mass: 1, airDrag: 0, gravityFactor: 1,
 							color,
 							baseDotRadius: Math.max(1, globalRadiusAvg),
 							isClosed,
@@ -19124,7 +19145,7 @@ window.addEventListener("keydown", (e) => {
 				return { width, height };
 			}
 
-			function renderArtworkCanvas({ layerId = null, shadowOnly = false, transparent = false, size = null } = {}) {
+			function renderArtworkCanvas({ layerId = null, shadowOnly = false, transparent = false, size = null, readback = false } = {}) {
 				const { width: exportWidth, height: exportHeight } = size || rasterExportSize();
 
 				// Calculate scale factors from canvas internal resolution to export resolution
@@ -19134,7 +19155,7 @@ window.addEventListener("keydown", (e) => {
 				const offscreen = document.createElement("canvas");
 				offscreen.width = exportWidth;
 				offscreen.height = exportHeight;
-				const ctx = offscreen.getContext("2d");
+				const ctx = offscreen.getContext("2d", { willReadFrequently: readback });
 
 				// Paint the canvas background colour (or white when the user has switched the
 				// background off). The grid is still never exported.
@@ -19170,35 +19191,49 @@ window.addEventListener("keydown", (e) => {
 					return true;
 				};
 
-				// Relief shadow for one layer: its silhouettes are drawn opaque on a
-				// scratch canvas, then laid down once — blurred, offset and at the chosen
-				// opacity — so overlapping shapes cast one shadow, as on screen.
+				// Collect one opaque silhouette per layer, then use the same offset taps
+				// and per-tap alpha as WebGL. Canvas 2D filters are unavailable in some
+				// browsers; relying on blur() there leaves only an unsoftened crescent
+				// when the form's fill covers its shadow. PDF uses this renderer too.
 				const shadow = reliefShadow.enabled ? shadowGeometry() : null;
 				const drawShadow = members => {
+					const { offsets, alpha } = shadowTaps();
+					// Clip after shifting the shadow, not before. Off-artboard geometry
+					// can still cast a shadow back onto the sheet.
+					const padX = Math.ceil(Math.max(...offsets.map(([x]) => Math.abs(x * scaleX)))) + 2;
+					const padY = Math.ceil(Math.max(...offsets.map(([, y]) => Math.abs(y * scaleY)))) + 2;
 					const sc = document.createElement("canvas");
-					sc.width = exportWidth;
-					sc.height = exportHeight;
-					const sctx = sc.getContext("2d");
+					sc.width = exportWidth + padX * 2;
+					sc.height = exportHeight + padY * 2;
+					const sctx = sc.getContext("2d", { willReadFrequently: readback });
+					if (!sctx) throw new Error("The browser could not create the shadow canvas. Try a lower DPI.");
+					sctx.translate(padX, padY);
 					sctx.fillStyle = sctx.strokeStyle = reliefShadow.color;
 					sctx.lineWidth = Math.max(outlineWidth, 1) * Math.min(scaleX, scaleY);
 					sctx.lineCap = "round";
 					sctx.lineJoin = "miter";
 					sctx.miterLimit = MITER_LIMIT;
 					members.forEach(obj => {
-						if (obj.isParticle || obj.chain.length === 1) return;
+						if (obj.isParticle || obj.chain.length === 1 || formOpacity(obj) === 0) return;
 						if (!traceChain(sctx, obj)) return;
-						if (obj.isClosed && showFilled) sctx.fill(obj.holes?.length ? "evenodd" : "nonzero");
-						else sctx.stroke();
+						if (obj.isClosed && showFilled) {
+                            sctx.fill(obj.holes?.length ? "evenodd" : "nonzero");
+                            if (shadow.spread > 0) { sctx.lineWidth = shadow.spread * 2 * Math.min(scaleX, scaleY); sctx.stroke(); }
+                        } else {
+                            sctx.lineWidth = (Math.max(outlineWidth, 1) + shadow.spread * 2) * Math.min(scaleX, scaleY); sctx.stroke();
+                        }
 					});
 					ctx.save();
-					ctx.globalAlpha = reliefShadow.opacity;
-					if (shadow.soft >= 0.5) ctx.filter = `blur(${shadow.soft * Math.min(scaleX, scaleY) / 2}px)`;
-					ctx.drawImage(sc, shadow.ox * scaleX, shadow.oy * scaleY);
+					ctx.globalAlpha = alpha;
+					for (const [x, y] of offsets) {
+						ctx.drawImage(sc, x * scaleX - padX, y * scaleY - padY);
+					}
 					sc.width = sc.height = 1;
 					ctx.restore();
 				};
 
 				const drawChainJPG = obj => {
+                    ctx.globalAlpha = formOpacity(obj);
 					// Handle particle chains (single-vertex, rendered as circles)
 					if (obj.isParticle && obj.chain.length === 1) {
 						const dot = obj.chain[0];
@@ -19339,7 +19374,7 @@ window.addEventListener("keydown", (e) => {
 							});
 							commands += `q ${canvas.width} 0 0 ${-canvas.height} 0 ${canvas.height} cm /Im${imageIndex} Do Q\n`;
 						}
-						for (const obj of members) commands += pdfChainCommands(obj, allLayers);
+						for (const obj of members) commands += `q /O${Math.round(formOpacity(obj) * 100)} gs\n` + pdfChainCommands(obj, allLayers) + "Q\n";
 					}
 					return { name: allLayers ? group[0].name : "Artwork", commands: commands + "Q\n", images };
 				});
@@ -19920,7 +19955,7 @@ window.addEventListener("keydown", (e) => {
 				if (!includeBinding) delete settings.movementBinding;
 				// Three decimals is well below a pixel and below one colour step (1/255).
 				const compact = (key, value) => {
-					if (key === "_forces" || key === "_held") return undefined;
+					if (key === "_forces" || key === "_held" || key === "_growthScratch") return undefined;
 					return typeof value === "number" ? Math.round(value * 1000) / 1000 : value;
 				};
 				return JSON.stringify({ savedAt: Date.now(), chains, circles, rigidPolygons,
@@ -19949,7 +19984,7 @@ window.addEventListener("keydown", (e) => {
 				if (!raw) return;
 				try {
 					const data = JSON.parse(raw);
-					(data.chains || []).forEach(c => chains.push(c));
+					(data.chains || []).forEach(c => chains.push(adoptMaterial(c, { opacity: 1, mass: 1, airDrag: 0, gravityFactor: 1 })));
 					(data.circles || []).forEach(c => circles.push(c));
 					(data.rigidPolygons || []).forEach(p => rigidPolygons.push(p));
 					(data.attractorsRepulsors || []).forEach(a => attractorsRepulsors.push(a));
@@ -19974,6 +20009,259 @@ window.addEventListener("keydown", (e) => {
 				try { localStorage.removeItem(AUTOSAVE_KEY); } catch (err) { /* nothing to clear */ }
 				location.reload();
 			};
+
+            /* Nature studies use the existing scene, selection and undo machinery. */
+            const natureDescriptions = {
+                vacuum: "Mass and falling: blue is light, terracotta is heavy. With no air and Gravity influence = 1, both accelerate equally. Bounce is set to 100% so it does not damp the fall.",
+                air: "Air resistance: blue is light, terracotta is heavy. Both have the same resistance setting. The light form slows more; the heavy form falls faster. This is linear drag, a simplified model.",
+                elastic: "Elasticity and pressure: drag a contour, release it, then change Stiffness or Inflation one at a time. Shape Memory restores the initial outline. This is a contour model, not a complete tissue simulation.",
+                growth: "Local growth: different parts of a contour advance at different rates. Compare Local variation 0 with 1. This 2D boundary model suggests organic lobes; it does not simulate 3D leaf tissue.",
+                branches: "Branching: a repeated rule creates two smaller branches at each tip. Change the angle or seed and add another study. This is a bounded rule-based generator; junctions are not mechanically joined.",
+                stains: "Pigment stains: irregular translucent forms overlap like washes of colour. Select a stain to adjust opacity. Colour blending is an artistic model, not a simulation of pigment chemistry."
+            };
+            $("natureStudy").onchange = () => { $("natureExplanation").textContent = natureDescriptions[$("natureStudy").value]; $("branchAngle").disabled = $("natureStudy").value !== "branches"; };
+            $("natureStudy").onchange();
+            function advanceNatureGrowth(obj) {
+                if (!obj.growth?.running) return;
+                if (HanSketchNature.growContour(obj, canvas.width, canvas.height, getPhysicsScale())) {
+                    // Maintain point density as the boundary gains length. Only growing forms
+                    // adopt the new outline as their shape memory; normal editing is unchanged.
+                    if (obj.growth.steps % 12 === 0) {
+                        const resampled = respacePoints(obj.chain, true, obj.growth.spacing);
+                        if (resampled.length < 600) obj.chain = resampled;
+                        else obj.growth.running = false;
+                        obj.restDistance = bindingRingRestDistance(obj.chain);
+                    }
+                    delete obj._shapeMemory; ensureShapeMemory(obj);
+                    const measured = measurePerimeterArea(obj.chain, true);
+                    obj._L0 = measured.L; obj._A0 = Math.abs(measured.A);
+                    obj._forces = null; spatialHashCache.needsRebuild = true;
+                }
+                if (!obj.growth.running) $("natureStatus").textContent = "A growing form reached its limit. Change its position or reduce the study size before starting again.";
+            }
+            function beginGrowth(obj, rate, variation, seed) {
+                obj.growth = { running: true, rate, variation, seed, steps: 0, spacing: averageSpacing(obj.chain,true) };
+            }
+            $("growthStart").onclick = () => {
+                const targets = materialTargets().filter(obj => obj.isClosed && !obj.holes?.length && !isChainStatic(obj));
+                if (!targets.length) { $("natureStatus").textContent = "Select a moving closed form without holes. Unfreeze it or enable its layer’s physics first."; return; }
+                history.push({type:"compound",entries:targets.map(obj => ({type:"edit",target:obj,prev:{growth:obj.growth}}))});
+                const rate=Math.max(0,Math.min(1,Number($("growthRate").value)||0)), variation=Math.max(0,Math.min(1,Number($("growthVariation").value)||0));
+                targets.forEach(obj => beginGrowth(obj,rate,variation,Number($("natureSeed").value)||42));
+                $("natureStatus").textContent = `Growth enabled for ${targets.length} form(s). Space pauses the simulation.`;
+            };
+            $("growthStop").onclick = () => {
+                const targets=materialTargets().filter(obj=>obj.growth);
+                history.push({type:"compound",entries:targets.map(obj=>({type:"edit",target:obj,prev:{growth:{...obj.growth}}}))});
+                targets.forEach(obj=>{obj.growth.running=false}); $("natureStatus").textContent="Growth stopped on the selection.";
+            };
+            $("natureAdd").onclick = () => {
+                const type=$("natureStudy").value, seed=Math.max(1,Math.min(99999,Number($("natureSeed").value)||42));
+                $("natureSeed").value=seed;
+                stampUnassignedChains();
+                const previous={type:"settings",settings:getCurrentSettings(),physicsPaused};
+                const layer=createLayer(`Study · ${$("natureStudy").selectedOptions[0].textContent}`), added=[];
+                activeLayerId=layer.id;
+                const add=(points,color,closed=true) => {
+                    const obj=makeChainFromPoints(points,{color,closed}); assignChainToActiveLayer(obj); chains.push(obj);added.push(obj);return obj;
+                };
+                const short=Math.min(canvas.width,canvas.height), radius=short*0.065;
+                const blue=[0.25,0.44,0.68,1], red=[0.75,0.33,0.23,1];
+                gravityEnabled=type==="air"||type==="vacuum";gravityDirection=90;windStrength=0;
+                setPhysicsPercent("gravityStrength",25);setPhysicsPercent("noiseStrength",0);setPhysicsPercent("simSpeed",50);
+                setPhysicsPercent("damping",type==="vacuum"||type==="air"?100:85);setPhysicsPercent("turgorPressure",0);
+                if (type==="vacuum"||type==="air") {
+                    [0.35,0.65].forEach((x,i)=>{
+                        const obj=add(HanSketchNature.circle(canvas.width*x,canvas.height*0.18,radius),i?red:blue);
+                        Object.assign(obj,{opacity:1,mass:i?4:1,airDrag:type==="air"?2:0,gravityFactor:1});
+                    });
+                } else if(type==="stains") {
+                    HanSketchNature.stains(canvas.width,canvas.height,seed).forEach((stain,i)=>{
+                        const color=palette.length?hexToRGBA(palette[i%palette.length]):(i%2?red:blue);
+                        const obj=add(stain.points,color);obj.opacity=stain.opacity;obj.frozen=true;
+                    });
+                } else if(type==="branches") {
+                    const angle=Math.max(10,Math.min(45,Number($("branchAngle").value)||25));$("branchAngle").value=angle;
+                    for(const path of HanSketchNature.branches(canvas.width,canvas.height,seed,angle)) { const obj=add(path,blue,false);obj.frozen=true; }
+                } else {
+                    const obj=add(HanSketchNature.circle(canvas.width/2,canvas.height/2,short*0.17),blue);
+                    if(type==="growth") beginGrowth(obj,0.5,0.7,seed);
+                }
+                showOutline = type !== "stains"; showFilled = true;
+                setPhysicsPaused(false);syncEnvironmentUI();syncPhysicsDial("gravityStrength");
+                toggleActiveIcon($("iconGravity"),gravityEnabled);
+                setSelection(added);setEditTool("select", { forceOn: true });renderLayerPanel();
+                history.push({type:"compound",entries:[previous,additionEntry({chains:added,layers:[layer]})]});
+                splineCache.clear();spatialHashCache.needsRebuild=true;_gpuTexturesDirty=true;
+                $("natureStatus").textContent=`Added ${added.length} form(s). ${natureDescriptions[type]}`;
+            };
+
+            /* Live artwork recording is independent of editor overlays and view zoom. */
+            let videoRecording = null;
+            const videoFormats = HanSketchAnimation.formats();
+            for (const [index, format] of videoFormats.entries()) {
+                const option = document.createElement("option"); option.value = index; option.textContent = format.label; $("videoFormat").append(option);
+            }
+            function endVideoPreview() {
+                videoArtworkPreview?.remove(); videoArtworkPreview = null;
+            }
+            function renderVideoFrame(size) {
+                // Recording reads every frame back into the encoder. CPU-backed
+                // frames avoid GPU transfer stalls that can leave short MP4s audio-only.
+                const image = renderArtworkCanvas({size, readback:true});
+                const preview = videoArtworkPreview;
+                if (preview) {
+                    const rect=canvas.getBoundingClientRect(), stage=$("canvasStage").getBoundingClientRect();
+                    Object.assign(preview.style,{left:`${rect.left-stage.left}px`,top:`${rect.top-stage.top}px`,width:`${rect.width}px`,height:`${rect.height}px`});
+                }
+                return image;
+            }
+            function videoBusy(busy) {
+                for (const id of ["videoStart", "videoFormat", "videoDuration", "videoFps", "videoSize"]) $(id).disabled = busy || !videoFormats.length;
+                $("videoStop").disabled = $("videoCancel").disabled = !busy;
+            }
+            if (!videoFormats.length) $("videoStatus").textContent = "This browser cannot record canvas video. Try a browser with MediaRecorder and canvas capture support.";
+            videoBusy(false);
+            $("recordAnimationOption").onclick = e => {
+                e.stopPropagation(); $("exportSubmenu").style.display = "none";
+                if (_isIPad) { inspectorPanel.classList.add("panel-visible"); toggleInspectorBtn.classList.add("panel-visible"); }
+                $("animationSection").scrollIntoView({block:"center"}); $("videoStart").focus();
+            };
+            $("openFilmstripOption").onclick = e => { e.stopPropagation(); $("exportSubmenu").style.display = "none"; document.body.classList.add("filmstrip-unlocked"); };
+            $("videoStart").onclick = () => {
+                if (videoRecording || !videoFormats.length) return;
+                const seconds = Math.max(1, Math.min(120, Number($("videoDuration").value) || 10));
+                $("videoDuration").value = seconds;
+                const longEdge = Number($("videoSize").value), k = longEdge / Math.max(canvas.width,canvas.height);
+                // Even dimensions work with common H.264 encoders.
+                const size = { width: Math.max(2, Math.round(canvas.width*k/2)*2), height: Math.max(2,Math.round(canvas.height*k/2)*2) };
+                videoBusy(true);
+                videoArtworkPreview=document.createElement("canvas");
+                videoArtworkPreview.setAttribute("aria-hidden","true");
+                videoArtworkPreview.style.cssText="position:absolute;pointer-events:none;z-index:2";
+                $("canvasStage").append(videoArtworkPreview);
+                try {
+                    videoRecording = HanSketchAnimation.record({
+                        render: () => renderVideoFrame(size), format: videoFormats[Number($("videoFormat").value)],
+                        onCanvas: output => {
+                            videoArtworkPreview?.remove(); videoArtworkPreview=output;
+                            output.setAttribute("aria-hidden","true");output.style.cssText="position:absolute;pointer-events:none;z-index:2";
+                            $("canvasStage").append(output);
+                            const rect=canvas.getBoundingClientRect(),stage=$("canvasStage").getBoundingClientRect();
+                            Object.assign(output.style,{left:`${rect.left-stage.left}px`,top:`${rect.top-stage.top}px`,width:`${rect.width}px`,height:`${rect.height}px`});
+                        },
+                        fps:Number($("videoFps").value), seconds,
+                        onProgress: elapsed => { $("videoStatus").textContent = `Recording ${elapsed.toFixed(1)} / ${seconds} s · ${size.width} × ${size.height}`; },
+                        onComplete: (blob, extension) => {
+                            videoRecording = null; endVideoPreview(); videoBusy(false);
+                            if (blob) downloadArtwork(blob, `hansketch-animation.${extension}`);
+                            $("videoStatus").textContent = blob ? `Saved ${extension.toUpperCase()} film.` : "Recording cancelled. No file saved.";
+                        },
+                        onError: error => { videoRecording = null; endVideoPreview(); videoBusy(false); $("videoStatus").textContent = error.message; }
+                    });
+                } catch(error) { videoRecording = null; endVideoPreview(); videoBusy(false); $("videoStatus").textContent = error.message; }
+            };
+            $("videoStop").onclick = () => videoRecording?.stop();
+            $("videoCancel").onclick = () => videoRecording?.cancel();
+
+            /* Selected form properties: one undo entry per committed change. */
+            function materialTargets() { return selectMode ? [...selectedChains].filter(obj => chains.includes(obj) && isChainPickable(obj)) : []; }
+            function syncMaterialUI() {
+                if (!$("materialScope")) return;
+                const targets = materialTargets();
+                $("materialScope").textContent = targets.length ? `${targets.length} selected form${targets.length > 1 ? "s" : ""}` : "New forms";
+                for (const [id, key, scale] of [["formOpacity", "opacity", 100], ["formMass", "mass", 1], ["formAirDrag", "airDrag", 1], ["formGravityFactor", "gravityFactor", 1]]) {
+                    const values = (targets.length ? targets : [materialDefaults]).map(obj => materialValue(obj, key));
+                    const el = $(id), mixed = values.some(v => v !== values[0]);
+                    el.value = mixed ? "" : Math.round(values[0] * scale * 100) / 100;
+                    el.placeholder = mixed ? "Mixed" : "";
+                }
+            }
+            function changeMaterial(key, value) {
+                if (!Number.isFinite(value)) { syncMaterialUI(); return; }
+                const [lo, hi] = materialLimits[key];
+                value = Math.max(lo, Math.min(hi, value));
+                const targets = materialTargets();
+                const entries = (targets.length ? targets : [materialDefaults]).map(obj => ({ type: "edit", target: obj, prev: { [key]: obj[key] } }));
+                history.push({ type: "compound", entries });
+                for (const obj of (targets.length ? targets : [materialDefaults])) obj[key] = value;
+                syncMaterialUI(); _gpuTexturesDirty = true;
+            }
+            for (const [id, key, scale] of [["formOpacity", "opacity", 100], ["formMass", "mass", 1], ["formAirDrag", "airDrag", 1], ["formGravityFactor", "gravityFactor", 1]]) {
+                $(id).onchange = e => { if (e.target.value !== "") changeMaterial(key, Number(e.target.value) / scale); };
+            }
+            document.querySelectorAll("[data-opacity]").forEach(btn => btn.onclick = () => changeMaterial("opacity", Number(btn.dataset.opacity) / 100));
+            function syncEnvironmentUI() {
+                $("environmentGravity").checked = gravityEnabled;
+                $("gravityDirection").value = gravityDirection;
+                $("windStrength").value = windStrength;
+            }
+            $("environmentGravity").onchange = () => { $("iconGravity").click(); };
+            $("iconGravity").addEventListener("click", syncEnvironmentUI);
+            $("gravityDirection").onchange = e => { gravityDirection = Math.max(0, Math.min(360, Number(e.target.value) || 0)); syncEnvironmentUI(); };
+            $("windStrength").onchange = e => { windStrength = Math.max(-10, Math.min(10, Number(e.target.value) || 0)); syncEnvironmentUI(); };
+            syncMaterialUI(); syncEnvironmentUI();
+
+            /* View-only zoom: the canvas bitmap and physics coordinates never change.
+               getCanvasXY and CSS-pixel hit slacks already invert this axis-aligned transform. */
+            let viewZoom = 1, viewX = 0, viewY = 0, viewHand = false;
+            const viewPointers = new Map();
+            let viewGesture = null;
+            const viewTools = document.createElement("div");
+            viewTools.className = "view-tools";
+            viewTools.innerHTML = '<button type="button" id="zoomOut" aria-label="Zoom out">−</button><output id="zoomLevel" aria-live="polite">100%</output><button type="button" id="zoomIn" aria-label="Zoom in">+</button><button type="button" id="zoomFit">Fit</button><button type="button" id="viewHand" aria-pressed="false">Pan</button>';
+            $("canvasStage").append(viewTools);
+            function updateView() {
+                canvas.style.transformOrigin = "center";
+                canvas.style.transform = `translate(${viewX}px, ${viewY}px) scale(${viewZoom})`;
+                $("zoomLevel").textContent = `${Math.round(viewZoom * 100)}%`;
+                $("viewHand").setAttribute("aria-pressed", String(viewHand));
+                canvas.style.cursor = viewHand ? "grab" : "";
+            }
+            function zoomView(next, clientX, clientY) {
+                next = Math.max(0.25, Math.min(8, next));
+                if (Number.isFinite(clientX)) {
+                    const rect = canvas.getBoundingClientRect(), ratio = next / viewZoom;
+                    viewX += (clientX - (rect.left + rect.width / 2)) * (1 - ratio);
+                    viewY += (clientY - (rect.top + rect.height / 2)) * (1 - ratio);
+                }
+                viewZoom = next; updateView();
+            }
+            $("zoomIn").onclick = () => zoomView(viewZoom * 1.25);
+            $("zoomOut").onclick = () => zoomView(viewZoom / 1.25);
+            $("zoomFit").onclick = () => { viewZoom = 1; viewX = viewY = 0; updateView(); };
+            $("viewHand").onclick = () => { viewHand = !viewHand; updateView(); };
+            canvas.addEventListener("wheel", e => {
+                if (e.altKey) return; // Alt-wheel retains the Blob Size shortcut.
+                e.preventDefault(); e.stopImmediatePropagation();
+                zoomView(viewZoom * Math.exp(-e.deltaY * 0.002), e.clientX, e.clientY);
+            }, { capture: true, passive: false });
+            const gestureStart = () => {
+                const pts = [...viewPointers.values()];
+                if (!pts.length) { viewGesture = null; return; }
+                const x = pts.reduce((v,p) => v+p.x,0)/pts.length, y = pts.reduce((v,p) => v+p.y,0)/pts.length;
+                viewGesture = { x, y, zoom: viewZoom, vx: viewX, vy: viewY, distance: pts.length > 1 ? Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y) : 0 };
+            };
+            canvas.addEventListener("pointerdown", e => {
+                if (!viewHand && e.button !== 1) return;
+                e.preventDefault(); e.stopImmediatePropagation(); canvas.setPointerCapture(e.pointerId);
+                viewPointers.set(e.pointerId, { x:e.clientX, y:e.clientY }); gestureStart();
+            }, true);
+            canvas.addEventListener("pointermove", e => {
+                if (!viewPointers.has(e.pointerId)) return;
+                e.preventDefault(); e.stopImmediatePropagation();
+                viewPointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+                const pts = [...viewPointers.values()], g = viewGesture;
+                const x = pts.reduce((v,p) => v+p.x,0)/pts.length, y = pts.reduce((v,p) => v+p.y,0)/pts.length;
+                viewX = g.vx + x - g.x; viewY = g.vy + y - g.y;
+                if (pts.length > 1 && g.distance > 0) viewZoom = Math.max(0.25, Math.min(8, g.zoom * Math.hypot(pts[1].x-pts[0].x,pts[1].y-pts[0].y)/g.distance));
+                updateView();
+            }, true);
+            for (const event of ["pointerup", "pointercancel", "lostpointercapture"]) canvas.addEventListener(event, e => {
+                if (!viewPointers.has(e.pointerId)) return;
+                e.preventDefault(); e.stopImmediatePropagation(); viewPointers.delete(e.pointerId); gestureStart();
+            }, true);
+            updateView();
 
 			setCanvasSize(Math.round(2048 * 297 / 420), 2048);
 			const defaultResettableSettings = resettableSettings();
